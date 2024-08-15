@@ -1,0 +1,104 @@
+{
+    "general": {
+        "title": "Default guidelines",
+        "description": ["These default guidelines contain the standard keyword arguments for the methods of the resilient plotter class.",
+                        "The user can copy this file and modify it to comply with the specific requirements for a given project.",
+                        "Passing the project guidelines to the resilient plotter class will overwrite the default guidelines.",
+                        "Moreover, the user can also pass keyword arguments directly to the plotting methods to overwrite the default and project guidelines.",
+                        "In summary the priority is: user keyword arguments > project guidelines > default guidelines."],
+        "date": "2024-08-15",
+        "authors": ["Math van Soest", "Ruben White"]
+    },
+
+    "reference_type": {
+        "crs": null,
+        "vrl": null,
+        "cartopy_features": ["land", "ocean", "lakes", "rivers", "coastline", "borders", "states"]
+    },
+    
+    "data_type": {
+        "bathymetry": {
+            "pcolormesh": {
+                "cmap": "Spectral_r",
+                "vmin": null,
+                "vmax": null,
+                "cbar_kwargs": {"label": "Bathymetry [m ?]"}
+            },
+            "imshow": {
+                "cmap": "Spectral_r",
+                "vmin": null,
+                "vmax": null,
+                "cbar_kwargs": {"label": "Bathymetry [m ?]"}
+            },
+            "contour": {
+                "cmap": "Spectral",
+                "levels": 10
+            },
+            "contourf": {
+                "cmap": "Spectral",
+                "levels": 10
+            }
+        },
+
+        "bedforms": {
+
+        },
+
+        "morphology": {
+
+        },
+
+        "flow_velocity": {
+
+        },
+
+        "flow_direction": {
+
+        },
+
+        "wave_height": {
+
+        },
+
+        "wave_period": {
+
+        },
+
+        "wave_direction": {
+
+        },
+
+        "sediment_concentration": {
+
+        },
+
+        "sediment_transport": {
+
+        }
+    },
+
+    "geometry_type": {
+        "aoi": {
+            "facecolor": "none",
+            "edgecolor": "black",
+            "linewidth": 1.5,
+            "linestyle": "-",
+            "alpha": 1,
+            "zorder": 2.2,
+            "label": "Area of interest"
+        }
+    },
+
+    "map_type": {
+        "osm" : {
+            "source": "openstreetmap.Mapnik"
+        }
+    },
+
+    "extent_type": {
+        "aoi" : {
+            "xlim": null,
+            "ylim": null
+        }
+    }
+}

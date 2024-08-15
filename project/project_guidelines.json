@@ -1,0 +1,64 @@
+{
+    "general": {
+        "title": "Project guidelines",
+        "description": [],
+        "date": "2024-08-15",
+        "authors": ["Math van Soest", "Ruben White"]
+    },
+
+    "reference_type": {
+        "crs": null,
+        "vrl": null,
+        "cartopy_features": ["land", "ocean", "lakes", "rivers", "coastline", "borders", "states"]
+    },
+    
+    "data_type": {
+        "bathymetry": {
+            "pcolormesh": {
+                "cmap": "jet_r",
+                "vmin": null,
+                "vmax": null,
+                "cbar_kwargs": {"label": "Bathymetry [m LAT]"}
+            },
+            "imshow": {
+                "cmap": "jet_r",
+                "vmin": null,
+                "vmax": null,
+                "cbar_kwargs": {"label": "Bathymetry [m LAT]"}
+            },
+            "contour": {
+                "cmap": "jet",
+                "levels": 10
+            },
+            "contourf": {
+                "cmap": "jet",
+                "levels": 10
+            }
+        }
+    },
+
+    "geometry_type": {
+        "aoi": {
+            "facecolor": "none",
+            "edgecolor": "black",
+            "linewidth": 1.5,
+            "linestyle": "-",
+            "alpha": 1,
+            "zorder": 2.2,
+            "label": "Area of interest"
+        }
+    },
+
+    "map_type": {
+        "osm" : {
+            "source": "openstreetmap.Mapnik"
+        }
+    },
+
+    "extent_type": {
+        "aoi" : {
+            "xlim": null,
+            "ylim": null
+        }
+    }
+}
