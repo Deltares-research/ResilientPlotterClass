@@ -1,14 +1,15 @@
 {
-    "general": {
+    "metadata": {
         "title": "Project guidelines",
         "description": [],
         "date": "2024-08-15",
         "authors": ["Math van Soest", "Ruben White"]
     },
 
-    "reference_type": {
-        "crs": null,
-        "vrl": null,
+    "general": {
+        "crs": "'EPSG:28992",
+        "vrl": "MSL",
+        "xy_unit": "km",
         "cartopy_features": ["land", "ocean", "lakes", "rivers", "coastline", "borders", "states"]
     },
     
@@ -18,21 +19,26 @@
                 "cmap": "jet_r",
                 "vmin": null,
                 "vmax": null,
-                "cbar_kwargs": {"label": "Bathymetry [m LAT]"}
+                "center": false,
+                "cbar_kwargs": {"label": "Bathymetry [m LAT]", "fraction": 0.046, "pad": 0.04}
             },
             "imshow": {
                 "cmap": "jet_r",
                 "vmin": null,
                 "vmax": null,
-                "cbar_kwargs": {"label": "Bathymetry [m LAT]"}
+                "center": false,
+                "cbar_kwargs": {"label": "Bathymetry [m LAT]", "fraction": 0.046, "pad": 0.04}
             },
             "contour": {
                 "cmap": "jet",
-                "levels": 10
+                "levels": 10,
+                "center": false
             },
             "contourf": {
                 "cmap": "jet",
-                "levels": 10
+                "levels": 10,
+                "center": false,
+                "cbar_kwargs": {"label": "Bathymetry [m LAT]", "fraction": 0.046, "pad": 0.04}
             }
         }
     },

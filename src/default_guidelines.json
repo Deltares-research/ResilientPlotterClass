@@ -1,5 +1,5 @@
 {
-    "general": {
+    "metadata": {
         "title": "Default guidelines",
         "description": ["These default guidelines contain the standard keyword arguments for the methods of the resilient plotter class.",
                         "The user can copy this file and modify it to comply with the specific requirements for a given project.",
@@ -10,33 +10,40 @@
         "authors": ["Math van Soest", "Ruben White"]
     },
 
-    "reference_type": {
+    "general": {
         "crs": null,
-        "vrl": null,
+        "vertical_refrence_level": null,
+        "xy_unit": null,
+        "bounds": null,
         "cartopy_features": ["land", "ocean", "lakes", "rivers", "coastline", "borders", "states"]
     },
     
     "data_type": {
         "bathymetry": {
             "pcolormesh": {
-                "cmap": "Spectral_r",
+                "cmap": "bathymetry",
                 "vmin": null,
                 "vmax": null,
-                "cbar_kwargs": {"label": "Bathymetry [m ?]"}
+                "center": false,
+                "cbar_kwargs": {"label": "Bathymetry [m]", "fraction": 0.046, "pad": 0.04}
             },
             "imshow": {
-                "cmap": "Spectral_r",
+                "cmap": "bathymetry",
                 "vmin": null,
                 "vmax": null,
-                "cbar_kwargs": {"label": "Bathymetry [m ?]"}
+                "center": false,
+                "cbar_kwargs": {"label": "Bathymetry [m]", "fraction": 0.046, "pad": 0.04}
             },
             "contour": {
-                "cmap": "Spectral",
-                "levels": 10
+                "cmap": "bathymetry_contours",
+                "levels": 10,
+                "center": false
             },
             "contourf": {
-                "cmap": "Spectral",
-                "levels": 10
+                "cmap": "bathymetry_contours",
+                "levels": 10,
+                "center": false,
+                "cbar_kwargs": {"label": "Bathymetry [m]", "fraction": 0.046, "pad": 0.04}
             }
         },
 
@@ -84,14 +91,27 @@
             "linewidth": 1.5,
             "linestyle": "-",
             "alpha": 1,
-            "zorder": 2.2,
             "label": "Area of interest"
+        },
+
+        "grid": {
+            "color": "red",
+            "linewidth": 0.5,
+            "linestyle": "-",
+            "alpha": 1,
+            "label": "Grid"
         }
     },
 
     "map_type": {
         "osm" : {
-            "source": "openstreetmap.Mapnik"
+            "source": "OpenStreetMap.BZH",
+            "attribution": false
+        },
+        
+        "satellite": {
+            "source": "Esri.WorldImagery",
+            "attribution": false
         }
     },
 
@@ -100,5 +120,12 @@
             "xlim": null,
             "ylim": null
         }
+    },
+
+    "refrences": {
+        "pcolormesh": "https://docs.xarray.dev/en/latest/generated/xarray.plot.pcolormesh.html",
+        "imshow": "https://docs.xarray.dev/en/latest/generated/xarray.plot.imshow.html",
+        "contour": "https://docs.xarray.dev/en/latest/generated/xarray.plot.contour.html",
+        "contourf": "https://docs.xarray.dev/en/latest/generated/xarray.plot.contourf.html"
     }
 }
