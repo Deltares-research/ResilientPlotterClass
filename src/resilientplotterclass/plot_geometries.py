@@ -1,12 +1,9 @@
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import numpy as np
-import os
-import sys
-sys.path.append(os.path.join(os.path.dirname(__file__)))
-from rescale import get_rescale_parameters, rescale
+from resilientplotterclass.rescale import get_rescale_parameters, rescale
 
-def plot_gdf(gdf, ax, **kwargs):
+def _plot_gdf(gdf, ax, **kwargs):
     """Plot a GeoDataFrame using plot.
 
     :param gdf:    GeoDataFrame to plot.
@@ -136,7 +133,7 @@ def plot_geometries(gdf, ax=None, xy_unit=None,
     grid_kwargs.setdefault('visible', True)
 
     # Plot the GeoDataFrame
-    ax = plot_gdf(gdf, ax=ax, **kwargs)
+    ax = _plot_gdf(gdf, ax=ax, **kwargs)
 
     # Set limits
     if xlim is not None:

@@ -1,21 +1,14 @@
 # %%
 # Packages
-import copy
 import geopandas as gpd
-import json
 import matplotlib.pyplot as plt
 import os
-import rioxarray as rxr
 import xarray as xr
 import xugrid as xu
-import sys
+from resilientplotterclass.rpc import rpc_class
 
 # Repository path
-repo_path = os.path.join(os.path.dirname(os.path.dirname(__file__)))
-
-# Local packages
-sys.path.append(os.path.join(repo_path, 'src'))
-from resilientplotterclass import resilientplotterclass
+repo_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # %%
 # File paths
@@ -54,7 +47,7 @@ gls = {'general': {'crs': da.rio.crs, 'bounds': bounds}, 'extent_type': {'aoi': 
 
 # %%
 # Set guidelines
-rpc = resilientplotterclass(cartopy=False)
+rpc = rpc_class(cartopy=False)
 rpc.set_guidelines(gls)
 #rpc.set_guidelines(file_path_gls)
 rpc.set_cartopy()

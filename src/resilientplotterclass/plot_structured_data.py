@@ -1,8 +1,5 @@
 import matplotlib.pyplot as plt
-import os
-import sys
-sys.path.append(os.path.join(os.path.dirname(__file__)))
-from rescale import get_rescale_parameters, rescale
+from resilientplotterclass.rescale import get_rescale_parameters, rescale
 
 def pcolormesh_DataArray(da, ax=None, xy_unit=None, skip=1, smooth=1, xlabel_kwargs=None, ylabel_kwargs=None, title_kwargs=None, aspect_kwargs=None, grid_kwargs=None, **kwargs):
     """Plot a DataArray using pcolormesh.
@@ -77,9 +74,6 @@ def pcolormesh_DataArray(da, ax=None, xy_unit=None, skip=1, smooth=1, xlabel_kwa
     # Smooth data array
     if smooth > 1:
         da = da.rolling(x=smooth, center=True).mean().rolling(y=smooth, center=True).mean()
-    
-    # Plot data array
-    p = da.plot.pcolormesh(ax=ax, **kwargs)
 
     # Set labels
     ax.set_xlabel(**xlabel_kwargs)
@@ -91,6 +85,9 @@ def pcolormesh_DataArray(da, ax=None, xy_unit=None, skip=1, smooth=1, xlabel_kwa
 
     # Set grid
     ax.grid(**grid_kwargs)
+    
+    # Plot data array
+    p = da.plot.pcolormesh(ax=ax, **kwargs)
     
     # Return plot
     return p

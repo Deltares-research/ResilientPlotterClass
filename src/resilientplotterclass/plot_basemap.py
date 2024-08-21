@@ -1,13 +1,9 @@
 import matplotlib.pyplot as plt
-import os
-from pyproj import CRS
-import sys
-sys.path.append(os.path.join(os.path.dirname(__file__)))
-from rescale import get_rescale_parameters
+from resilientplotterclass.rescale import get_rescale_parameters
 
 # Wrapper for contextily.add_basemap() to allow for scaling of the basemap using the xy_unit parameter
-def add_basemap(ax=None, xy_unit=None, crs=None, xlabel_kwargs=None, ylabel_kwargs=None, title_kwargs=None, aspect_kwargs=None, grid_kwargs=None, **kwargs):
-    """Add a basemap using contextily.
+def plot_basemap(ax=None, xy_unit=None, crs=None, xlabel_kwargs=None, ylabel_kwargs=None, title_kwargs=None, aspect_kwargs=None, grid_kwargs=None, **kwargs):
+    """Plot basemap using contextily.
 
     :param ax:            Axis.
     :type ax:             matplotlib.axes.Axes, optional

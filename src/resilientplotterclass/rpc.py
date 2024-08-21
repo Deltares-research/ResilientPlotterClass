@@ -5,19 +5,15 @@ import os
 import matplotlib.pyplot as plt
 import xarray as xr
 import xugrid as xu
-import sys
-
-# Local packages
-sys.path.append(os.path.join(os.path.dirname(__file__)))
-from colormaps import register_colormaps, plot_colormaps
-from geometries import get_gdf_cartopy
-from plot_structured_data import pcolormesh_DataArray
-from plot_unstructured_data import pcolormesh_UgridDataArray, grid_UgridDataArray
-from plot_geometries import plot_geometries
-from plot_basemaps import add_basemap
+from resilientplotterclass.colormaps import register_colormaps, plot_colormaps
+from resilientplotterclass.geometries import get_gdf_cartopy
+from resilientplotterclass.plot_structured_data import pcolormesh_DataArray
+from resilientplotterclass.plot_unstructured_data import pcolormesh_UgridDataArray, grid_UgridDataArray
+from resilientplotterclass.plot_geometries import plot_geometries
+from resilientplotterclass.plot_basemap import plot_basemap
 
 # Resilient Plotter Class
-class resilientplotterclass:
+class rpc_class:
     # =============================================================================
     # Constructor
     # =============================================================================
@@ -348,7 +344,7 @@ class resilientplotterclass:
         :type map_type:     str, optional
         :param extent_type: Extent type from guidelines.
         :type extent_type:  str, optional
-        :param kwargs:      Keyword arguments for :func:`resilientplotterclass.add_basemap
+        :param kwargs:      Keyword arguments for :func:`resilientplotterclass.plot_basemap`.
         :type kwargs:       dict, optional
         :return:            None.
         :rtype:             None
@@ -363,7 +359,7 @@ class resilientplotterclass:
             kwargs = self.combine_dictionaries(self.guidelines['extent_type'][extent_type], kwargs)
         
         # Plot basemap
-        add_basemap(ax=ax, **kwargs)
+        plot_basemap(ax=ax, **kwargs)
     
     # =============================================================================
     # Specialised plot methods

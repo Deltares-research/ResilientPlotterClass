@@ -1,0 +1,28 @@
+[project]
+name = "resilientplotterclass"
+version = "4.0.0"
+authors = [{name="Math van Soest"}, {name="Ruben White"}]
+description = "TODO"
+readme = "readme.md"
+requires-python = ">=3.7"
+dependencies = [
+    'rioxarray',
+    'xugrid',
+    'geopandas',
+    'matplotlib',
+    'colorcet',
+    'cmocean'
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Deltares-research/ResilientPlotterClass"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.package-data]
+morphopy = ["default_guidelines.json", "custom_colormaps/*.txt"]

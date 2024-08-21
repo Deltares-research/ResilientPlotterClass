@@ -1,8 +1,5 @@
 import matplotlib.pyplot as plt
-import os
-import sys
-sys.path.append(os.path.join(os.path.dirname(__file__)))
-from rescale import get_rescale_parameters, rescale
+from resilientplotterclass.rescale import get_rescale_parameters, rescale
 
 def pcolormesh_UgridDataArray(uda, ax=None, xy_unit=None, skip=1, smooth=1, xlabel_kwargs=None, ylabel_kwargs=None, title_kwargs=None, aspect_kwargs=None, grid_kwargs=None, **kwargs):
     """Plot a UgridDataArray using pcolormesh.
@@ -77,9 +74,6 @@ def pcolormesh_UgridDataArray(uda, ax=None, xy_unit=None, skip=1, smooth=1, xlab
     # Smooth udata array
     if smooth > 1:
         uda = uda.rolling(x=smooth, center=True).mean().rolling(y=smooth, center=True).mean()
-    
-    # Plot udata array
-    p = uda.ugrid.plot.pcolormesh(ax=ax, **kwargs)
 
     # Set labels
     ax.set_xlabel(**xlabel_kwargs)
@@ -91,6 +85,9 @@ def pcolormesh_UgridDataArray(uda, ax=None, xy_unit=None, skip=1, smooth=1, xlab
 
     # Set grid
     ax.grid(**grid_kwargs)
+
+    # Plot udata array
+    p = uda.ugrid.plot.pcolormesh(ax=ax, **kwargs)
     
     # Return plot
     return p
