@@ -1,42 +1,36 @@
-# Resilient plotter class
-### Plot methods
-The resilient plotter class provides the following general plot methods:
-| Method | Arguments |
-| --- | --- |
-| `pcolormesh` | `data_type`, `extent_type`
-| `imshow` | `data_type`, `extent_type`
-| `contour` | `data_type`, `extent_type`
-| `contourf` | `data_type`, `extent_type`
-| `quiver` | `data_type`, `extent_type`
-| `streamplot` | `data_type`, `extent_type`
-| `geometries` | `geometry_type`, `extent_type`
-| `cartopy` | `extent_type`
-| `basemap` | `map_type`, `extent_type`
+# Resilient Plotter Class
+A wrapper around the [xarray](http://xarray.pydata.org/en/stable), [xugrid](https://github.com/Deltares/xugrid) and [geopandas](https://geopandas.org) plotting functionalities to create plots in a standardised manner.
 
-These general methods are combined to form the following specialised plot methods:
-| Method | Arguments |
-| --- | --- |
-| `bathymetry` | `extent_type`
-| `bedforms` | `extent_type`
-| `morphology` | `extent_type`
-| `flow_velocity` | `extent_type`
-| `flow_direction` | `extent_type`
-| `wave_height` | `extent_type`
-| `wave_period` | `extent_type`
-| `wave_direction` | `extent_type`
-| `sediment_concentration` | `extent_type`
-| `sediment_transport` | `extent_type`
-| `model_grid` | `extent_type`
+## Prerequisites
+The following steps are required to install and use the ResilientPlotterClass:
 
-### Arguments
-The abovementioned methods take arguments These arguments are provided by the guidelines. Using the default guidelines, the following options are available for the arguments of the plot methods:
-| Argument | Options |
-| --- | --- |
-| `data_type` | `bathymetry`, `bedforms`, `morphology`, `flow_velocity`, `flow_direction`, `wave_height`, `wave_period`, `wave_direction`, `sediment_concentration`, `sediment_transport` |
-| `geometry_type` | `aoi` |
-| `map_type` | `osm` |
-| `extent_type` | `aoi` |
+1. Install [Python](https://www.python.org/downloads)
 
-### Guidelines
-The default guidelines contain the standard keyword arguments for the methods of the resilient plotter class. The user can copy these guidelines and modify it to comply with the specific requirements for a given project. Passing the project guidelines to the resilient plotter class will overwrite the default guidelines. Moreover, the user can also pass keyword arguments directly to the plotting methods to overwrite the default and project guidelines. In summary the priority is:
-* `user keyword arguments` > `project guidelines` > `default guidelines`
+2. Install a python package manager (e.g., [Anaconda](https://www.anaconda.com/products/individual), [Miniconda](https://docs.conda.io/en/latest/miniconda.html) or [Mamba](https://github.com/conda-forge/miniforge#mambaforge))
+
+3. Install [Git](https://git-scm.com/downloads)
+
+5. Install a code editor (e.g. [Virtual Studio Code](https://code.visualstudio.com/Download))
+
+## Installation
+The following steps describe how to install the ResilientPlotterClass as a standalone package:
+
+1. Clone the [ResilientPlotterClass Repository](https://github.com/Deltares-research/ResilientPlotterClass)
+
+2. Create a dedicated environment or use an existing one:
+    ```
+    conda create --name rpc_env pip ipykernel
+    ```
+
+3. Activate the environment:
+    ```
+    conda activate rpc_env
+    ```
+
+4. Install the ResilientPlotterClass:
+    ```
+    pip install -e c:\...\ResilientPlotterClass
+    ```
+
+## Documentation
+...

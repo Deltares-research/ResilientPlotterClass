@@ -7,9 +7,10 @@
     },
 
     "general": {
-        "crs": "'EPSG:28992",
-        "vrl": "MSL",
+        "crs": "EPSG:28992",
+        "vertical_refrence_level": "MSL",
         "xy_unit": "km",
+        "bounds": null,
         "cartopy_features": ["land", "ocean", "lakes", "rivers", "coastline", "borders", "states"]
     },
     
@@ -20,25 +21,7 @@
                 "vmin": null,
                 "vmax": null,
                 "center": false,
-                "cbar_kwargs": {"label": "Bathymetry [m LAT]", "fraction": 0.046, "pad": 0.04}
-            },
-            "imshow": {
-                "cmap": "jet_r",
-                "vmin": null,
-                "vmax": null,
-                "center": false,
-                "cbar_kwargs": {"label": "Bathymetry [m LAT]", "fraction": 0.046, "pad": 0.04}
-            },
-            "contour": {
-                "cmap": "jet",
-                "levels": 10,
-                "center": false
-            },
-            "contourf": {
-                "cmap": "jet",
-                "levels": 10,
-                "center": false,
-                "cbar_kwargs": {"label": "Bathymetry [m LAT]", "fraction": 0.046, "pad": 0.04}
+                "cbar_kwargs": {"label": "Bathymetry [m MSL]", "fraction": 0.046, "pad": 0.04}
             }
         }
     },

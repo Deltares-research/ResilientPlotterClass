@@ -1,17 +1,20 @@
 ### TODO
-Complete the following:
+General:
 - Add more custom colormaps
-- Complete default guidelines
-- Complete project guidelines example
+- Complete default and project guidelines
 
-Add the following general plots:
-- imshow
-- contour -> Potential problem cmap and colors input
-- contourf
-- quiver
-- streamplot
-- geometries
-- cartopy
+Helena:
+- UHighlighting banks and other bedform features
+- See email.
 
-Add the following specialised plots:
-- specialised plots
+Ruben:
+- Hillshade
+- xugrid quiver: Add option to skip
+- contour: Potential problem cmap and colors input
+- geometries: Problem with zorder of patches, should be just underneath lines
+- General: Check
+
+Nice to have:
+- Annotations/descriptions
+- Documentation
+- PyPi installation

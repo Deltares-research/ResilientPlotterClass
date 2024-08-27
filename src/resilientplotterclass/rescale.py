@@ -56,7 +56,7 @@ def _get_xy_attrs_from_crs(crs=None):
 def _get_scale_factor(xy_unit_in, xy_unit_out=None):
     """Get the scale factor and corresponding x and y unit.
 
-    :param xy_unit_in:  x and y unit of the input data.
+    :param xy_unit_in:  x and y unit of the data.
     :type xy_unit_in:   str
     :param xy_unit_out: x and y unit of the output data. If ``None``, default x and y units are used.
     :type xy_unit_out:  str, optional
@@ -74,8 +74,10 @@ def _get_scale_factor(xy_unit_in, xy_unit_out=None):
         xy_unit_out = 'km'
     elif xy_unit_out is None and xy_unit_in in SCALE_DEGREES:
         xy_unit_out = 'deg'
-    else:
+    elif xy_unit_out is None:
         xy_unit_out = xy_unit_in
+    else:
+        xy_unit_out = xy_unit_out
     
     # Get the scale factor
     if xy_unit_in in SCALE_METRES.keys() and xy_unit_out in SCALE_METRES.keys():
@@ -88,18 +90,18 @@ def _get_scale_factor(xy_unit_in, xy_unit_out=None):
     # Return the scale factor and corresponding x and y unit
     return scale_factor, xy_unit_out
 
-def _rescale_DataArray(da, scale_factor):
-    """Rescale the x and y dimensions of a DataArray.
+def _rescale_xarray(da, scale_factor):
+    """Rescale the x and y dimensions of a DataArray or Dataset.
 
-    :param da:           DataArray to rescale.
-    :type da:            xr.DataArray
+    :param da:           Data to rescale.
+    :type da:            xarray.DataArray or xarray.Dataset
     :param scale_factor: Scale factor to rescale the x and y dimensions to.
     :type scale_factor:  float
-    :return:             Rescaled DataArray
-    :rtype:              xr.DataArray
+    :return:             Rescaled data
+    :rtype:              xarray.DataArray or xarray.Dataset
     """
     
-    # If scale factor is 1, return the original DataArray
+    # If scale factor is 1, return the original data
     if scale_factor == 1:
         return da
     
@@ -107,20 +109,20 @@ def _rescale_DataArray(da, scale_factor):
     x_coord = xr.DataArray(da['x'].values*scale_factor, dims=['x'], attrs=da['x'].attrs)
     y_coord = xr.DataArray(da['y'].values*scale_factor, dims=['y'], attrs=da['y'].attrs)
 
-    # Assign the coordinate arrays to the DataArray
+    # Assign the coordinate arrays to the data
     da = da.assign_coords(x=x_coord, y=y_coord)
 
-    # Return the rescaled DataArray
+    # Return the rescaled data
     return da
 
-def _rescale_UgridDataArray(uda, scale_factor):
-    """Rescale the x and y dimensions of a UgridDataArray.
+def _rescale_xugrid(uda, scale_factor):
+    """Rescale the x and y dimensions of a UgridDataArray or UgridDataset.
 
-    :param uda:          UgridDataArray to rescale.
-    :type uda:           xugrid.UgridDataArray
+    :param uda:          Data to rescale.
+    :type uda:           xugrid.UgridDataArray or xugrid.UgridDataset
     :param scale_factor: Scale factor to rescale the x and y dimensions to.
     :type scale_factor:  float
-    :return:             Rescaled UgridDataArray
+    :return:             Rescaled data
     :rtype:              xugrid.UgridDataArray
     """
     
@@ -128,68 +130,109 @@ def _rescale_UgridDataArray(uda, scale_factor):
     if scale_factor == 1:
         return uda
 
-    # Rescale the x and y dimensions of the grid
-    grid = xu.Ugrid2d(node_x=uda.grid.node_x*scale_factor,
-                      node_y=uda.grid.node_y*scale_factor,
-                      fill_value=uda.grid.fill_value,
-                      face_node_connectivity=uda.grid.face_node_connectivity)
+    # Function to rescale the grid
+    def _rescale_grid(grid, scale_factor):
+        # Rescale the x and y dimensions of 1D grid
+        if isinstance(grid, xu.Ugrid1d):
+            grid = xu.Ugrid1d(node_x=grid.node_x*scale_factor,
+                              node_y=grid.node_y*scale_factor,
+                              fill_value=grid.fill_value,
+                              edge_node_connectivity=grid.edge_node_connectivity)
 
-    # Rename the dimensions of the UgridDataArray if necessary (TODO: Make this more robust)
-    if uda.dims[0] != 'mesh2d_nFaces':
-        uda = uda.rename({uda.dims[0]: 'mesh2d_nFaces'})
+        # Rescale x and y dimensions of 2D grid  
+        elif isinstance(grid, xu.Ugrid2d):
+            grid = xu.Ugrid2d(node_x=grid.node_x*scale_factor,
+                              node_y=grid.node_y*scale_factor,
+                              fill_value=grid.fill_value,
+                              face_node_connectivity=grid.face_node_connectivity,
+                              edge_node_connectivity=grid.edge_node_connectivity)
+        
+        # Return rescaled grid
+        return grid
     
-    # Assign the coordinate arrays to the UgridDataArray
-    uda = xu.UgridDataArray(obj=xr.DataArray(uda), grid=grid)
+    # Function to rename the dimensions of the data
+    def _rename_dims(da):
+        # Define the new dimension names
+        NEW_DIMS_1D = {'node':'network1d_nNodes', 'edge':'network1d_nEdges', 'face':'network1d_nFaces',
+                       'Node':'network1d_nNodes', 'Edge':'network1d_nEdges', 'Face':'network1d_nFaces'}
+        NEW_DIMS_2D = {'node':'mesh2d_nNodes', 'edge':'mesh2d_nEdges', 'face':'mesh2d_nFaces',
+                       'Node':'mesh2d_nNodes', 'Edge':'mesh2d_nEdges', 'Face':'mesh2d_nFaces'}
+        
+        # Get the new dimension names
+        if isinstance(da.grid, xu.Ugrid1d):
+            NEW_DIMS = NEW_DIMS_1D
+        elif isinstance(da.grid, xu.Ugrid2d):
+            NEW_DIMS = NEW_DIMS_2D
+
+        # Rename the dimensions of the data
+        for dim in list(da.indexes):
+            for new_dim in NEW_DIMS.keys():
+                if new_dim in dim:
+                    da = da.rename({dim: NEW_DIMS[new_dim]})
+        
+        # Return the renamed data
+        return da
     
-    # Return the rescaled UgridDataArray
+    # Rename the dimensions of the data
+    da = _rename_dims(uda)
+    
+    # Assign the coordinate arrays to the data
+    if isinstance(uda, xu.UgridDataArray):
+        grid = _rescale_grid(uda.grid, scale_factor)
+        uda = xu.UgridDataArray(obj=xr.DataArray(da), grid=grid)
+    elif isinstance(uda, xu.UgridDataset):
+        grids = [_rescale_grid(grid, scale_factor) for grid in uda.grids]
+        uda = xu.UgridDataset(obj=xr.Dataset(da), grids=grids)
+    
+    # Return the rescaled data
     return uda
 
 def _rescale_GeoDataFrame(gdf, scale_factor):
     """Rescale the x and y dimensions of a GeoDataFrame.
 
-    :param gdf:          GeoDataFrame to rescale.
-    :type gdf:           gpd.GeoDataFrame
+    :param gdf:          Geometries to rescale.
+    :type gdf:           geopandas.GeoDataFrame
     :param scale_factor: Scale factor to rescale the x and y dimensions to.
     :type scale_factor:  float
-    :return:             Rescaled GeoDataFrame
-    :rtype:              gpd.GeoDataFrame
+    :return:             Rescaled geometries
+    :rtype:              geopandas.GeoDataFrame
     """
 
-    # If scale factor is 1, return the original GeoDataFrame
+    # If scale factor is 1, return the original geometries
     if scale_factor == 1:
         return gdf
     
-    # Rescale the x and y dimensions
+    # Rescale the x and y dimensions 
     gdf_rescaled = gdf.copy()
     gdf_rescaled['geometry'] = gdf_rescaled['geometry'].scale(xfact=scale_factor, yfact=scale_factor, zfact=1, origin=(0, 0))
 
-    # Return the rescaled geodataframe
+    # Return the rescaled geometries
     return gdf_rescaled
 
 def get_rescale_parameters(data=None, crs=None, xy_unit=None):
-    """Get the scale factor, xlabel and ylabel for a DataArray, UgridDataArray or GeoDataFrame or a given coordinate reference system and unit.
+    """Get the scale factor, xlabel and ylabel for data, geometries or a coordinate reference system and unit.
 
-    :param data:    DataArray, UgridDataArray or GeoDataFrame to rescale.
-    :type data:     xr.DataArray or xugrid.UgridDataArray or gpd.GeoDataFrame
-    :param crs:     Coordinate reference system of the data. If ``None``, the crs is determined automatically based on the input data.
+    :param data:    Data or geometries to rescale. If ``None``, the crs is used to determine the rescale parameters.
+    :type data:     xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray, xugrid.UgridDataset, geopandas.GeoDataFrame, optional
+    :param crs:     Coordinate reference system of the data. If ``None``, the crs is determined automatically based on the data.
     :type crs:      pyproj.CRS or rasterio.CRS or str, optional
-    :param xy_unit: Unit to rescale the x and y dimensions to. If ``None``, the unit is determined automatically based on the input data.
+    :param xy_unit: Unit to rescale the x and y dimensions to. If ``None``, the unit is determined automatically based on the data.
     :type xy_unit:  str, optional
-    :return:        scale factor, xlabel, ylabel.
-    :rtype:         float, str, str
+    :return:        Scale factor, xlabel, ylabel.
+    :rtype:         tuple[float, str, str]
     """
-
+    
     # Get the coordiante reference system of the data
-    if isinstance(data, xr.DataArray):
+    if isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset):
         crs = data.rio.crs
-    elif isinstance(data, xu.UgridDataArray):
-        crs = data.crs if 'crs' in data.attrs.keys() else crs
+    elif isinstance(data, xu.UgridDataArray) or isinstance(data, xu.UgridDataset):
+        crs = data.grid.crs
     elif isinstance(data, gpd.GeoDataFrame):
         crs = data.crs
     elif data is None:
         crs = crs
     else:
-        raise ValueError('Data type not supported. Please provide a DataArray, UgridDataArray or GeoDataFrame.')
+        raise TypeError('data type not supported. Please provide a xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray, xugrid.UgridDataset or geopandas.GeoDataFrame.')
         
     # Convert the crs to a pyproj.CRS
     if isinstance(crs, pyprojCRS):
@@ -201,7 +244,7 @@ def get_rescale_parameters(data=None, crs=None, xy_unit=None):
     elif crs is None:
         crs = crs
     else:
-        raise ValueError('CRS type not supported. Please provide a pyproj.CRS, rasterio.CRS or str object.')
+        raise TypeError('crs type not supported. Please provide a pyproj.CRS, rasterio.CRS or str object.')
 
     # Get x and y attributes and unit
     x_attrs, y_attrs = _get_xy_attrs_from_crs(crs)
@@ -217,25 +260,25 @@ def get_rescale_parameters(data=None, crs=None, xy_unit=None):
     return scale_factor, xlabel, ylabel
 
 def rescale(data, scale_factor=1):
-    """Rescale the x and y dimensions of a DataArray, UgridDataArray or GeoDataFrame.
+    """Rescale the x and y dimensions of data or geometries.
 
-    :param data:         DataArray, UgridDataArray or GeoDataFrame to rescale.
+    :param data:         Data or geometries to rescale.
     :type data:          xr.DataArray or xugrid.UgridDataArray or gpd.GeoDataFrame
     :param scale_factor: Scale factor to rescale the x and y dimensions to.
     :type scale_factor:  float, optional
-    :return:             Rescaled DataArray, UgridDataArray or GeoDataFrame, xlabel, ylabel.
-    :rtype:              xr.DataArray or xugrid.UgridDataArray or gpd.GeoDataFrame
+    :return:             Rescaled data or geometries
+    :rtype:              xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray, xugrid.UgridDataset, geopandas.GeoDataFrame
     """
 
     # Rescale the datas
-    if isinstance(data, xr.DataArray):
-        data = _rescale_DataArray(data, scale_factor)
-    elif isinstance(data, xu.UgridDataArray):
-        data = _rescale_UgridDataArray(data, scale_factor)
+    if isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset):
+        data = _rescale_xarray(data, scale_factor)
+    elif isinstance(data, xu.UgridDataArray) or isinstance(data, xu.UgridDataset):
+        data = _rescale_xugrid(data, scale_factor)
     elif isinstance(data, gpd.GeoDataFrame):
         data = _rescale_GeoDataFrame(data, scale_factor)
     else:
-        raise ValueError('Data type not supported. Please provide a DataArray, UgridDataArray or GeoDataFrame.')
+        raise TypeError('data type not supported. Please provide a xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray, xugrid.UgridDataset or geopandas.GeoDataFrame.')
     
     # Return the rescaled data
     return data

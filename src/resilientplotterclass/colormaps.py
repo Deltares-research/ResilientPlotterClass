@@ -16,7 +16,7 @@ def _get_colormaps():
     
     # Function to scale colors
     def scale_colors(colors, rgba_scales=(1, 1, 1, 1)):
-        if type(rgba_scales) in [int, float]:
+        if isinstance(rgba_scales, (int, float)):
             rgba_scales = (rgba_scales, rgba_scales, rgba_scales, rgba_scales)
         colors_new = []
         for r, g, b, a in colors:
@@ -54,7 +54,7 @@ def _get_colormaps():
     cmaps_contours.append(get_cmap_from_colors(scale_colors(get_colors_from_cmap('RdBu_r'), rgba_scales=(0.75, 0.75, 0.75, 1)), 'bedforms_contour'))
     
     # Add colormaps from text files
-    file_path_cmaps = glob.glob(os.path.join(os.path.dirname(__file__), 'colormaps', '*.txt'))
+    file_path_cmaps = glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', '*.txt'))
     for file_path in file_path_cmaps:
         cmap_name = os.path.basename(file_path).split('.')[0]
         colors = get_colors_from_file(file_path)
@@ -102,10 +102,10 @@ def plot_colormaps():
     # Create figure and axes
     nrows = len(cmaps)
     figh = 0.35 + 0.15 + (nrows + (nrows - 1) * 0.1) * 0.22
-    fig, axs = plt.subplots(nrows=nrows + 2, figsize=(6.4, figh))
+    fig, axs = plt.subplots(nrows=nrows + 3, figsize=(6.4, figh))
     fig.subplots_adjust(top=1 - 0.35 / figh, bottom=0.15 / figh,
                         left=0.2, right=0.99)
-    axs_ = [ax for idx, ax in enumerate(axs) if idx != int(nrows/2)]
+    axs_ = [ax for idx, ax in enumerate(axs) if idx not in [int(nrows/2), int(nrows/2)+1]]
     
     # Create gradient
     gradient = np.linspace(0, 1, 256)
@@ -119,7 +119,7 @@ def plot_colormaps():
         
     # Add titles
     axs_[0].set_title('Colormaps', fontsize=10)
-    axs_[int(nrows/2)].set_title('Contour colormaps', fontsize=10)
+    axs_[int(nrows/2)].set_title('Contour Colormaps', fontsize=10)
 
     # Turn off all ticks & spines
     for ax in axs:

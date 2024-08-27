@@ -6,10 +6,13 @@ description = "TODO"
 readme = "readme.md"
 requires-python = ">=3.7"
 dependencies = [
+    'ipykernel',
     'rioxarray',
     'xugrid',
     'geopandas',
     'matplotlib',
+    'contextily',
+    'cartopy',
     'colorcet',
     'cmocean'
 ]
@@ -25,4 +28,4 @@ build-backend = "setuptools.build_meta"
 include-package-data = true
 
 [tool.setuptools.package-data]
-morphopy = ["default_guidelines.json", "custom_colormaps/*.txt"]
+morphopy = ["data/*"]
