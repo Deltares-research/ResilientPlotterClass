@@ -1,0 +1,3 @@
+imshow
+======
+.. automethod:: resilientplotterclass.rpclass.rpclass.imshow

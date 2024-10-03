@@ -1,0 +1,3 @@
+pretty_grid
+===========
+.. automethod:: resilientplotterclass.rpclass.rpclass.pretty_grid

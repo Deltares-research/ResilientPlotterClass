@@ -48,7 +48,6 @@ def pcolormesh(uda, ax=None, xy_unit=None, xlim=None, ylim=None, xlabel_kwargs=N
     uda = rpc.rescale.rescale(data=uda, scale_factor=scale_factor)
     
     # Plot UgridDataArray
-    print(type(uda))
     p = uda.ugrid.plot.pcolormesh(ax=ax, **kwargs)
 
     # Format axis
@@ -270,14 +269,6 @@ def scatter(uda, ax=None, xy_unit=None, xlim=None, ylim=None, xlabel_kwargs=None
 
     # Rescale UgridudataArray
     uda = rpc.rescale.rescale(data=uda, scale_factor=scale_factor)
-
-    # Remove x, y and hue from kwargs
-    if 'x' in kwargs:
-        kwargs.pop('x')
-    if 'y' in kwargs:
-        kwargs.pop('y')
-    if 'hue' in kwargs:
-        kwargs.pop('hue')
 
     # Plot UgridDataArray
     p = uda.ugrid.plot.scatter(ax=ax, **kwargs)

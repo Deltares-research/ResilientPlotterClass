@@ -1,0 +1,3 @@
+flow_velocity
+=============
+.. automethod:: resilientplotterclass.rpclass.rpclass.flow_velocity

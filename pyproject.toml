@@ -1,8 +1,8 @@
 [project]
 name = "resilientplotterclass"
-version = "4.0.0"
+version = "0.5"
 authors = [{name="Math van Soest"}, {name="Ruben White"}]
-description = "TODO"
+description = "A package to create resilient plots for geospatial data"
 readme = "readme.md"
 requires-python = ">=3.7"
 dependencies = [
@@ -14,7 +14,24 @@ dependencies = [
     'contextily',
     'cartopy',
     'colorcet',
-    'cmocean'
+    'cmocean',
+
+    'holoviews',
+    'geoviews',
+    'hvplot',
+    'datashader',
+    'jupyter_bokeh',
+    'dask[dataframe]'
+]
+
+[project.optional-dependencies]
+docs = [
+    'toml',
+    'sphinx',
+    'sphinx_design',
+    'sphinx-copybutton',
+    'nbsphinx',
+    'pydata-sphinx-theme',
 ]
 
 [project.urls]
@@ -28,4 +45,4 @@ build-backend = "setuptools.build_meta"
 include-package-data = true
 
 [tool.setuptools.package-data]
-morphopy = ["data/*"]
+resilientplotterclass = ["data/*"]

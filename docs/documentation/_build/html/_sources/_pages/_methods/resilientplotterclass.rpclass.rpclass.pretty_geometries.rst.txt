@@ -1,0 +1,3 @@
+pretty_geometries
+=================
+.. automethod:: resilientplotterclass.rpclass.rpclass.pretty_geometries

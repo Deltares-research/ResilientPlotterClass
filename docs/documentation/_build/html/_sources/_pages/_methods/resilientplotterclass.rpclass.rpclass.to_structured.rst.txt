@@ -1,0 +1,3 @@
+to_structured
+=============
+.. automethod:: resilientplotterclass.rpclass.rpclass.to_structured

@@ -2,6 +2,7 @@ import cartopy.feature as cfeature
 import geopandas as gpd
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.patches import FancyArrowPatch
 import pandas as pd
 from pyproj import CRS as pyprojCRS
 from rasterio.crs import CRS as rasterioCRS
@@ -204,11 +205,40 @@ def _plot_gdf(gdf, ax, **kwargs):
     :See also: `geopandas.GeoDataFrame.plot <https://geopandas.org/en/stable/docs/reference/api/geopandas.GeoDataFrame.plot.html>`_.
     """
 
+    # Copy the GeoDataFrame to prevent changing the original GeoDataFrame
+    gdf = gdf.copy().reset_index(drop=True)
+
     # Combine keyword arguments on GeoDataFrame with user keyword arguments, prioritising user keyword arguments
     if 'kwargs' in gdf.columns: 
         gdf['kwargs'] = gdf['kwargs'].apply(lambda x: {**x, **kwargs})
     else:
         gdf['kwargs'] = [kwargs]*len(gdf)
+    
+    # Function to add arrow to plot
+    def add_arrow_to_plot(ax, geometries, arrow_kwargs, plot_kwargs):
+        if geometries[0].geom_type in ['LineString', 'MultiLineString']:
+            # Convert the geometries to MultiLineString
+            if geometries[0].geom_type == 'LineString':
+                lines = MultiLineString(list(geometries))
+            else:
+                lines = MultiLineString([line for lines in list(geometries) for line in lines.geoms])
+            
+            # Set the arrow_kwargs based on the plot_kwargs
+            if arrow_kwargs is None:
+                arrow_kwargs = plot_kwargs.copy()
+            else:
+                arrow_kwargs = {**plot_kwargs, **arrow_kwargs}
+            arrow_kwargs.setdefault('arrowstyle', '-|>')
+            arrow_kwargs.setdefault('mutation_scale', 20)
+            arrow_kwargs.setdefault('shrinkA', 0)
+            arrow_kwargs.setdefault('shrinkB', 0)
+            if 'color' not in arrow_kwargs:
+                arrow_kwargs['edgecolor'] = 'none'
+            
+            # Add arrow to last segment of each line
+            for line in lines.geoms:
+                x1, y1, x2, y2 = line.xy[0][-2], line.xy[1][-2], line.xy[0][-1], line.xy[1][-1]
+                ax.add_patch(FancyArrowPatch((x1, y1), (x2, y2), **arrow_kwargs))
 
     # Function to add label to legend
     def add_label_to_legend(geometry, plot_label, kwargs):
@@ -224,6 +254,7 @@ def _plot_gdf(gdf, ax, **kwargs):
 
         # Plot a polygon with label
         elif geometry.geom_type in ['Polygon', 'MultiPolygon']:
+            kwargs.setdefault('zorder', 2)
             ax.add_patch(plt.Polygon(np.array([[np.nan, np.nan]]), label=plot_label, **kwargs))
 
     # Add string representation of keyword arguments to GeoDataFrame
@@ -237,8 +268,18 @@ def _plot_gdf(gdf, ax, **kwargs):
         # Seperate label from keyword arguments
         label = kwargs.pop('label', None)
 
+        # Seperate add_arrow from keyword arguments
+        add_arrow = kwargs.pop('add_arrow', False)
+
+        # Seperate arrow_kwargs from keyword arguments
+        arrow_kwargs = kwargs.pop('arrow_kwargs', None)
+
         # Plot geodataframe
         ax = gdf_group.plot(ax=ax, **kwargs)
+
+        # Add arrow to plot
+        if add_arrow:
+            add_arrow_to_plot(ax, gdf_group['geometry'], arrow_kwargs, kwargs)
 
         # Add label to legend
         if label is not None:

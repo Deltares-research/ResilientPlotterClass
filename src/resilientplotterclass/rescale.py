@@ -29,8 +29,12 @@ def _get_xy_attrs_from_crs(crs=None):
         return x_attrs, y_attrs
     
     # Get the x and y axis names
-    x_axis_name = crs.axis_info[0].name
-    y_axis_name = crs.axis_info[1].name
+    if crs.axis_info[0].direction == 'north' or crs.axis_info[0].direction == 'south':
+        x_axis_name = crs.axis_info[1].name
+        y_axis_name = crs.axis_info[0].name
+    else:
+        x_axis_name = crs.axis_info[0].name
+        y_axis_name = crs.axis_info[1].name
 
     # Abbreviate the axis names
     x_axis_name = XY_NAME_ABRIVIATIONS[x_axis_name] if x_axis_name in XY_NAME_ABRIVIATIONS.keys() else x_axis_name
@@ -129,26 +133,6 @@ def _rescale_xugrid(uda, scale_factor):
     # If scale factor is 1, return the original UgridDataArray
     if scale_factor == 1:
         return uda
-
-    # Function to rescale the grid
-    def _rescale_grid(grid, scale_factor):
-        # Rescale the x and y dimensions of 1D grid
-        if isinstance(grid, xu.Ugrid1d):
-            grid = xu.Ugrid1d(node_x=grid.node_x*scale_factor,
-                              node_y=grid.node_y*scale_factor,
-                              fill_value=grid.fill_value,
-                              edge_node_connectivity=grid.edge_node_connectivity)
-
-        # Rescale x and y dimensions of 2D grid  
-        elif isinstance(grid, xu.Ugrid2d):
-            grid = xu.Ugrid2d(node_x=grid.node_x*scale_factor,
-                              node_y=grid.node_y*scale_factor,
-                              fill_value=grid.fill_value,
-                              face_node_connectivity=grid.face_node_connectivity,
-                              edge_node_connectivity=grid.edge_node_connectivity)
-        
-        # Return rescaled grid
-        return grid
     
     # Function to rename the dimensions of the data
     def _rename_dims(da):
@@ -173,19 +157,66 @@ def _rescale_xugrid(uda, scale_factor):
         # Return the renamed data
         return da
     
+    # Rescale the coordinates of the data
+    def _rescale_coords(da, scale_factor):
+        # Define the coordinates to rescale
+        COORD_NAMES = ['x', 'y', 'node_x', 'node_y', 'edge_x', 'edge_y', 'face_x', 'face_y',
+                       'X', 'Y', 'Node_x', 'Node_y', 'Edge_x', 'Edge_y', 'Face_x', 'Face_y']
+        
+        # Rescale the coordinates
+        coord_names = [coord_name for coord_name in list(da.coords) if coord_name not in list(da.dims)]
+
+        # Rescale the coordinates
+        coords = {}
+        for coord_name in coord_names:
+            if np.any([COORD_NAME in coord_name for COORD_NAME in COORD_NAMES]):
+                coords[coord_name] = xr.DataArray(da[coord_name].values*scale_factor, dims=da[coord_name].dims, attrs=da[coord_name].attrs)
+        
+        # Assign the rescaled coordinates to the data
+        da = da.assign_coords(coords)
+
+        # Return the rescaled data
+        return da
+    
+    # Function to rescale the grid
+    def _rescale_grid(grid, scale_factor):
+        # Rescale the x and y dimensions of 1D grid
+        if isinstance(grid, xu.Ugrid1d):
+            grid = xu.Ugrid1d(node_x=grid.node_x*scale_factor,
+                              node_y=grid.node_y*scale_factor,
+                              fill_value=grid.fill_value,
+                              edge_node_connectivity=grid.edge_node_connectivity)
+
+        # Rescale x and y dimensions of 2D grid  
+        elif isinstance(grid, xu.Ugrid2d):
+            grid = xu.Ugrid2d(node_x=grid.node_x*scale_factor,
+                              node_y=grid.node_y*scale_factor,
+                              fill_value=grid.fill_value,
+                              face_node_connectivity=grid.face_node_connectivity,
+                              edge_node_connectivity=grid.edge_node_connectivity)
+        
+        # Return rescaled grid
+        return grid
+    
     # Rename the dimensions of the data
     da = _rename_dims(uda)
+
+    # Rescale the coordinates of the data
+    da = _rescale_coords(da, scale_factor)
     
     # Assign the coordinate arrays to the data
     if isinstance(uda, xu.UgridDataArray):
         grid = _rescale_grid(uda.grid, scale_factor)
-        uda = xu.UgridDataArray(obj=xr.DataArray(da), grid=grid)
+        uda_rescaled = xu.UgridDataArray(obj=xr.DataArray(da), grid=grid)
     elif isinstance(uda, xu.UgridDataset):
         grids = [_rescale_grid(grid, scale_factor) for grid in uda.grids]
-        uda = xu.UgridDataset(obj=xr.Dataset(da), grids=grids)
-    
+        uda_rescaled = xu.UgridDataset(obj=xr.Dataset(da), grids=grids)
+
+    # Assign the coordinate reference system to the data
+    uda_rescaled.grid.set_crs(uda.grid.crs)
+
     # Return the rescaled data
-    return uda
+    return uda_rescaled
 
 def _rescale_GeoDataFrame(gdf, scale_factor):
     """Rescale the x and y dimensions of a GeoDataFrame.

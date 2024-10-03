@@ -1,0 +1,3 @@
+grid
+====
+.. automethod:: resilientplotterclass.rpclass.rpclass.grid

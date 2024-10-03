@@ -1,0 +1,3 @@
+scatter
+=======
+.. automethod:: resilientplotterclass.rpclass.rpclass.scatter

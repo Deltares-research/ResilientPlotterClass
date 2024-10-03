@@ -1,0 +1,3 @@
+get_cartopy
+===========
+.. automethod:: resilientplotterclass.rpclass.rpclass.get_cartopy

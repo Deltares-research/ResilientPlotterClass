@@ -1,0 +1,3 @@
+get_guideline_options
+=====================
+.. automethod:: resilientplotterclass.rpclass.rpclass.get_guideline_options
