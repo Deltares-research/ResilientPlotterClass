@@ -36,4 +36,4 @@ The following steps describe how to install the ResilientPlotterClass as a stand
     ```
 
 ## Documentation
-The documentation for the Resilient Plotter Class is currently only available locally. After cloning the repository, the documation can be found in `ResilientPlotterClass/docs/documentation/_build/html/index.html`.
+The documentation for the ResilientPlotterClass is currently only available locally. After cloning the repository, the documation can be found in `ResilientPlotterClass/docs/documentation/_build/html/index.html`.
