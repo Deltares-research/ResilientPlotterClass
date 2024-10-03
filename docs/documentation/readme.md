@@ -1,5 +1,5 @@
 # Build the documentation for the Resilient Plotter Class
-The following sections describe how to build the documentation for the ResilientPlotterClass package. The documentation is built using `Sphinx` and the documentation is written in reStructuredText. The documentation is built in the html format and can be viewed in a web browser.
+The following sections describe how to build the documentation for the ResilientPlotterClass package. The documentation is built using [Sphinx](https://www.sphinx-doc.org/en/master/index.html) and the documentation is written in reStructuredText. The documentation is built in the html format and can be viewed in a web browser.
 
 ## Prerequisites
 The following steps are required to install and use ResilientPlotterClass:
