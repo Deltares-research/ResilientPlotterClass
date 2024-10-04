@@ -1,5 +1,6 @@
 # Packages
 import geopandas as gpd
+import holoviews as hv
 import inspect
 import json
 import matplotlib.pyplot as plt
@@ -7,6 +8,7 @@ import os
 import xarray as xr
 import xugrid as xu
 import resilientplotterclass as rpc
+
 
 # Resilient Plotter Class
 class rpclass:
@@ -207,11 +209,13 @@ class rpclass:
         return fig, axs
 
     # Save figure
-    def savefig(self, file_path, dpi=300, bbox_inches='tight', **kwargs):
+    def savefig(self, fig, file_path, dpi=300, bbox_inches='tight', **kwargs):
         """Save figure.
 
         :param file_path:   File path to save figure.
         :type file_path:    str
+        :param fig:         Figure to save.
+        :type fig:          matplotlib.figure.Figure or holoviews.element.chart.Element or holoviews.element.chart.Overlay or holoviews.element.chart.DynamicMap
         :param dpi:         Dots per inch.
         :type dpi:          int, optional
         :param bbox_inches: Bounding box in inches.
@@ -224,11 +228,18 @@ class rpclass:
         See also: `matplotlib.figure.Figure.savefig() <https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure.savefig>`_
         """
 
-        # Get figure
-        fig = plt.gcf()
-        
         # Save figure
-        fig.savefig(file_path, dpi=dpi, bbox_inches=bbox_inches, **kwargs)
+        if isinstance(fig, plt.Figure):
+            fig.savefig(file_path, dpi=dpi, bbox_inches=bbox_inches, **kwargs)
+        elif any(isinstance(fig, getattr(hv, x)) for x in ['Overlay', 'Element', 'DynamicMap']):
+            # Remove file extension
+            file_path = file_path.rsplit('.', maxsplit=1)[0]
+            
+            # Save figure
+            renderer = hv.renderer('bokeh')
+            renderer.save(fig, file_path, fmt='html')
+        else:
+            raise TypeError('fig must be a matplotlib.figure.Figure or holoviews.element.chart.Element or holoviews.element.chart.Overlay or holoviews.element.chart.DynamicMap.')
 
     # =============================================================================
     # General plot methods
@@ -311,6 +322,45 @@ class rpclass:
         # Return plot
         return p
     
+    # Plot data using scatter
+    def scatter(self, data, ax=None, data_type=None, extent_type=None, **kwargs):
+        """Plot data using scatter.
+
+        :param data:        Data to plot.
+        :type data:         xarray.DataArray or xarray.Dataset or xugrid.UgridDataArray, optional
+        :param ax:          Axis.
+        :type ax:           matplotlib.axes.Axes, optional
+        :param data_type:   Data type from guidelines.
+        :type data_type:    str, optional
+        :param extent_type: Extent type from guidelines.
+        :type extent_type:  str, optional
+        :param kwargs:      Keyword arguments for :func:`resilientplotterclass.data_xarray.scatter` or :func:`resilientplotterclass.data_xugrid.scatter`.
+        :type kwargs:       dict, optional
+        :return:            Plot.
+        :rtype:             matplotlib.collections.QuadMesh
+        """
+
+        # Get plot_type (function name)
+        plot_type = inspect.currentframe().f_code.co_name
+
+        # Combine guidelines and user keyword arguments, prioritising user keyword arguments
+        kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
+        if data_type is not None:
+            kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type], kwargs)
+        if extent_type is not None:
+            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type], kwargs)
+
+        # Plot data
+        if isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset):
+            p = rpc.data_xarray.scatter(data, ax=ax, **kwargs)
+        elif isinstance(data, xu.UgridDataArray):
+            p = rpc.data_xugrid.scatter(data, ax=ax, **kwargs)
+        else: 
+            raise TypeError('data type not supported. Please provide a xarray.DataArray, xarray.Dataset or xugrid.UgridDataArray.')
+        
+        # Return plot
+        return p
+    
     # Plot data using contourf
     def contourf(self, data, ax=None, data_type=None, extent_type=None, **kwargs):
         """Plot data using contourf.
@@ -385,45 +435,6 @@ class rpclass:
             p = rpc.data_xugrid.contour(data, ax=ax, **kwargs)
         else:
             raise TypeError('data type not supported. Please provide a xarray.DataArray or xugrid.UgridDataArray.')
-        
-        # Return plot
-        return p
-    
-    # Plot data using scatter
-    def scatter(self, data, ax=None, data_type=None, extent_type=None, **kwargs):
-        """Plot data using scatter.
-
-        :param data:        Data to plot.
-        :type data:         xarray.DataArray or xarray.Dataset or xugrid.UgridDataArray, optional
-        :param ax:          Axis.
-        :type ax:           matplotlib.axes.Axes, optional
-        :param data_type:   Data type from guidelines.
-        :type data_type:    str, optional
-        :param extent_type: Extent type from guidelines.
-        :type extent_type:  str, optional
-        :param kwargs:      Keyword arguments for :func:`resilientplotterclass.data_xarray.scatter` or :func:`resilientplotterclass.data_xugrid.scatter`.
-        :type kwargs:       dict, optional
-        :return:            Plot.
-        :rtype:             matplotlib.collections.QuadMesh
-        """
-
-        # Get plot_type (function name)
-        plot_type = inspect.currentframe().f_code.co_name
-
-        # Combine guidelines and user keyword arguments, prioritising user keyword arguments
-        kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
-        if data_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type], kwargs)
-        if extent_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type], kwargs)
-
-        # Plot data
-        if isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset):
-            p = rpc.data_xarray.scatter(data, ax=ax, **kwargs)
-        elif isinstance(data, xu.UgridDataArray):
-            p = rpc.data_xugrid.scatter(data, ax=ax, **kwargs)
-        else: 
-            raise TypeError('data type not supported. Please provide a xarray.DataArray, xarray.Dataset or xugrid.UgridDataArray.')
         
         # Return plot
         return p
@@ -947,7 +958,9 @@ class rpclass:
 
         # Convert structured data to unstructured data
         if isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset):
+            crs = data.rio.crs
             data = xu.UgridDataArray.from_structured(data, **kwargs)
+            data.grid.crs = crs
         else:
             raise TypeError('data type not supported. Please provide a xarray.DataArray or xarray.Dataset.')
         
@@ -955,19 +968,21 @@ class rpclass:
         return data
     
     # Unstructured data to structured data
-    def to_structured(self, data, **kwargs):
+    def to_structured(self, data, data_blueprint=None, **kwargs):
         """Unstructured data to structured data.
 
-        :param data:   Data to convert.
-        :type data:    xugrid.UgridDataArray or xugrid.UgridDataset
-        :param kwargs: Keyword arguments for :func:`resilientplotterclass.utils.rasterise_xugrid`.
-        :return:       Structured data.
-        :rtype:        xarray.DataArray or xarray.Dataset
+        :param data:           Data to convert.
+        :type data:            xugrid.UgridDataArray or xugrid.UgridDataset
+        :param data_blueprint: Data blueprint.
+        :type data_blueprint:  xarray.DataArray or xarray.Dataset, optional
+        :param kwargs:         Keyword arguments for :func:`resilientplotterclass.utils.rasterise_xugrid`.
+        :return:               Structured data.
+        :rtype:                xarray.DataArray or xarray.Dataset
         """
 
         # Convert unstructured data to structured data
         if isinstance(data, xu.UgridDataArray) or isinstance(data, xu.UgridDataset):
-            data = rpc.utils.rasterise_xugrid(data, **kwargs)
+            data = rpc.utils.rasterise_xugrid(data, data_blueprint, **kwargs)
         else:
             raise TypeError('data type not supported. Please provide a xugrid.UgridDataArray or xugrid.UgridDataset.')
         

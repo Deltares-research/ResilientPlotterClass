@@ -9,62 +9,42 @@
     },
     "general": {
         "crs": null,
-        "vertical_reference_level": null,
+        "vrl": null,
         "xy_unit": null,
         "bounds": null,
-        "cartopy_features": [
-            "land",
-            "ocean",
-            "lakes",
-            "rivers",
-            "coastline",
-            "borders",
-            "states"
-        ]
+        "cartopy_features": ["land", "ocean", "lakes", "rivers", "coastline", "borders", "states"]
     },
     "data_type": {
-        "general": {
+        "default": {
             "pcolormesh": {
                 "cmap": "Spectral_r",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"fraction": 0.046, "pad": 0.04}
             },
             "imshow": {
                 "cmap": "Spectral_r",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"fraction": 0.046, "pad": 0.04}
+            },
+            "scatter": {
+                "edgecolor": "none",
+                "zorder": 1,
+                "cbar_kwargs": {"fraction": 0.046, "pad": 0.04}
             },
             "contourf": {
                 "cmap": "Spectral_r",
                 "center": false,
                 "levels": 10,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"fraction": 0.046, "pad": 0.04}
             },
             "contour": {
                 "cmap": "Spectral_r",
                 "center": false,
                 "zorder": 1,
                 "levels": 10
-            },
-            "scatter": {
-                "edgecolor": "none",
-                "zorder": 1,
-                "cbar_kwargs": {
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
             },
             "quiver": {
                 "add_guide": false,
@@ -82,97 +62,32 @@
                 "cmap": "bathymetry",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Bathymetry [m]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Bathymetry [m]", "fraction": 0.046, "pad": 0.04}
             },
             "imshow": {
                 "cmap": "bathymetry",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Bathymetry [m]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Bathymetry [m]", "fraction": 0.046, "pad": 0.04}
+            },
+            "scatter": {
+                "edgecolor": "none",
+                "cmap": "bathymetry",
+                "zorder": 1,
+                "cbar_kwargs": {"label": "Bathymetry [m]", "fraction": 0.046, "pad": 0.04}
             },
             "contourf": {
                 "cmap": "bathymetry",
                 "center": false,
                 "levels": 10,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Bathymetry [m]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Bathymetry [m]", "fraction": 0.046, "pad": 0.04}
             },
             "contour": {
                 "cmap": "bathymetry_contour",
                 "center": false,
                 "zorder": 1,
                 "levels": 10
-            },
-            "scatter": {
-                "edgecolor": "none",
-                "cmap": "bathymetry",
-                "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Bathymetry [m]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
-            }
-        },
-        "topography": {
-            "pcolormesh": {
-                "cmap": "topography",
-                "center": false,
-                "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Topography [m]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
-            },
-            "imshow": {
-                "cmap": "topography",
-                "center": false,
-                "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Topography [m]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
-            },
-            "contourf": {
-                "cmap": "topography",
-                "center": false,
-                "levels": 10,
-                "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Topography [m]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
-            },
-            "contour": {
-                "cmap": "topography_contour",
-                "center": false,
-                "zorder": 1,
-                "levels": 10
-            },
-            "scatter": {
-                "edgecolor": "none",
-                "cmap": "topography",
-                "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Topography [m]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
             }
         },
         "bedforms": {
@@ -180,48 +95,32 @@
                 "cmap": "bedforms",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Bedforms [m]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Bedforms [m]", "fraction": 0.046, "pad": 0.04}
             },
             "imshow": {
                 "cmap": "bedforms",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Bedforms [m]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Bedforms [m]", "fraction": 0.046, "pad": 0.04}
+            },
+            "scatter": {
+                "edgecolor": "none",
+                "cmap": "bedforms",
+                "zorder": 1,
+                "cbar_kwargs": {"label": "Bedforms [m]", "fraction": 0.046, "pad": 0.04}
             },
             "contourf": {
                 "cmap": "bedforms",
                 "center": false,
                 "levels": 10,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Bedforms [m]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Bedforms [m]", "fraction": 0.046, "pad": 0.04}
             },
             "contour": {
                 "cmap": "bedforms_contour",
                 "center": false,
                 "zorder": 1,
                 "levels": 10
-            },
-            "scatter": {
-                "edgecolor": "none",
-                "cmap": "bedforms",
-                "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Bedforms [m]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
             }
         },
         "morphology": {
@@ -229,48 +128,32 @@
                 "cmap": "morphology",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Erosion/Sedimentation [m]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Erosion/Sedimentation [m]", "fraction": 0.046, "pad": 0.04}
             },
             "imshow": {
                 "cmap": "morphology",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Erosion/Sedimentation [m]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Erosion/Sedimentation [m]", "fraction": 0.046, "pad": 0.04}
+            },
+            "scatter": {
+                "edgecolor": "none",
+                "cmap": "morphology",
+                "zorder": 1,
+                "cbar_kwargs": {"label": "Erosion/Sedimentation [m]", "fraction": 0.046, "pad": 0.04}
             },
             "contourf": {
                 "cmap": "morphology",
                 "center": false,
                 "levels": 10,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Erosion/Sedimentation [m]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Erosion/Sedimentation [m]", "fraction": 0.046, "pad": 0.04}
             },
             "contour": {
                 "cmap": "morphology_contour",
                 "center": false,
                 "zorder": 1,
                 "levels": 10
-            },
-            "scatter": {
-                "edgecolor": "none",
-                "cmap": "morphology",
-                "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Erosion/Sedimentation",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
             }
         },
         "flow_velocity": {
@@ -278,48 +161,32 @@
                 "cmap": "other",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Flow velocity [m/s]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Flow velocity [m/s]", "fraction": 0.046, "pad": 0.04}
             },
             "imshow": {
                 "cmap": "other",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Flow velocity [m/s]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Flow velocity [m/s]", "fraction": 0.046, "pad": 0.04}
+            },
+            "scatter": {
+                "edgecolor": "none",
+                "cmap": "other",
+                "zorder": 1,
+                "cbar_kwargs": {"label": "Flow velocity [m/s]", "fraction": 0.046, "pad": 0.04}
             },
             "contourf": {
                 "cmap": "other",
                 "center": false,
                 "levels": 10,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Flow velocity [m/s]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Flow velocity [m/s]", "fraction": 0.046, "pad": 0.04}
             },
             "contour": {
                 "cmap": "other_contour",
                 "center": false,
                 "zorder": 1,
                 "levels": 10
-            },
-            "scatter": {
-                "edgecolor": "none",
-                "cmap": "other",
-                "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Flow velocity [m/s]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
             }
         },
         "flow_direction": {
@@ -327,48 +194,32 @@
                 "cmap": "cet_CET_C8s",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Flow direction [degN]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Flow direction [degN]", "fraction": 0.046, "pad": 0.04}
             },
             "imshow": {
                 "cmap": "cet_CET_C8s",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Flow direction [degN]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Flow direction [degN]", "fraction": 0.046, "pad": 0.04}
             },
             "contourf": {
                 "cmap": "cet_CET_C8s",
                 "center": false,
                 "levels": 10,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Flow direction [degN]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Flow direction [degN]", "fraction": 0.046, "pad": 0.04}
+            },
+            "scatter": {
+                "edgecolor": "none",
+                "cmap": "cet_CET_C8s",
+                "zorder": 1,
+                "cbar_kwargs": {"label": "Flow direction [degN]", "fraction": 0.046, "pad": 0.04}
             },
             "contour": {
                 "cmap": "cet_CET_C8s",
                 "center": false,
                 "zorder": 1,
                 "levels": 10
-            },
-            "scatter": {
-                "edgecolor": "none",
-                "cmap": "cet_CET_C8s",
-                "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Flow direction [degN]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
             }
         },
         "wave_height": {
@@ -376,48 +227,32 @@
                 "cmap": "other",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Wave height [m]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Wave height [m]", "fraction": 0.046, "pad": 0.04}
             },
             "imshow": {
                 "cmap": "other",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Wave height [m]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Wave height [m]", "fraction": 0.046, "pad": 0.04}
+            },
+            "scatter": {
+                "edgecolor": "none",
+                "cmap": "other",
+                "zorder": 1,
+                "cbar_kwargs": {"label": "Wave height [m]", "fraction": 0.046, "pad": 0.04}
             },
             "contourf": {
                 "cmap": "other",
                 "center": false,
                 "levels": 10,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Wave height [m]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Wave height [m]", "fraction": 0.046, "pad": 0.04}
             },
             "contour": {
                 "cmap": "other_contour",
                 "center": false,
                 "zorder": 1,
                 "levels": 10
-            },
-            "scatter": {
-                "edgecolor": "none",
-                "cmap": "other",
-                "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Wave height [m]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
             }
         },
         "wave_period": {
@@ -425,48 +260,32 @@
                 "cmap": "other",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Wave period [s]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Wave period [s]", "fraction": 0.046, "pad": 0.04}
             },
             "imshow": {
                 "cmap": "other",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Wave period [s]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Wave period [s]", "fraction": 0.046, "pad": 0.04}
+            },
+            "scatter": {
+                "edgecolor": "none",
+                "cmap": "other",
+                "zorder": 1,
+                "cbar_kwargs": {"label": "Wave period [s]", "fraction": 0.046, "pad": 0.04}
             },
             "contourf": {
                 "cmap": "other",
                 "center": false,
                 "levels": 10,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Wave period [s]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Wave period [s]", "fraction": 0.046, "pad": 0.04}
             },
             "contour": {
                 "cmap": "other_contour",
                 "center": false,
                 "zorder": 1,
                 "levels": 10
-            },
-            "scatter": {
-                "edgecolor": "none",
-                "cmap": "other",
-                "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Wave period [s]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
             }
         },
         "wave_direction": {
@@ -474,48 +293,32 @@
                 "cmap": "cet_CET_C8s",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Wave direction [degN]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Wave direction [degN]", "fraction": 0.046, "pad": 0.04}
             },
             "imshow": {
                 "cmap": "cet_CET_C8s",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Wave direction [degN]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Wave direction [degN]", "fraction": 0.046, "pad": 0.04}
+            },
+            "scatter": {
+                "edgecolor": "none",
+                "cmap": "cet_CET_C8s",
+                "zorder": 1,
+                "cbar_kwargs": {"label": "Wave direction [degN]", "fraction": 0.046, "pad": 0.04}
             },
             "contourf": {
                 "cmap": "cet_CET_C8s",
                 "center": false,
                 "levels": 10,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Wave direction [degN]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Wave direction [degN]", "fraction": 0.046, "pad": 0.04}
             },
             "contour": {
                 "cmap": "cet_CET_C8s",
                 "center": false,
                 "zorder": 1,
                 "levels": 10
-            },
-            "scatter": {
-                "edgecolor": "none",
-                "cmap": "cet_CET_C8s",
-                "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Wave direction [degN]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
             }
         },
         "sediment_transport": {
@@ -523,48 +326,32 @@
                 "cmap": "sediment_transport",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Sediment transport [kg/?]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Sediment transport [?]", "fraction": 0.046, "pad": 0.04}
             },
             "imshow": {
                 "cmap": "sediment_transport",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Sediment transport [kg/?]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Sediment transport [?]", "fraction": 0.046, "pad": 0.04}
+            },
+            "scatter": {
+                "edgecolor": "none",
+                "cmap": "sediment_transport",
+                "zorder": 1,
+                "cbar_kwargs": {"label": "Sediment transport [?]", "fraction": 0.046, "pad": 0.04}
             },
             "contourf": {
                 "cmap": "sediment_transport",
                 "center": false,
                 "levels": 10,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Sediment transport [kg/?]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Sediment transport [?]", "fraction": 0.046, "pad": 0.04}
             },
             "contour": {
                 "cmap": "sediment_transport",
                 "center": false,
                 "zorder": 1,
                 "levels": 10
-            },
-            "scatter": {
-                "edgecolor": "none",
-                "cmap": "sediment_transport",
-                "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Sediment transport [kg?]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
             }
         },
         "sediment_concentration": {
@@ -572,48 +359,32 @@
                 "cmap": "sediment_transport",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Sediment concentration [kg/m³]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Sediment concentration [?]", "fraction": 0.046, "pad": 0.04}
             },
             "imshow": {
                 "cmap": "sediment_transport",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Sediment concentration [kg/m³]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Sediment concentration [?]", "fraction": 0.046, "pad": 0.04}
+            },
+            "scatter": {
+                "edgecolor": "none",
+                "cmap": "sediment_transport",
+                "zorder": 1,
+                "cbar_kwargs": {"label": "Sediment concentration [?]", "fraction": 0.046, "pad": 0.04}
             },
             "contourf": {
                 "cmap": "sediment_transport",
                 "center": false,
                 "levels": 10,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Sediment concentration [kg/m³]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Sediment concentration [?]", "fraction": 0.046, "pad": 0.04}
             },
             "contour": {
                 "cmap": "sediment_transport",
                 "center": false,
                 "zorder": 1,
                 "levels": 10
-            },
-            "scatter": {
-                "edgecolor": "none",
-                "cmap": "sediment_transport",
-                "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Sediment particle size [m]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
             }
         },
         "sediment_particle_size": {
@@ -621,48 +392,32 @@
                 "cmap": "sediment_particle_size",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Sediment particle size [m]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Sediment particle size [m]", "fraction": 0.046, "pad": 0.04}
             },
             "imshow": {
                 "cmap": "sediment_particle_size",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Sediment particle size [m]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Sediment particle size [m]", "fraction": 0.046, "pad": 0.04}
+            },
+            "scatter": {
+                "edgecolor": "none",
+                "cmap": "sediment_particle_size",
+                "zorder": 1,
+                "cbar_kwargs": {"label": "Sediment particle size [m]", "fraction": 0.046, "pad": 0.04}
             },
             "contourf": {
                 "cmap": "sediment_particle_size",
                 "center": false,
                 "levels": 10,
                 "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Sediment particle size [m]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
+                "cbar_kwargs": {"label": "Sediment particle size [m]", "fraction": 0.046, "pad": 0.04}
             },
             "contour": {
                 "cmap": "sediment_particle_size",
                 "center": false,
                 "zorder": 1,
                 "levels": 10
-            },
-            "scatter": {
-                "edgecolor": "none",
-                "cmap": "sediment_particle_size",
-                "zorder": 1,
-                "cbar_kwargs": {
-                    "label": "Sediment particle size [m]",
-                    "fraction": 0.046,
-                    "pad": 0.04
-                }
             }
         }
     },

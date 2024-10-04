@@ -1,0 +1,44 @@
+{
+    "metadata": {
+        "title": "Example guidelines",
+        "date": "2024-10-04",
+        "authors": ["Math van Soest", "Ruben White"]
+    },
+    "general": {
+        "crs": "EPSG:28992",
+        "vrl": "MSL",
+        "xy_unit": null,
+        "bounds": [110000, 560000, 190000, 620000],
+        "cartopy_features": ["land", "ocean", "lakes", "rivers", "coastline", "borders", "states"]
+    },
+    "data_type": {
+    },
+    "geometry_type": {
+        "aoi": {
+            "facecolor": "none",
+            "edgecolor": "black",
+            "linewidth": 1.5,
+            "label": "Area of interest"
+        }
+    },
+    "map_type": {
+        "satellite": {
+            "source": "Esri.WorldImagery",
+            "attribution": false
+        },
+        "osm": {
+            "source": "OpenStreetMap.Mapnik",
+            "attribution": false
+        }
+    },
+    "extent_type": {
+        "aoi": {
+            "xlim": [120000, 190000],
+            "ylim": [560000, 620000]
+        },
+        "aoi_tight": {
+            "xlim": [128000, 152000],
+            "ylim": [580000, 600000]
+        }
+    }
+}

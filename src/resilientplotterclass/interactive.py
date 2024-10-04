@@ -72,6 +72,9 @@ def interactive_da(da, xy_unit=None, **kwargs):
     # Rescale the DataArray
     da = rpc.rescale.rescale(data=da, scale_factor=scale_factor)
 
+    # Get rasterization
+    rasterize = kwargs.pop('rasterize', True)
+
     # Get x and y dimensions
     x = kwargs.pop('x', da.dims[1])
     y = kwargs.pop('y', da.dims[0])
@@ -87,7 +90,10 @@ def interactive_da(da, xy_unit=None, **kwargs):
         kwargs.setdefault('clabel', '{} [{}]'.format(da.attrs['long_name'], da.attrs['units']))
         
     # Plot the DataArray
-    da_plot = hd.rasterize(da.hvplot(x=x, y=y, geo=geo, label=label)).opts(**kwargs)
+    if rasterize:
+        da_plot = hd.rasterize(da.hvplot(x=x, y=y, geo=geo, label=label)).opts(**kwargs)
+    else:
+        da_plot = da.hvplot(x=x, y=y, geo=geo, label=label).opts(**kwargs)
 
     # Format the plot
     da_plot = da_plot.opts(width=550, height=550, xlabel=xlabel, ylabel=ylabel, title='', aspect='equal', show_grid=True, active_tools=['pan', 'wheel_zoom'])
