@@ -1,3 +1,0 @@
-savefig
-=======
-.. automethod:: resilientplotterclass.rpclass.rpclass.savefig

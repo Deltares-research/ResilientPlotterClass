@@ -1,3 +1,0 @@
-cartopy
-=======
-.. automethod:: resilientplotterclass.rpclass.rpclass.cartopy

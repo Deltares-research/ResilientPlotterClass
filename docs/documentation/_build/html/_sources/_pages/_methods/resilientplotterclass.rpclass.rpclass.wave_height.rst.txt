@@ -1,3 +1,0 @@
-wave_height
-===========
-.. automethod:: resilientplotterclass.rpclass.rpclass.wave_height

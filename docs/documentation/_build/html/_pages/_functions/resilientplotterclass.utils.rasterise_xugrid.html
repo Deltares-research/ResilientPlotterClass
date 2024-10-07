@@ -414,14 +414,14 @@ document.write(`
 <h1>utils.rasterise_xugrid<a class="headerlink" href="#utils-rasterise-xugrid" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="resilientplotterclass.utils.rasterise_xugrid">
-<span class="sig-prename descclassname"><span class="pre">resilientplotterclass.utils.</span></span><span class="sig-name descname"><span class="pre">rasterise_xugrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uda</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resilientplotterclass.utils.rasterise_xugrid" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">resilientplotterclass.utils.</span></span><span class="sig-name descname"><span class="pre">rasterise_xugrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uda</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">da</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resilientplotterclass.utils.rasterise_xugrid" title="Link to this definition">#</a></dt>
 <dd><p>Rasterise data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>uda</strong> (<em>xugrid.UgridDataSet</em>) – Data to rasterise.</p></li>
-<li><p><strong>crs</strong> (<em>str</em>) – Coordinate reference system.</p></li>
-<li><p><strong>kwargs</strong> (<em>dict</em>) – Keyword arguments for <code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.Ugrid.grid.rasterize()</span></code>.</p></li>
+<li><p><strong>da</strong> (<em>xarray.DataArray</em><em>, </em><em>optional</em>) – Data array to rasterise data on.</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Keyword arguments for <code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.Ugrid.grid.rasterize()</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

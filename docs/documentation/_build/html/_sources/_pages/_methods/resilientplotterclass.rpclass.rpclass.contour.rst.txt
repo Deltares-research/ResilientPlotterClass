@@ -1,3 +1,0 @@
-contour
-=======
-.. automethod:: resilientplotterclass.rpclass.rpclass.contour

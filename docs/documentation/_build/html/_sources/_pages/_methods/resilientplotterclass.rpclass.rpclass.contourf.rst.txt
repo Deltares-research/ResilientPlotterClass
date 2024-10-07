@@ -1,3 +1,0 @@
-contourf
-========
-.. automethod:: resilientplotterclass.rpclass.rpclass.contourf

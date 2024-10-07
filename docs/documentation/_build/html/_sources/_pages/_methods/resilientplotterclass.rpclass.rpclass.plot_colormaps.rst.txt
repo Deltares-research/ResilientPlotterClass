@@ -1,3 +1,0 @@
-plot_colormaps
-==============
-.. automethod:: resilientplotterclass.rpclass.rpclass.plot_colormaps

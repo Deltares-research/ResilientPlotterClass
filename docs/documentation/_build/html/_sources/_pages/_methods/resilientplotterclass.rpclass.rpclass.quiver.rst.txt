@@ -1,3 +1,0 @@
-quiver
-======
-.. automethod:: resilientplotterclass.rpclass.rpclass.quiver

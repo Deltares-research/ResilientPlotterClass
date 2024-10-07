@@ -1,3 +1,0 @@
-basemap
-=======
-.. automethod:: resilientplotterclass.rpclass.rpclass.basemap

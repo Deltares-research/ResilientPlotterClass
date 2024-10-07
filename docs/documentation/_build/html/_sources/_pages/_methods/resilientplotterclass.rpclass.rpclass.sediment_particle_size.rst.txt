@@ -1,3 +1,0 @@
-sediment_particle_size
-======================
-.. automethod:: resilientplotterclass.rpclass.rpclass.sediment_particle_size

@@ -1,3 +1,0 @@
-wave_period
-===========
-.. automethod:: resilientplotterclass.rpclass.rpclass.wave_period

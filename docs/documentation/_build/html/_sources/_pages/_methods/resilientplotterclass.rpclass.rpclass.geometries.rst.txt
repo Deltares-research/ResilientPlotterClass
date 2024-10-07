@@ -1,3 +1,0 @@
-geometries
-==========
-.. automethod:: resilientplotterclass.rpclass.rpclass.geometries

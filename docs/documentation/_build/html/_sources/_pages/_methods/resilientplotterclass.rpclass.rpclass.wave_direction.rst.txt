@@ -1,3 +1,0 @@
-wave_direction
-==============
-.. automethod:: resilientplotterclass.rpclass.rpclass.wave_direction

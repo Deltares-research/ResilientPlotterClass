@@ -418,7 +418,7 @@ document.write(`
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>uda</strong> (<em>xugrid.UgridDataSet</em>) – Data to reproject.</p></li>
+<li><p><strong>uda</strong> (<em>xugrid.UgridDataArray</em><em> or </em><em>xugrid.UgridDataSet</em>) – Data to reproject.</p></li>
 <li><p><strong>crs</strong> (<em>str</em>) – Coordinate reference system.</p></li>
 <li><p><strong>kwargs</strong> (<em>dict</em>) – Keyword arguments for <code class="xref py py-func docutils literal notranslate"><span class="pre">geopandas.GeoDataFrame.to_crs()</span></code>.</p></li>
 </ul>
@@ -427,7 +427,7 @@ document.write(`
 <dd class="field-even"><p>Reprojected data.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>xugrid.UgridDataSet</p>
+<dd class="field-odd"><p>xugrid.UgridDataArray or xugrid.UgridDataSet</p>
 </dd>
 </dl>
 <p>See also: <a class="reference external" href="https://geopandas.org/en/stable/docs/reference/api/geopandas.GeoDataFrame.to_crs.html">geopandas.GeoDataFrame.to_crs</a>.</p>

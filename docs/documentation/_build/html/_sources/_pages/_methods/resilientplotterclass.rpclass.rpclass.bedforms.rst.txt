@@ -1,3 +1,0 @@
-bedforms
-========
-.. automethod:: resilientplotterclass.rpclass.rpclass.bedforms

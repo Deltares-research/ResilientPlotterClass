@@ -1,3 +1,0 @@
-flow_direction
-==============
-.. automethod:: resilientplotterclass.rpclass.rpclass.flow_direction

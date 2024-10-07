@@ -1,3 +1,0 @@
-bathymetry
-==========
-.. automethod:: resilientplotterclass.rpclass.rpclass.bathymetry

@@ -1,5 +1,0 @@
-Attributes
-==========
-.. toctree::
-    :caption: Attributes
-

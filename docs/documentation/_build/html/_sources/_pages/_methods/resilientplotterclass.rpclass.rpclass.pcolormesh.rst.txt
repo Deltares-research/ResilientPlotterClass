@@ -1,3 +1,0 @@
-pcolormesh
-==========
-.. automethod:: resilientplotterclass.rpclass.rpclass.pcolormesh

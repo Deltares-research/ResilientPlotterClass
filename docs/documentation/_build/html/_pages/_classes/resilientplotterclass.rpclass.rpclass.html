@@ -854,12 +854,13 @@ document.write(`
 
 <dl class="py method">
 <dt class="sig sig-object py" id="resilientplotterclass.rpclass.rpclass.savefig">
-<span class="sig-name descname"><span class="pre">savefig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bbox_inches</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tight'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.savefig" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">savefig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bbox_inches</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tight'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.savefig" title="Link to this definition">#</a></dt>
 <dd><p>Save figure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>file_path</strong> (<em>str</em>) – File path to save figure.</p></li>
+<li><p><strong>fig</strong> (<em>matplotlib.figure.Figure</em><em> or </em><em>holoviews.element.chart.Element</em><em> or </em><em>holoviews.element.chart.Overlay</em><em> or </em><em>holoviews.element.chart.DynamicMap</em>) – Figure to save.</p></li>
 <li><p><strong>dpi</strong> (<em>int</em><em>, </em><em>optional</em>) – Dots per inch.</p></li>
 <li><p><strong>bbox_inches</strong> (<em>str</em><em>, </em><em>optional</em>) – Bounding box in inches.</p></li>
 <li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Keyword arguments for <code class="xref py py-func docutils literal notranslate"><span class="pre">matplotlib.figure.Figure.savefig()</span></code>.</p></li>
@@ -982,12 +983,13 @@ document.write(`
 
 <dl class="py method">
 <dt class="sig sig-object py" id="resilientplotterclass.rpclass.rpclass.to_structured">
-<span class="sig-name descname"><span class="pre">to_structured</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.to_structured" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">to_structured</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_blueprint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.to_structured" title="Link to this definition">#</a></dt>
 <dd><p>Unstructured data to structured data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<em>xugrid.UgridDataArray</em><em> or </em><em>xugrid.UgridDataset</em>) – Data to convert.</p></li>
+<li><p><strong>data_blueprint</strong> (<em>xarray.DataArray</em><em> or </em><em>xarray.Dataset</em><em>, </em><em>optional</em>) – Data blueprint.</p></li>
 <li><p><strong>kwargs</strong> – Keyword arguments for <a class="reference internal" href="../_functions/resilientplotterclass.utils.rasterise_xugrid.html#resilientplotterclass.utils.rasterise_xugrid" title="resilientplotterclass.utils.rasterise_xugrid"><code class="xref py py-func docutils literal notranslate"><span class="pre">resilientplotterclass.utils.rasterise_xugrid()</span></code></a>.</p></li>
 </ul>
 </dd>

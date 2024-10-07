@@ -1,3 +1,0 @@
-set_guidelines
-==============
-.. automethod:: resilientplotterclass.rpclass.rpclass.set_guidelines

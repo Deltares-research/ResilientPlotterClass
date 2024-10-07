@@ -1,3 +1,0 @@
-reproject
-=========
-.. automethod:: resilientplotterclass.rpclass.rpclass.reproject

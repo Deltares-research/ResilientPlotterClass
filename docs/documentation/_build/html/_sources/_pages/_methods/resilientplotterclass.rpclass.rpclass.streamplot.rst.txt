@@ -1,3 +1,0 @@
-streamplot
-==========
-.. automethod:: resilientplotterclass.rpclass.rpclass.streamplot

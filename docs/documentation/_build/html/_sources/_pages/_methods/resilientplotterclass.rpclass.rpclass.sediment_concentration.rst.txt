@@ -1,3 +1,0 @@
-sediment_concentration
-======================
-.. automethod:: resilientplotterclass.rpclass.rpclass.sediment_concentration

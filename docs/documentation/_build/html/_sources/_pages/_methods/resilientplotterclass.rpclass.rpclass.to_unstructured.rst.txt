@@ -1,3 +1,0 @@
-to_unstructured
-===============
-.. automethod:: resilientplotterclass.rpclass.rpclass.to_unstructured

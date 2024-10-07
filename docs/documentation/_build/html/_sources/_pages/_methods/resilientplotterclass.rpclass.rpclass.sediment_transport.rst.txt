@@ -1,3 +1,0 @@
-sediment_transport
-==================
-.. automethod:: resilientplotterclass.rpclass.rpclass.sediment_transport
