@@ -13,3 +13,4 @@ Modules
     resilientplotterclass.interactive
     resilientplotterclass.rescale
     resilientplotterclass.utils
+    resilientplotterclass.videos

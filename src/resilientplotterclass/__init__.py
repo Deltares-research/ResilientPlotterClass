@@ -7,5 +7,6 @@ from . import geometries
 from . import interactive
 from . import utils
 from . import rescale
+from . import videos
 from .rpclass import rpclass
 rpc = rpclass()

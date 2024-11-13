@@ -1,5 +1,33 @@
 import matplotlib.pyplot as plt
 import resilientplotterclass as rpc
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+def append_cbar_axis(ax, append_axes_kwargs=None):
+    """Append a colorbar axis.
+
+    :param ax:                 Axis.
+    :type ax:                  matplotlib.axes.Axes
+    :param append_axes_kwargs: Keyword arguments for :func:`mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes`.
+    :type append_axes_kwargs:  dict, optional
+    :return:                   Colorbar axis.
+    :rtype:                    matplotlib.axes.Axes
+
+    :See also: `matplotlib.figure.Figure.colorbar <https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.colorbar.html>`_,
+               `mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes <https://matplotlib.org/stable/api/_as_gen/mpl_toolkits.axes_grid1.axes_divider.AxesDivider.html#mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes>`_.
+    """
+
+    # Create keyword arguments if not provided
+    if append_axes_kwargs is None: append_axes_kwargs = {}
+
+    # Divide axis
+    divider = make_axes_locatable(ax)
+
+    # Create colorbar axis
+    cax = divider.append_axes(**append_axes_kwargs)
+    
+    # Return colorbar axis
+    return cax
+
 
 def format(ax, data=None, crs=None, xy_unit=None, xlim=None, ylim=None, xlabel_kwargs=None, ylabel_kwargs=None, title_kwargs=None, aspect_kwargs=None, grid_kwargs=None):
     """Format axis for a DataArray, UgridDataArray or GeoDataFrame.

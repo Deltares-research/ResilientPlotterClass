@@ -2,13 +2,15 @@
 import geopandas as gpd
 import holoviews as hv
 import inspect
+from IPython.display import display
 import json
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import os
+import pandas as pd
 import xarray as xr
 import xugrid as xu
 import resilientplotterclass as rpc
-
 
 # Resilient Plotter Class
 class rpclass:
@@ -33,27 +35,32 @@ class rpclass:
             self.set_cartopy()
         else:
             self.gdf_cartopy = None
-
+            
         # Register colormaps
         rpc.colormaps.register_colormaps()
         import colorcet as cc    # See also: https://colorcet.holoviz.org/
         import cmocean.cm as cmo # See also: https://matplotlib.org/cmocean/
-        # TODO: Add more colormaps
 
     # =============================================================================
     # Support methods
     # =============================================================================
     # Combine dictionaries recursively
-    def _combine_dictionaries(self, dict1, dict2):
+    def _combine_dictionaries(self, dict1, dict2, max_depth=4):
         """Recursively combine dictionaries, prioritising dictionary 2.
 
-        :param dict1: Dictionary 1.
-        :type dict1:  dict
-        :param dict2: Dictionary 2.
-        :type dict2:  dict
-        :return:      Combined dictionary.
-        :rtype:       dict
+        :param dict1:     Dictionary 1.
+        :type dict1:      dict
+        :param dict2:     Dictionary 2.
+        :type dict2:      dict
+        :param max_depth: Maximum depth to combine dictionaries.
+        :type max_depth:  int, optional
+        :return:          Combined dictionary.
+        :rtype:           dict
         """
+
+        # Maximum depth reached --> return dictionary 2
+        if max_depth == 0:
+            return dict2
 
         # Both dictionaries are not dictionaries --> return dictionary 2
         if not isinstance(dict1, dict) and not isinstance(dict2, dict):
@@ -68,7 +75,7 @@ class rpclass:
             return dict1
         
         # Both dictionaries are dictionaries --> combine dictionaries
-        keys = set(list(dict1.keys()) + list(dict2.keys()))
+        keys = list(dict1.keys()) + list(dict2.keys())
         dict3 = {}
         for key in keys:
             # Key not in dictionary 1 --> use dictionary 2
@@ -81,11 +88,137 @@ class rpclass:
             
             # Key in both dictionaries --> combine dictionaries
             else:
-                dict3[key] = self._combine_dictionaries(dict1[key], dict2[key])
+                dict3[key] = self._combine_dictionaries(dict1[key], dict2[key], max_depth=max_depth-1)
         
         # Return combined dictionary
         return dict3
     
+    # Remove conflicting kwargs from dictionary
+    def _remove_dictonary_conflicts(self, dict, warn=True):
+        """ Remove conflicting kwargs from dictionary, prioritising the last kwargs.
+
+        :param dict: Dictionary.
+        :type dict:  dict
+        :param warn: Print warning if conflicting kwargs.
+        :type warn:  bool, optional
+        :return:     Dictionary without conflicting kwargs.
+        :rtype:      dict
+        """
+
+        # Define conflicting kwargs
+        CONFLICT_DICT = {'color': ['cmap'],
+                         'cmap': ['color']}
+
+        # Remove conflicting kwargs
+        dict2 = {}
+        for key in list(dict.keys())[::-1]:
+            if key not in CONFLICT_DICT.keys():
+                dict2[key] = dict[key]
+            elif not any([conflict in dict2.keys() for conflict in CONFLICT_DICT[key]]):
+                dict2[key] = dict[key]
+            elif warn:
+                key2 = [key2 for key2 in CONFLICT_DICT[key] if key2 in dict2.keys()][0]
+                print("\033[93m Warning: Conflicting kwargs ('{}' and '{}') using '{}'. \033[0m".format(key2, key, key2))
+        
+        # Return dictionary without conflicting kwargs
+        return dict2
+
+    # Get guidelines dataframe
+    def _get_df_guidelines(self, guidelines, section):
+        """Get guidelines dataframe.	
+
+        :param guidelines: Guidelines.
+        :type guidelines:  dict
+        :return:           General guidelines dataframe.
+        :rtype:            pandas.DataFrame
+        """
+
+        # Create dataframe
+        df_guidelines = gpd.GeoDataFrame({key: [value] for key, value in guidelines[section].items()}, index=[''])
+
+        # Sort dataframe
+        df_guidelines = df_guidelines[list(guidelines[section].keys())]
+
+        # Return dataframe
+        return df_guidelines
+
+    # Get argument guidelines dataframe
+    def _get_df_argument_guidelines(self, guidelines, default_guidelines, project_guidelines):
+        """Get argument guidelines dataframe.
+
+        :param guidelines:       Guidelines.
+        :type guidelines:        dict
+        :param default_guidelines: Default guidelines.
+        :type default_guidelines:  dict
+        :param project_guidelines: Project guidelines.
+        :type project_guidelines:  dict
+        :param guidelines_type:  Guidelines type.
+        :type guidelines_type:   str
+        :return:                 Argument guidelines dataframe.
+        :rtype:                  pandas.DataFrame
+        """
+        
+        # Get guidelines
+        def _get_guideline(guidelines, parameter, argument, method):
+            if parameter in guidelines.keys() and parameter == 'data_type' and argument in guidelines[parameter].keys() and method in guidelines[parameter][argument].keys():
+                guideline = guidelines[parameter][argument][method] # Data type
+            elif parameter in guidelines.keys() and parameter == 'geom_type' and argument in guidelines[parameter].keys() and method in ['grid', 'geometries']:
+                guideline = guidelines[parameter][argument] # Geom type
+            elif parameter in guidelines.keys() and parameter == 'map_type' and argument in guidelines[parameter].keys() and method in ['basemap']:
+                guideline = guidelines[parameter][argument] # Map type
+            elif parameter in guidelines.keys() and parameter == 'extent_type' and argument in guidelines[parameter].keys():
+                guideline = guidelines[parameter][argument] # Extent type
+            else:
+                guideline = None
+            return guideline
+        
+        # Compare guidelines
+        def _compare_guidelines(guidelines, default_guidelines, project_guidelines, parameter, argument, method):
+            # Get guidelines
+            guideline = _get_guideline(guidelines, parameter, argument, method)
+            default_guideline = _get_guideline(default_guidelines, parameter, argument, method)
+            project_guideline = _get_guideline(project_guidelines, parameter, argument, method)
+
+            # Compare guidelines
+            if guideline is None:
+                return '' # No guidelines
+            elif guideline == default_guideline and guideline == project_guideline:
+                return 'D=P' # Default guideline equal to project guideline
+            elif guideline == default_guideline:
+                return 'D' # Default guideline
+            elif guideline == project_guideline:
+                return 'P' # Project guideline
+            else:
+                return 'D+P' # Default guideline merged with project guideline
+
+        # Initialise lists
+        parameters = []
+        arguments = []
+        methods = {'pcolormesh': [], 'imshow': [], 'scatter': [], 'contourf': [], 'contour': [],
+                    'quiver': [], 'streamplot': [], 'grid': [], 'geometries': [], 'basemap': [], 'cartopy': []}
+
+        # Add parameters, arguments and methods
+        for parameter in ['data_type', 'geom_type', 'map_type', 'extent_type']:
+            if parameter not in guidelines.keys():
+                continue
+            for argument in guidelines[parameter]:
+                parameters.append(parameter)
+                arguments.append(argument)
+                for method in methods.keys():
+                    methods[method].append(_compare_guidelines(guidelines, default_guidelines, project_guidelines, parameter, argument, method))
+
+        # Create dataframe
+        df_guidelines = pd.DataFrame({'parameter': parameters, 'argument': arguments, **methods})
+
+        # Set multi-index
+        df_guidelines = df_guidelines.set_index(['parameter', 'argument'])
+
+        # Reindex argument guidelines dataframe
+        df_guidelines = df_guidelines.reindex(['data_type', 'geom_type', 'map_type', 'extent_type'], level=0)
+
+        # Return dataframe
+        return df_guidelines
+
     # Set guidelines
     def set_guidelines(self, project_guidelines=None):
         """Set guidelines.
@@ -97,25 +230,40 @@ class rpclass:
         """
 
         # Read default guidelines
-        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'default_guidelines.json')) as f:
+        dir_path_data = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+        with open(os.path.join(dir_path_data, 'default_guidelines.json')) as f:
             default_guidelines = json.load(f)
 
         # Read project guidelines
         if project_guidelines is None:
             project_guidelines = {}
-        elif isinstance(project_guidelines, str):
-            with open(project_guidelines) as f:
-                project_guidelines = json.load(f)
         elif isinstance(project_guidelines, dict):
             project_guidelines = project_guidelines
+        elif isinstance(project_guidelines, str):
+            if os.path.exists(os.path.join(dir_path_data, project_guidelines)) and not os.path.exists(project_guidelines):
+                project_guidelines = os.path.join(dir_path_data, project_guidelines)
+            with open(project_guidelines) as f:
+                project_guidelines = json.load(f)
         else:
-            raise ValueError('Project guidelines must be a file path (str) or a dictionary (dict).')
-        
+            raise ValueError('Project guidelines must be a file path (str) or a dictionary (dict). Received: {}'.format(type(project_guidelines)))
+
         # Combine guidelines, prioritising project guidelines
         guidelines = self._combine_dictionaries(default_guidelines, project_guidelines)
 
+        # Remove conflicting kwargs from guidelines
+        guidelines = self._remove_dictonary_conflicts(guidelines, warn=False)
+
         # Set guidelines
         self.guidelines = guidelines
+
+        # Set metadata guidelines dataframe
+        self._df_metadata_guidelines = self._get_df_guidelines(guidelines, 'metadata')
+
+        # Set general guidelines dataframe
+        self._df_general_guidelines = self._get_df_guidelines(guidelines, 'general')
+
+        # Set argument guidelines dataframe
+        self._df_argument_guidelines = self._get_df_argument_guidelines(guidelines, default_guidelines, project_guidelines)
     
     # Get guidelines
     def get_guidelines(self):
@@ -128,17 +276,40 @@ class rpclass:
         # Return guidelines
         return self.guidelines
     
-    # Get guideline options
-    def get_guideline_options(self):
-        """Get guideline options per guideline type.
+    # Print guidelines
+    def print_guidelines(self):
+        """Print guidelines.
 
-        :return: Guideline options per guideline type.
-        :rtype:  dict
+        :return: None.
+        :rtype:  None
         """
-        
-        # Return guideline options
-        return {key: list(value.keys()) for key, value in self.guidelines.items()}
-    
+
+        # Print metadata guidelines dataframe
+        s = self._df_metadata_guidelines.style
+        s = s.set_properties(**{'text-align': 'center'}).set_caption('Metadata')
+        s = s.set_table_styles([{'selector': 'th', 'props': [('text-align', 'center')]},
+                                {'selector': 'thead', 'props': [('border-bottom', '2px solid black')]},
+                                {'selector': 'caption', 'props': [('font-weight', 'bold')]}])
+        display(s)
+
+        # Print general guidelines dataframe
+        s = self._df_general_guidelines.style
+        s = s.set_properties(**{'text-align': 'center'}).set_caption('General')
+        s = s.set_table_styles([{'selector': 'th', 'props': [('text-align', 'center')]},
+                                {'selector': 'thead', 'props': [('border-bottom', '2px solid black')]},
+                                {'selector': 'caption', 'props': [('font-weight', 'bold')]}])
+        display(s)
+
+        # Print argument guidelines dataframe
+        s = self._df_argument_guidelines.style
+        for _, df_group in self._df_argument_guidelines.groupby(level=0):
+            s = s.set_properties(**{'text-align': 'center'})
+            s = s.set_table_styles({df_group.index[0]: [{'selector': '', 'props': 'border-top: 2px solid black'}]}, overwrite=False, axis=1)
+        s = s.set_caption('Arguments (D: Default, P: Project, D=P: Default equal to Project, D+P: Default merged with Project)')
+        s = s.set_table_styles([{'selector': 'thread', 'props': [('border-top', '2px solid black')]},
+                                {'selector': 'caption', 'props': [('font-weight', 'bold')]}], overwrite=False)
+        display(s)
+
     # Set cartopy
     def set_cartopy(self, features=None, bounds=None, crs=None):
         """Set cartopy geometries.
@@ -187,7 +358,9 @@ class rpclass:
         # Plot custom colormaps
         rpc.colormaps.plot_colormaps()
     
-
+    # =============================================================================
+    # Plot methods
+    # =============================================================================
     # Create figure and axes
     def subplots(self, *args, **kwargs):
         """Create figure and axes.
@@ -209,7 +382,7 @@ class rpclass:
         return fig, axs
 
     # Save figure
-    def savefig(self, fig, file_path, dpi=300, bbox_inches='tight', **kwargs):
+    def savefig(self, fig, file_path, close=True, dpi=300, bbox_inches='tight', **kwargs):
         """Save figure.
 
         :param file_path:   File path to save figure.
@@ -239,7 +412,27 @@ class rpclass:
             renderer = hv.renderer('bokeh')
             renderer.save(fig, file_path, fmt='html')
         else:
-            raise TypeError('fig must be a matplotlib.figure.Figure or holoviews.element.chart.Element or holoviews.element.chart.Overlay or holoviews.element.chart.DynamicMap.')
+            raise TypeError('fig must be a matplotlib.figure.Figure or holoviews.element.chart.Element or holoviews.element.chart.Overlay or holoviews.element.chart.DynamicMap. Received: {}'.format(type(fig)))
+        
+    # Create video
+    def create_video(self, file_paths, file_path_video, fps=5, frame_size=(1920, 1080), **kwargs):
+        """Create video from images.
+
+        :param file_paths:      File paths to images.
+        :type file_paths:       list[str]
+        :param file_path_video: File path to video.
+        :type file_path_video:  str
+        :param fps:             Frames per second.
+        :type fps:              int, optional
+        :param frame_size:      Frame size.
+        :type frame_size:       tuple[int, int], optional
+        :param kwargs:          Keyword arguments for :func:`resilientplotterclass.video.create_video`.
+        :type kwargs:           dict, optional
+        :return:                None.
+        """
+
+        # Create video
+        rpc.videos.create_video(file_paths, file_path_video, fps=fps, frame_size=frame_size, **kwargs)
 
     # =============================================================================
     # General plot methods
@@ -265,6 +458,12 @@ class rpclass:
         # Get plot_type (function name)
         plot_type = inspect.currentframe().f_code.co_name
 
+        # Get default types
+        if data_type is None:
+            data_type = self.guidelines['general']['default_types']['data_type']
+        if extent_type is None:
+            extent_type = self.guidelines['general']['default_types']['extent_type']
+
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
         if data_type is not None:
@@ -272,13 +471,17 @@ class rpclass:
         if extent_type is not None:
             kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type], kwargs)
 
+        # Remove conflicting kwargs
+        kwargs = self._remove_dictonary_conflicts(kwargs)
+
+
         # Plot data
         if isinstance(data, xr.DataArray):
             p = rpc.data_xarray.pcolormesh(data, ax=ax, **kwargs)
         elif isinstance(data, xu.UgridDataArray):
             p = rpc.data_xugrid.pcolormesh(data, ax=ax, **kwargs)
         else:
-            raise TypeError('data type not supported. Please provide a xarray.DataArray or xugrid.UgridDataArray.')
+            raise TypeError('data type not supported. Please provide a xarray.DataArray or xugrid.UgridDataArray. Received: {}'.format(type(data)))
         
         # Return plot
         return p
@@ -304,12 +507,21 @@ class rpclass:
         # Get plot_type (function name)
         plot_type = inspect.currentframe().f_code.co_name
 
+        # Get default types
+        if data_type is None:
+            data_type = self.guidelines['general']['default_types']['data_type']
+        if extent_type is None:
+            extent_type = self.guidelines['general']['default_types']['extent_type']
+
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
         if data_type is not None:
             kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type], kwargs)
         if extent_type is not None:
             kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type], kwargs)
+
+        # Remove conflicting kwargs
+        kwargs = self._remove_dictonary_conflicts(kwargs)
         
         # Plot data
         if isinstance(data, xr.DataArray):
@@ -317,7 +529,7 @@ class rpclass:
         elif isinstance(data, xu.UgridDataArray):
             p = rpc.data_xugrid.imshow(data, ax=ax, **kwargs)
         else:
-            raise TypeError('data type not supported. Please provide a xarray.DataArray or xugrid.UgridDataArray.')
+            raise TypeError('data type not supported. Please provide a xarray.DataArray or xugrid.UgridDataArray. Received: {}'.format(type(data)))
         
         # Return plot
         return p
@@ -343,6 +555,12 @@ class rpclass:
         # Get plot_type (function name)
         plot_type = inspect.currentframe().f_code.co_name
 
+        # Get default types
+        if data_type is None:
+            data_type = self.guidelines['general']['default_types']['data_type']
+        if extent_type is None:
+            extent_type = self.guidelines['general']['default_types']['extent_type']
+
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
         if data_type is not None:
@@ -350,13 +568,16 @@ class rpclass:
         if extent_type is not None:
             kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type], kwargs)
 
+        # Remove conflicting kwargs
+        kwargs = self._remove_dictonary_conflicts(kwargs)
+
         # Plot data
         if isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset):
             p = rpc.data_xarray.scatter(data, ax=ax, **kwargs)
         elif isinstance(data, xu.UgridDataArray):
             p = rpc.data_xugrid.scatter(data, ax=ax, **kwargs)
         else: 
-            raise TypeError('data type not supported. Please provide a xarray.DataArray, xarray.Dataset or xugrid.UgridDataArray.')
+            raise TypeError('data type not supported. Please provide a xarray.DataArray, xarray.Dataset or xugrid.UgridDataArray. Received: {}'.format(type(data)))
         
         # Return plot
         return p
@@ -382,6 +603,12 @@ class rpclass:
         # Get plot_type (function name)
         plot_type = inspect.currentframe().f_code.co_name
 
+        # Get default types
+        if data_type is None:
+            data_type = self.guidelines['general']['default_types']['data_type']
+        if extent_type is None:
+            extent_type = self.guidelines['general']['default_types']['extent_type']
+
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
         if data_type is not None:
@@ -389,13 +616,16 @@ class rpclass:
         if extent_type is not None:
             kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type], kwargs)
 
+        # Remove conflicting kwargs
+        kwargs = self._remove_dictonary_conflicts(kwargs)
+
         # Plot data
         if isinstance(data, xr.DataArray):
             p = rpc.data_xarray.contourf(data, ax=ax, **kwargs)
         elif isinstance(data, xu.UgridDataArray):
             p = rpc.data_xugrid.contourf(data, ax=ax, **kwargs)
         else:
-            raise TypeError('data type not supported. Please provide a xarray.DataArray or xugrid.UgridDataArray.')
+            raise TypeError('data type not supported. Please provide a xarray.DataArray or xugrid.UgridDataArray. Received: {}'.format(type(data)))
         
         # Return plot
         return p
@@ -421,6 +651,12 @@ class rpclass:
         # Get plot_type (function name)
         plot_type = inspect.currentframe().f_code.co_name
 
+        # Get default types
+        if data_type is None:
+            data_type = self.guidelines['general']['default_types']['data_type']
+        if extent_type is None:
+            extent_type = self.guidelines['general']['default_types']['extent_type']
+
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
         if data_type is not None:
@@ -428,13 +664,16 @@ class rpclass:
         if extent_type is not None:
             kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type], kwargs)
 
+        # Remove conflicting kwargs
+        kwargs = self._remove_dictonary_conflicts(kwargs)
+
         # Plot data
         if isinstance(data, xr.DataArray):
             p = rpc.data_xarray.contour(data, ax=ax, **kwargs)
         elif isinstance(data, xu.UgridDataArray) or isinstance(data, xu.UgridDataset):
             p = rpc.data_xugrid.contour(data, ax=ax, **kwargs)
         else:
-            raise TypeError('data type not supported. Please provide a xarray.DataArray or xugrid.UgridDataArray.')
+            raise TypeError('data type not supported. Please provide a xarray.DataArray or xugrid.UgridDataArray. Received: {}'.format(type(data)))
         
         # Return plot
         return p
@@ -460,12 +699,21 @@ class rpclass:
         # Get plot_type (function name)
         plot_type = inspect.currentframe().f_code.co_name
 
+        # Get default types
+        if data_type is None:
+            data_type = self.guidelines['general']['default_types']['data_type']
+        if extent_type is None:
+            extent_type = self.guidelines['general']['default_types']['extent_type']
+
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
         if data_type is not None:
             kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type], kwargs)
         if extent_type is not None:
             kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type], kwargs)
+        
+        # Remove conflicting kwargs
+        kwargs = self._remove_dictonary_conflicts(kwargs)
 
         # Plot data
         if isinstance(data, xr.Dataset):
@@ -473,7 +721,7 @@ class rpclass:
         elif isinstance(data, xu.UgridDataset):
             p = rpc.data_xugrid.quiver(data, ax=ax, **kwargs)
         else:
-            raise TypeError('data type not supported. Please provide a xarray.Dataset or xugrid.UgridDataset.')
+            raise TypeError('data type not supported. Please provide a xarray.Dataset or xugrid.UgridDataset. Received: {}'.format(type(data)))
         
         # Return plot
         return p
@@ -499,32 +747,41 @@ class rpclass:
         # Get plot_type (function name)
         plot_type = inspect.currentframe().f_code.co_name
 
+        # Get default types
+        if data_type is None:
+            data_type = self.guidelines['general']['default_types']['data_type']
+        if extent_type is None:
+            extent_type = self.guidelines['general']['default_types']['extent_type']
+
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
         if data_type is not None:
             kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type], kwargs)
         if extent_type is not None:
             kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type], kwargs)
+
+        # Remove conflicting kwargs
+        kwargs = self._remove_dictonary_conflicts(kwargs)
         
         # Plot data
         if isinstance(da, xr.Dataset):
             p = rpc.data_xarray.streamplot(da, ax=ax, **kwargs)
         else:
-            raise TypeError('data type not supported. Please provide a xarray.Dataset.')
+            raise TypeError('data type not supported. Please provide a xarray.Dataset. Received: {}'.format(type(da)))
 
         # Return plot
         return p
 
     # Plot grid using xugrid
-    def grid(self, data, ax=None, geometry_type='grid', extent_type=None, **kwargs):
+    def grid(self, data, ax=None, geom_type='grid', extent_type=None, **kwargs):
         """Plot grid using xugrid.
 
         :param data:          Data to plot.
         :type data:           xugrid.UgridDataArray
         :param ax:            Axis.
         :type ax:             matplotlib.axes.Axes, optional
-        :param geometry_type: Geometry type from guidelines.
-        :type geometry_type:  str, optional
+        :param geom_type:     Geometry type from guidelines.
+        :type geom_type:      str, optional
         :param extent_type:   Extent type from guidelines.
         :type extent_type:    str, optional
         :param kwargs:        Keyword arguments for :func:`resilientplotterclass.data_xugrid.grid`.
@@ -533,32 +790,41 @@ class rpclass:
         :rtype:               matplotlib.axes.Axes
         """
 
+        # Get default types
+        if geom_type is None:
+            geom_type = self.guidelines['general']['default_types']['geom_type']
+        if extent_type is None:
+            extent_type = self.guidelines['general']['default_types']['extent_type']
+
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
-        if geometry_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['geometry_type'][geometry_type], kwargs)
+        if geom_type is not None:
+            kwargs = self._combine_dictionaries(self.guidelines['geom_type'][geom_type], kwargs)
         if extent_type is not None:
             kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type], kwargs)
+        
+        # Remove conflicting kwargs
+        kwargs = self._remove_dictonary_conflicts(kwargs)
         
         # Plot grid
         if isinstance(data, xu.UgridDataArray) or isinstance(data, xu.UgridDataset):
             ax = rpc.data_xugrid.grid(data, ax=ax, **kwargs)
         else:
-            raise TypeError('data type not supported. Please provide a xugrid.UgridDataArray.')
+            raise TypeError('data type not supported. Please provide a xugrid.UgridDataArray. Received: {}'.format(type(data)))
 
         # Return axis
         return ax
     
     # Plot geometries using geopandas
-    def geometries(self, gdf, ax=None, geometry_type=None, extent_type=None, **kwargs):
+    def geometries(self, gdf, ax=None, geom_type=None, extent_type=None, **kwargs):
         """Plot geometries using geopandas.
 
         :param gdf:           geometries to plot.
         :type gdf:            geopandas.GeoDataFrame
         :param ax:            Axis.
         :type ax:             matplotlib.axes.Axes, optional
-        :param geometry_type: Geometry type from guidelines.
-        :type geometry_type:  str, optional
+        :param geom_type:     Geometry type from guidelines.
+        :type geom_type:      str, optional
         :param extent_type:   Extent type from guidelines.
         :type extent_type:    str, optional
         :param kwargs:        Keyword arguments for :func:`resilientplotterclass.geometries.plot_geometries`.
@@ -567,47 +833,31 @@ class rpclass:
         :rtype:               matplotlib.axes.Axes
         """
         
+        # Get default types
+        if geom_type is None:
+            geom_type = self.guidelines['general']['default_types']['geom_type']
+        if extent_type is None:
+            extent_type = self.guidelines['general']['default_types']['extent_type']
+
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
-        if geometry_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['geometry_type'][geometry_type], kwargs)
+        if geom_type is not None:
+            kwargs = self._combine_dictionaries(self.guidelines['geom_type'][geom_type], kwargs)
         if extent_type is not None:
             kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type], kwargs)
+
+        # Remove conflicting kwargs
+        kwargs = self._remove_dictonary_conflicts(kwargs)
         
         # Plot geometries
         if isinstance(gdf, gpd.GeoDataFrame):
             ax = rpc.geometries.plot_geometries(gdf, ax=ax, **kwargs)
         else:
-            raise TypeError('gdf must be a geopandas.GeoDataFrame.')
+            raise TypeError('gdf must be a geopandas.GeoDataFrame. Received: {}'.format(type(gdf)))
 
         # Return axis
         return ax
-
-    # Plot cartopy geometries using geopandas
-    def cartopy(self, ax=None, extent_type=None, **kwargs):
-        """Plot cartopy geometries using geopandas.
-
-        :param ax:          Axis.
-        :type ax:           matplotlib.axes.Axes, optional
-        :param extent_type: Extent type from guidelines.
-        :type extent_type:  str, optional
-        :param kwargs:      Keyword arguments for :func:`resilientplotterclass.geometries.plot_geometries`.
-        :type kwargs:       dict, optional
-        :return:            Axis.
-        :rtype:             matplotlib.axes.Axes
-        """
-        
-        # Combine guidelines and user keyword arguments, prioritising user keyword arguments
-        kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
-        if extent_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type], kwargs)
-        
-        # Plot cartopy geometries
-        ax = rpc.geometries.plot_geometries(self.get_cartopy(), ax=ax, **kwargs)
-
-        # Return axis
-        return ax
-
+    
     # Plot basemap using contextily
     def basemap(self, crs=None, ax=None, map_type=None, extent_type=None, **kwargs):
         """Plot basemap using contextily.
@@ -625,19 +875,57 @@ class rpclass:
         :return:            None.
         :rtype:             None
         """
-        
-        # Combine guidelines and user keyword arguments, prioritising user keyword arguments
+
+        # Get default types
         if crs is None:
             crs = self.guidelines['general']['crs']
+        if map_type is None:
+            map_type = self.guidelines['general']['default_types']['map_type']
+        if extent_type is None:
+            extent_type = self.guidelines['general']['default_types']['extent_type']
+        
+        # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
         if map_type is not None:
             kwargs = self._combine_dictionaries(self.guidelines['map_type'][map_type], kwargs)
         if extent_type is not None:
             kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type], kwargs)
+
+        # Remove conflicting kwargs
+        kwargs = self._remove_dictonary_conflicts(kwargs)
         
         # Plot basemap
         rpc.basemaps.plot_basemap(crs=crs, ax=ax, **kwargs)
+    
+    # Plot cartopy geometries using geopandas
+    def cartopy(self, ax=None, extent_type=None, **kwargs):
+        """Plot cartopy geometries using geopandas.
 
+        :param ax:          Axis.
+        :type ax:           matplotlib.axes.Axes, optional
+        :param extent_type: Extent type from guidelines.
+        :type extent_type:  str, optional
+        :param kwargs:      Keyword arguments for :func:`resilientplotterclass.geometries.plot_geometries`.
+        :type kwargs:       dict, optional
+        :return:            Axis.
+        :rtype:             matplotlib.axes.Axes
+        """
+
+        # Get default types
+        if extent_type is None:
+            extent_type = self.guidelines['general']['default_types']['extent_type']
+        
+        # Combine guidelines and user keyword arguments, prioritising user keyword arguments
+        kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
+        if extent_type is not None:
+            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type], kwargs)
+        
+        # Plot cartopy geometries
+        ax = rpc.geometries.plot_geometries(self.get_cartopy(), ax=ax, **kwargs)
+
+        # Return axis
+        return ax
+    
     def interactive_data(self, data, data_type=None, **kwargs):
         """Plot data interactively.
 
@@ -661,26 +949,29 @@ class rpclass:
         if data_type is not None:
             kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type], kwargs)
         
+        # Remove conflicting kwargs
+        kwargs = self._remove_dictonary_conflicts(kwargs)
+        
         # Plot data
         if isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset):
             p = rpc.interactive.interactive_da(data, **kwargs)
         elif isinstance(data, xu.UgridDataArray) or isinstance(data, xu.UgridDataset):
             p = rpc.interactive.interactive_uda(data, **kwargs)
         else:
-            raise TypeError('data type not supported. Please provide a xarray.DataArray or xugrid.UgridDataArray.')
+            raise TypeError('data type not supported. Please provide a xarray.DataArray or xugrid.UgridDataArray. Received: {}'.format(type(data)))
         
         # Return plot
         return p
     
-    def interactive_geometries(self, gdf, geometry_type=None, **kwargs):
+    def interactive_geometries(self, gdf, geom_type=None, **kwargs):
         """Plot geometries interactively.
 
         :param gdf:           Geodataframe to plot.
         :type gdf:            geopandas.GeoDataFrame
         :param ax:            Axis.
         :type ax:             matplotlib.axes.Axes, optional
-        :param geometry_type: Geometry type from guidelines.
-        :type geometry_type:  str, optional
+        :param geom_type:     Geometry type from guidelines.
+        :type geom_type:      str, optional
         :param kwargs:        Keyword arguments for :func:`resilientplotterclass.interactive.geometries_interactive`.
         :type kwargs:         dict, optional
         :return:              Interactive plot.
@@ -689,8 +980,11 @@ class rpclass:
 
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
-        if geometry_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['geometry_type'][geometry_type], kwargs)
+        if geom_type is not None:
+            kwargs = self._combine_dictionaries(self.guidelines['geom_type'][geom_type], kwargs)
+
+        # Remove conflicting kwargs
+        kwargs = self._remove_dictonary_conflicts(kwargs)
         
         # Plot geometries interactively
         p = rpc.interactive.interactive_gdf(gdf, **kwargs)
@@ -711,6 +1005,9 @@ class rpclass:
 
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
+
+        # Remove conflicting kwargs
+        kwargs = self._remove_dictonary_conflicts(kwargs)
         
         # Plot cartopy geometries interactively 
         p = rpc.interactive.interactive_gdf_cartopy(self.get_cartopy(), **kwargs)
@@ -729,6 +1026,9 @@ class rpclass:
         if map_type is None:
             map_type = self.guidelines['general']['map_type']
 
+        # Remove conflicting kwargs
+        kwargs = self._remove_dictonary_conflicts(kwargs)
+
         # Plot basemap interactively
         p = rpc.interactive.interactive_basemap(map_type=map_type, **kwargs)
 
@@ -739,7 +1039,7 @@ class rpclass:
     # Specialised plot methods
     # =============================================================================
     # Plot bathymetry
-    def bathymetry(self, da, gdf=None, ax=None, data_type='bathymetry', geometry_type='aoi', map_type='satellite', extent_type=None):
+    def bathymetry(self, da, gdf=None, ax=None, data_type='bathymetry', geom_type='aoi', map_type='satellite', extent_type=None):
         """Plot bathymetry.
 
         :param da:            DataArray or UgridDataArray to plot.
@@ -750,8 +1050,8 @@ class rpclass:
         :type ax:             matplotlib.axes.Axes, optional
         :param data_type:     Data type from guidelines.
         :type data_type:      str, optional
-        :param geometry_type: Geometry type from guidelines.
-        :type geometry_type:  str, optional
+        :param geom_type:     Geometry type from guidelines.
+        :type geom_type:      str, optional
         :param map_type:      Map type from guidelines.
         :type map_type:       str, optional
         :param extent_type:   Extent type from guidelines.
@@ -776,7 +1076,7 @@ class rpclass:
         
         # Plot geometries
         if gdf is not None:
-            self.geometries(gdf, ax=ax, geometry_type=geometry_type, extent_type=extent_type)
+            self.geometries(gdf, ax=ax, geom_type=geom_type, extent_type=extent_type)
             ax.legend(loc='upper right')
 
         # Get coordinate reference system
@@ -792,59 +1092,59 @@ class rpclass:
         return ax
 
     # Plot topography
-    def topography(self, da, gdf=None, ax=None, data_type='topography', geometry_type='aoi', map_type='satellite', extent_type=None):
+    def topography(self, da, gdf=None, ax=None, data_type='topography', geom_type='aoi', map_type='satellite', extent_type=None):
         pass
 
     # Plot bedforms
-    def bedforms(self, da, ax=None, data_type='bathymetry', geometry_type='aoi', map_type='satellite', extent_type=None):
+    def bedforms(self, da, ax=None, data_type='bathymetry', geom_type='aoi', map_type='satellite', extent_type=None):
         pass
 
     # Plot morphology
-    def morphology(self, da, gdf=None, ax=None, data_type='bathymetry', geometry_type='aoi', map_type='satellite', extent_type=None):
+    def morphology(self, da, gdf=None, ax=None, data_type='bathymetry', geom_type='aoi', map_type='satellite', extent_type=None):
         pass
 
     # Plot flow velocity
-    def flow_velocity(self, da, gdf=None, ax=None, data_type='bathymetry', geometry_type='aoi', map_type='satellite', extent_type=None):
+    def flow_velocity(self, da, gdf=None, ax=None, data_type='bathymetry', geom_type='aoi', map_type='satellite', extent_type=None):
         pass
 
     # Plot flow direction
-    def flow_direction(self,da, gdf=None, ax=None, data_type='bathymetry', geometry_type='aoi', map_type='satellite', extent_type=None):
+    def flow_direction(self,da, gdf=None, ax=None, data_type='bathymetry', geom_type='aoi', map_type='satellite', extent_type=None):
         pass
 
     # Plot wave height
-    def wave_height(self, da, gdf=None, ax=None, data_type='bathymetry', geometry_type='aoi', map_type='satellite', extent_type=None):
+    def wave_height(self, da, gdf=None, ax=None, data_type='bathymetry', geom_type='aoi', map_type='satellite', extent_type=None):
         pass
 
     # Plot wave period
-    def wave_period(self, da, gdf=None, ax=None, data_type='bathymetry', geometry_type='aoi', map_type='satellite', extent_type=None):
+    def wave_period(self, da, gdf=None, ax=None, data_type='bathymetry', geom_type='aoi', map_type='satellite', extent_type=None):
         pass
 
     # Plot wave direction
-    def wave_direction(self, da, gdf=None, ax=None, data_type='bathymetry', geometry_type='aoi', map_type='satellite', extent_type=None):
+    def wave_direction(self, da, gdf=None, ax=None, data_type='bathymetry', geom_type='aoi', map_type='satellite', extent_type=None):
         pass
     
     # Plot sediment transport
-    def sediment_transport(self, da, gdf=None, data_type='bathymetry', geometry_type='aoi', map_type='satellite', extent_type=None):
+    def sediment_transport(self, da, gdf=None, data_type='bathymetry', geom_type='aoi', map_type='satellite', extent_type=None):
         pass
     
     # Plot sediment concentration
-    def sediment_concentration(self, da, gdf=None, ax=None, data_type='bathymetry', geometry_type='aoi', map_type='satellite', extent_type=None):
+    def sediment_concentration(self, da, gdf=None, ax=None, data_type='bathymetry', geom_type='aoi', map_type='satellite', extent_type=None):
         pass
 
     # Plot sediment particle size
-    def sediment_particle_size(self, da, gdf=None, ax=None, data_type='bathymetry', geometry_type='aoi', map_type='satellite', extent_type=None):
+    def sediment_particle_size(self, da, gdf=None, ax=None, data_type='bathymetry', geom_type='aoi', map_type='satellite', extent_type=None):
         pass
 
     # Plot pretty geometries
-    def pretty_geometries(self, gdf, ax=None, geometry_type='aoi', map_type='satellite', extent_type=None):
+    def pretty_geometries(self, gdf, ax=None, geom_type='aoi', map_type='satellite', extent_type=None):
         """Plot pretty geometries.
 
         :param gdf:           Geodataframe to plot.
         :type gdf:            geopandas.GeoDataFrame
         :param ax:            Axis.
         :type ax:             matplotlib.axes.Axes, optional
-        :param geometry_type: Geometry type from guidelines.
-        :type geometry_type:  str, optional
+        :param geom_type:     Geometry type from guidelines.
+        :type geom_type:      str, optional
         :param map_type:      Map type from guidelines.
         :type map_type:       str, optional
         :param extent_type:   Extent type from guidelines.
@@ -858,7 +1158,7 @@ class rpclass:
             _, ax = plt.subplots(1, 1, figsize=(10, 10))
 
         # Plot geometries
-        self.geometries(gdf, ax=ax, geometry_type=geometry_type, extent_type=extent_type)
+        self.geometries(gdf, ax=ax, geom_type=geom_type, extent_type=extent_type)
         ax.legend(loc='upper right')
 
         # Get coordinate reference system
@@ -871,7 +1171,7 @@ class rpclass:
         return ax
     
     # Plot pretty grid
-    def pretty_grid(self, da, gdf=None, ax=None, geometry_type='aoi', map_type='satellite', extent_type=None):
+    def pretty_grid(self, da, gdf=None, ax=None, geom_type='aoi', map_type='satellite', extent_type=None):
         """Plot pretty grid.
 
         :param da:             DataArray or UgridDataArray to plot.
@@ -880,10 +1180,10 @@ class rpclass:
         :type gdf:             geopandas.GeoDataFrame, optional
         :param ax:             Axis.
         :type ax:              matplotlib.axes.Axes, optional
-        :param geometry_type:  Geometry type from guidelines.
-        :type geometry_type:   str, optional
-        :param geometry_type2: Geometry type from guidelines.
-        :type geometry_type2:  str, optional
+        :param geom_type:      Geometry type from guidelines.
+        :type geom_type:       str, optional
+        :param geom_type2:     Geometry type from guidelines.
+        :type geom_type2:      str, optional
         :param map_type:       Map type from guidelines.
         :type map_type:        str, optional
         :param extent_type:    Extent type from guidelines.
@@ -901,7 +1201,7 @@ class rpclass:
         
         # Plot geometries
         if gdf is not None:
-            self.geometries(gdf, ax=ax, geometry_type=geometry_type, extent_type=extent_type)
+            self.geometries(gdf, ax=ax, geom_type=geom_type, extent_type=extent_type)
             ax.legend(loc='upper right')
 
         # Get coordinate reference system
@@ -940,7 +1240,7 @@ class rpclass:
         elif isinstance(data, gpd.GeoDataFrame):
             data = data.to_crs(crs, **kwargs)
         else:
-            raise TypeError('data type not supported. Please provide a xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray, xugrid.UgridDataset or geopandas.GeoDataFrame.')
+            raise TypeError('data type not supported. Please provide a xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray, xugrid.UgridDataset or geopandas.GeoDataFrame. Received: {}'.format(type(data)))
         
         # Return reprojected data
         return data
@@ -962,7 +1262,7 @@ class rpclass:
             data = xu.UgridDataArray.from_structured(data, **kwargs)
             data.grid.crs = crs
         else:
-            raise TypeError('data type not supported. Please provide a xarray.DataArray or xarray.Dataset.')
+            raise TypeError('data type not supported. Please provide a xarray.DataArray or xarray.Dataset. Received: {}'.format(type(data)))
         
         # Return unstructured data
         return data
@@ -975,16 +1275,18 @@ class rpclass:
         :type data:            xugrid.UgridDataArray or xugrid.UgridDataset
         :param data_blueprint: Data blueprint.
         :type data_blueprint:  xarray.DataArray or xarray.Dataset, optional
-        :param kwargs:         Keyword arguments for :func:`resilientplotterclass.utils.rasterise_xugrid`.
+        :param kwargs:         Keyword arguments for :func:`resilientplotterclass.utils.rasterise_uda` or :func:`resilientplotterclass.utils.rasterise_uds`.
         :return:               Structured data.
         :rtype:                xarray.DataArray or xarray.Dataset
         """
 
         # Convert unstructured data to structured data
-        if isinstance(data, xu.UgridDataArray) or isinstance(data, xu.UgridDataset):
-            data = rpc.utils.rasterise_xugrid(data, data_blueprint, **kwargs)
+        if isinstance(data, xu.UgridDataset):
+            data = rpc.utils.rasterise_uds(data, data_blueprint, **kwargs)
+        elif isinstance(data, xu.UgridDataArray):
+            data = rpc.utils.rasterise_uda(data, data_blueprint, **kwargs)
         else:
-            raise TypeError('data type not supported. Please provide a xugrid.UgridDataArray or xugrid.UgridDataset.')
+            raise TypeError('data type not supported. Please provide a xugrid.UgridDataArray or xugrid.UgridDataset. Received: {}'.format(type(data)))
         
         # Return structured data
         return data

@@ -8,5 +8,6 @@
 
    .. autosummary::
    
+      append_cbar_axis
       format
    

@@ -15,6 +15,7 @@ dependencies = [
     'cartopy',
     'colorcet',
     'cmocean',
+    'opencv-python',
 
     'holoviews',
     'geoviews',

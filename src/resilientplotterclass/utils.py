@@ -83,11 +83,11 @@ def reproject_xugrid(uda, crs, **kwargs):
     # Return the reprojected data
     return uda_rescaled
 
-def rasterise_xugrid(uda, da=None, **kwargs):
+def rasterise_uda(uda, da=None, **kwargs):
     """Rasterise data.
 
     :param uda:    Data to rasterise.
-    :type uda:     xugrid.UgridDataSet
+    :type uda:     xugrid.DataArray
     :param da:     Data array to rasterise data on.
     :type da:      xarray.DataArray, optional
     :param kwargs: Keyword arguments for :func:`xugrid.Ugrid.grid.rasterize`.
@@ -95,7 +95,8 @@ def rasterise_xugrid(uda, da=None, **kwargs):
     :return:       Rasterised data.
     :rtype:        xarray.DataArray
 
-    See also: `xugrid.Ugrid.grid.rasterize <https://xugrid.readthedocs.io/en/stable/api/xugrid.Ugrid.html#xugrid.Ugrid.grid.rasterize>`_.
+    See also: `xugrid.Ugrid.grid.rasterize <https://deltares.github.io/xugrid/api/xugrid.UgridDatasetAccessor.rasterize.html>`_,
+              `xugrid.Ugrid.grid.rasterize_like <https://deltares.github.io/xugrid/api/xugrid.UgridDatasetAccessor.rasterize_like.html>`_.
     """
 
     # Create data array with grid indices
@@ -105,6 +106,9 @@ def rasterise_xugrid(uda, da=None, **kwargs):
         x, y, zG = uda.grid.rasterize(**kwargs)
     da_grid = xr.DataArray(zG, dims=['y', 'x'], coords={'y': y, 'x': x})
     da_grid = da_grid.where(da_grid != -1)
+
+    # Transpose data array
+    da_grid = da_grid.transpose('y', 'x')
 
     # Initialise data array with data
     da_data = da_grid.copy(deep=True)
@@ -133,3 +137,83 @@ def rasterise_xugrid(uda, da=None, **kwargs):
 
     # Return the rasterised data
     return da_data
+
+def rasterise_uds(uds, ds=None, bounds=None, resolution=None):
+    """Rasterise data.
+
+    :param uds:        Data to rasterise.
+    :type uds:         xugrid.UgridDataSet or xugrid.UgridDataArray
+    :param ds:         Data array to rasterise data on.
+    :type ds:          xarray.DataSet or xarray.DataArray, optional
+    :param bounds:     Bounds of the rasterised data.
+    :type bounds:      tuple, optional
+    :param resolution: Resolution of the rasterised data.
+    :type resolution:  float, optional
+    :return:           Rasterised data.
+    :rtype:            xarray.DataArray
+    """
+
+    # Get x and y coordinates
+    if ds is not None:
+        xs = ds['x']
+        ys = ds['y']
+    elif bounds is not None and resolution is not None:
+        xmin, ymin, xmax, ymax = bounds
+        xs = np.linspace(xmin, xmax, int((xmax - xmin) / resolution) + 1)
+        ys = np.linspace(ymin, ymax, int((ymax - ymin) / resolution) + 1)
+    else:
+        raise ValueError('Either ds or bounds and resolution should be provided.')
+    
+    # Create x and y grids
+    xG, yG = np.meshgrid(xs, ys)
+
+    # Remove data variables that do not have nmesh2d_face dimension
+    if isinstance(uds, xu.UgridDataset):
+        for var in uds.data_vars:
+            if 'nmesh2d_face' not in uds[var].dims:
+                uds = uds.drop_vars(var)
+
+    # Remove coordinates that contain _index, _x, or _y
+    for coord in uds.coords:
+        if '_index' in coord or '_x' in coord or '_y' in coord:
+            uds = uds.drop_vars(coord)
+
+    # Remove dimensions that contain nodes or edges
+    for dim in uds.dims:
+        if 'node' in dim or 'edge' in dim or 'Node' in dim or 'Edge' in dim:
+            uds = uds.drop_dims(dim)
+    
+    # Get dataset
+    ds = uds.ugrid.sel_points(x=xG.flatten(), y=yG.flatten(), out_of_bounds='ignore')
+    
+    # Remove mesh2d_ from data variables
+    for var in ds.data_vars:
+        if 'mesh2d_' in var:
+            ds = ds.rename({var: var.replace('mesh2d_', '')})
+    
+    # Remove coordinates that contain _index, _x, or _y
+    for coord in ds.coords:
+        if '_index' in coord or '_x' in coord or '_y' in coord:
+            ds = ds.drop_vars(coord)
+
+    # Replace mesh2d_nFaces dimension with idx dimension
+    ds = ds.rename({'nmesh2d_face': 'idx'})
+    ds['idx'] = range(len(ds['idx']))
+
+    # Add x, and y coordinates
+    ds = ds.assign_coords(x=('idx', xG.flatten()), y=('idx', yG.flatten()))
+
+    # Set index
+    ds = ds.set_index(idx=('x', 'y'))
+
+    # Unstack index
+    ds = ds.unstack('idx')
+
+    # Transpose data
+    ds = ds.transpose('y', 'x')
+    
+    # Set coordinate reference system
+    ds = ds.rio.write_crs(uds.grid.crs)
+
+    # Return the rasterised data
+    return ds

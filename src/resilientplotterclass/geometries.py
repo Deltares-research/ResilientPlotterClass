@@ -204,15 +204,6 @@ def _plot_gdf(gdf, ax, **kwargs):
 
     :See also: `geopandas.GeoDataFrame.plot <https://geopandas.org/en/stable/docs/reference/api/geopandas.GeoDataFrame.plot.html>`_.
     """
-
-    # Copy the GeoDataFrame to prevent changing the original GeoDataFrame
-    gdf = gdf.copy().reset_index(drop=True)
-
-    # Combine keyword arguments on GeoDataFrame with user keyword arguments, prioritising user keyword arguments
-    if 'kwargs' in gdf.columns: 
-        gdf['kwargs'] = gdf['kwargs'].apply(lambda x: {**x, **kwargs})
-    else:
-        gdf['kwargs'] = [kwargs]*len(gdf)
     
     # Function to add arrow to plot
     def add_arrow_to_plot(ax, geometries, arrow_kwargs, plot_kwargs):
@@ -257,13 +248,22 @@ def _plot_gdf(gdf, ax, **kwargs):
             kwargs.setdefault('zorder', 2)
             ax.add_patch(plt.Polygon(np.array([[np.nan, np.nan]]), label=plot_label, **kwargs))
 
+    # Copy the GeoDataFrame to prevent changing the original GeoDataFrame
+    gdf = gdf.copy().reset_index(drop=True)
+
+    # Combine keyword arguments on GeoDataFrame with user keyword arguments, prioritising user keyword arguments
+    if 'kwargs' in gdf.columns: 
+        gdf['kwargs'] = gdf['kwargs'].apply(lambda x: {**x, **kwargs})
+    else:
+        gdf['kwargs'] = [kwargs]*len(gdf)
+    
     # Add string representation of keyword arguments to GeoDataFrame
     gdf['kwargs_str'] = gdf['kwargs'].apply(lambda x: str(x))
 
     # Plot groups of GeoDataFrames with same string representation of keyword arguments
     for kwargs, gdf_group in gdf.groupby('kwargs_str'):
         # Evaluate string representation of keyword arguments
-        kwargs = eval(kwargs)
+        kwargs = gdf_group['kwargs'].iloc[0]
         
         # Seperate label from keyword arguments
         label = kwargs.pop('label', None)
@@ -282,45 +282,48 @@ def _plot_gdf(gdf, ax, **kwargs):
             add_arrow_to_plot(ax, gdf_group['geometry'], arrow_kwargs, kwargs)
 
         # Add label to legend
-        if label is not None:
+        if label is not None and 'column' not in kwargs:
             add_label_to_legend(gdf_group['geometry'].iloc[0], label, kwargs)
     
     # Return axis
     return ax
 
-def plot_geometries(gdf, ax=None, xy_unit=None, xlim=None, ylim=None, xlabel_kwargs=None, ylabel_kwargs=None, title_kwargs=None, aspect_kwargs=None, grid_kwargs=None, **kwargs):
+def plot_geometries(gdf, ax=None, xy_unit=None, xlim=None, ylim=None, xlabel_kwargs=None, ylabel_kwargs=None, title_kwargs=None, aspect_kwargs=None, grid_kwargs=None, append_axes_kwargs=None, **kwargs):
     """Plot a GeoDataFrame using plot.
     
-    :param gdf:           GeoDataFrame to plot.
-    :type gdf:            geopandas.GeoDataFrame
-    :param ax:            Axis.
-    :type ax:             matplotlib.axes.Axes, optional
-    :param xy_unit:       Unit to rescale the x and y dimensions to. If ``None``, the unit is determined automatically based on the input data.
-    :type xy_unit:        str, optional
-    :param xlim:          x limits.
-    :type xlim:           list[float], optional
-    :param ylim:          y limits.
-    :type ylim:           list[float], optional
-    :param xlabel_kwargs: Keyword arguments for :func:`matplotlib.axis.set_xlabel`.
-    :type xlabel_kwargs:  dict, optional
-    :param ylabel_kwargs: Keyword arguments for :func:`matplotlib.axis.set_ylabel`.
-    :type ylabel_kwargs:  dict, optional
-    :param title_kwargs:  Keyword arguments for :func:`matplotlib.axis.set_title`.
-    :type title_kwargs:   dict, optional
-    :param aspect_kwargs: Keyword arguments for :func:`matplotlib.axis.set_aspect`.
-    :type aspect_kwargs:  dict, optional
-    :param grid_kwargs:   Keyword arguments for :func:`matplotlib.axis.grid`.
-    :type grid_kwargs:    dict, optional
-    :param kwargs:        Keyword arguments for :func:`geopandas.GeoDataFrame.plot`.
-    :type kwargs:         dict, optional
-    :return:              Axis.
-    :rtype:               matplotlib.axes.Axes
+    :param gdf:                GeoDataFrame to plot.
+    :type gdf:                 geopandas.GeoDataFrame
+    :param ax:                 Axis.
+    :type ax:                  matplotlib.axes.Axes, optional
+    :param xy_unit:            Unit to rescale the x and y dimensions to. If ``None``, the unit is determined automatically based on the input data.
+    :type xy_unit:             str, optional
+    :param xlim:               x limits.
+    :type xlim:                list[float], optional
+    :param ylim:               y limits.
+    :type ylim:                list[float], optional
+    :param xlabel_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_xlabel`.
+    :type xlabel_kwargs:       dict, optional
+    :param ylabel_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_ylabel`.
+    :type ylabel_kwargs:       dict, optional
+    :param title_kwargs:       Keyword arguments for :func:`matplotlib.axis.set_title`.
+    :type title_kwargs:        dict, optional
+    :param aspect_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_aspect`.
+    :type aspect_kwargs:       dict, optional
+    :param grid_kwargs:        Keyword arguments for :func:`matplotlib.axis.grid`.
+    :type grid_kwargs:         dict, optional
+    :param append_axes_kwargs: Keyword arguments for :func:`mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes`.
+    :type append_axes_kwargs:  dict, optional
+    :param kwargs:             Keyword arguments for :func:`geopandas.GeoDataFrame.plot`.
+    :type kwargs:              dict, optional
+    :return:                   Axis.
+    :rtype:                    matplotlib.axes.Axes
 
     :See also: `matplotlib.axis.set_xlabel <https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_xlabel.html>`_,
                `matplotlib.axis.set_ylabel <https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_ylabel.html>`_,
                `matplotlib.axis.set_title <https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_title.html>`_,
                `matplotlib.axis.set_aspect <https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_aspect.html>`_,
                `matplotlib.axis.grid <https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.grid.html>`_,
+               `mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes <https://matplotlib.org/stable/api/_as_gen/mpl_toolkits.axes_grid1.axes_divider.AxesDivider.html#mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes>`_,
                `geopandas.GeoDataFrame.plot <https://geopandas.org/en/stable/docs/reference/api/geopandas.GeoDataFrame.plot.html>`_.
     """
 
@@ -333,6 +336,10 @@ def plot_geometries(gdf, ax=None, xy_unit=None, xlim=None, ylim=None, xlabel_kwa
     
     # Rescale the DataArray
     gdf = rpc.rescale.rescale(data=gdf, scale_factor=scale_factor)
+
+    # Append colorbar axis
+    if append_axes_kwargs is not None and 'cax' not in kwargs and 'legend' in kwargs and kwargs['legend']:
+        kwargs['cax'] = rpc.axes.append_cbar_axis(ax, append_axes_kwargs)
     
     # Plot DataArray
     ax = _plot_gdf(gdf, ax=ax, **kwargs)

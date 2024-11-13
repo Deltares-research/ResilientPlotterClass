@@ -64,7 +64,7 @@ for file_guide in file_guides:
 
 page += '\n.. toctree::\n'
 page += '    :maxdepth: 2\n'
-page += '    :caption: Guides:\n'
+page += '    :caption: Guides\n'
 page += '    :hidden:\n\n'
 page += '     Overview <self>\n'
 for file_guide in file_guides:

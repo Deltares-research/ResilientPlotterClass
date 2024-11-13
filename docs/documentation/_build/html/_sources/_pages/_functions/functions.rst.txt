@@ -3,6 +3,7 @@ Functions
 .. toctree::
     :caption: Functions
 
+    resilientplotterclass.axes.append_cbar_axis
     resilientplotterclass.axes.format
     resilientplotterclass.basemaps.plot_basemap
     resilientplotterclass.colormaps.plot_colormaps
@@ -30,5 +31,7 @@ Functions
     resilientplotterclass.interactive.interactive_uda
     resilientplotterclass.rescale.get_rescale_parameters
     resilientplotterclass.rescale.rescale
-    resilientplotterclass.utils.rasterise_xugrid
+    resilientplotterclass.utils.rasterise_uda
+    resilientplotterclass.utils.rasterise_uds
     resilientplotterclass.utils.reproject_xugrid
+    resilientplotterclass.videos.create_video

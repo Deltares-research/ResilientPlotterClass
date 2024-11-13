@@ -1,35 +1,39 @@
 {
     "metadata": {
         "title": "Example guidelines",
-        "date": "2024-10-04",
-        "authors": ["Math van Soest", "Ruben White"]
+        "date": "2024-10-25",
+        "author(s)": ["Math van Soest", "Ruben White"]
     },
     "general": {
         "crs": "EPSG:28992",
         "vrl": "MSL",
         "xy_unit": null,
         "bounds": [110000, 560000, 190000, 620000],
-        "cartopy_features": ["land", "ocean", "lakes", "rivers", "coastline", "borders", "states"]
+        "cartopy_features": ["land", "ocean", "lakes", "rivers", "coastline", "borders", "states"],
+        "default_types": {"data_type": null, "geom_type": null, "map_type": null, "extent_type": null}
     },
     "data_type": {
     },
-    "geometry_type": {
+    "geom_type": {
         "aoi": {
             "facecolor": "none",
             "edgecolor": "black",
             "linewidth": 1.5,
-            "label": "Area of interest"
+            "label": "Area of interest",
+            "zorder": 2
         }
     },
     "map_type": {
-        "satellite": {
-            "source": "Esri.WorldImagery",
-            "attribution": false
-        },
         "osm": {
             "source": "OpenStreetMap.Mapnik",
-            "attribution": false
-        }
+            "attribution": false,
+            "zorder": 0
+        },
+        "satellite": {
+            "source": "Esri.WorldImagery",
+            "attribution": false,
+            "zorder": 0
+        }  
     },
     "extent_type": {
         "aoi": {

@@ -16,29 +16,32 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-
-  
-  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+  <link href="../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
     <script src="../../_static/documentation_options.js?v=db78e746"></script>
-    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -51,6 +54,7 @@
     <link rel="prev" title="Classes" href="classes.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
   </head>
   
   
@@ -66,19 +70,8 @@
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../../search.html"
       method="get">
@@ -86,7 +79,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search the docs ..."
          aria-label="Search the docs ..."
          autocomplete="off"
@@ -94,8 +86,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -129,7 +121,7 @@
     
     
     <img src="../../_static/Resilient_Plotter_Class_Logo.png" class="logo__image only-light" alt="resilientplotterclass 0.5 documentation - Home"/>
-    <script>document.write(`<img src="../../_static/Resilient_Plotter_Class_Logo.png" class="logo__image only-dark" alt="resilientplotterclass 0.5 documentation - Home"/>`);</script>
+    <img src="../../_static/Resilient_Plotter_Class_Logo.png" class="logo__image only-dark pst-js-only" alt="resilientplotterclass 0.5 documentation - Home"/>
   
   
 </a></div>
@@ -175,29 +167,21 @@
         <div class="navbar-item navbar-persistent--container">
           
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
       
       
         <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
       
     </div>
     
@@ -206,15 +190,11 @@ document.write(`
   
     <div class="navbar-persistent--mobile">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
     </div>
   
 
@@ -233,7 +213,8 @@ document.write(`
       
       
       
-      <div class="bd-sidebar-primary bd-sidebar">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -280,15 +261,11 @@ document.write(`
         
           <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
         
       </div>
     
@@ -312,6 +289,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../_modules/resilientplotterclass.interactive.html">resilientplotterclass.interactive</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../_modules/resilientplotterclass.rescale.html">resilientplotterclass.rescale</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../_modules/resilientplotterclass.utils.html">resilientplotterclass.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_modules/resilientplotterclass.videos.html">resilientplotterclass.videos</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="classes.html">Classes</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
@@ -319,6 +297,7 @@ document.write(`
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../_functions/functions.html">Functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../_functions/resilientplotterclass.axes.append_cbar_axis.html">axes.append_cbar_axis</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../_functions/resilientplotterclass.axes.format.html">axes.format</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../_functions/resilientplotterclass.basemaps.plot_basemap.html">basemaps.plot_basemap</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../_functions/resilientplotterclass.colormaps.plot_colormaps.html">colormaps.plot_colormaps</a></li>
@@ -346,8 +325,10 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../_functions/resilientplotterclass.interactive.interactive_uda.html">interactive.interactive_uda</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../_functions/resilientplotterclass.rescale.get_rescale_parameters.html">rescale.get_rescale_parameters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../_functions/resilientplotterclass.rescale.rescale.html">rescale.rescale</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../_functions/resilientplotterclass.utils.rasterise_xugrid.html">utils.rasterise_xugrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_functions/resilientplotterclass.utils.rasterise_uda.html">utils.rasterise_uda</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_functions/resilientplotterclass.utils.rasterise_uds.html">utils.rasterise_uds</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../_functions/resilientplotterclass.utils.reproject_xugrid.html">utils.reproject_xugrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_functions/resilientplotterclass.videos.create_video.html">videos.create_video</a></li>
 </ul>
 </details></li>
 </ul>
@@ -377,8 +358,6 @@ document.write(`
       
         <div class="header-article-item">
 
-
-
 <nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
@@ -393,7 +372,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="classes.html" class="nav-link">Classes</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">rpclass.rpclass</li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">rpclass.rpclass</span></li>
   </ul>
 </nav>
 </div>
@@ -440,7 +419,7 @@ document.write(`
 
 <dl class="py method">
 <dt class="sig sig-object py" id="resilientplotterclass.rpclass.rpclass.bathymetry">
-<span class="sig-name descname"><span class="pre">bathymetry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gdf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bathymetry'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'aoi'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">map_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'satellite'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.bathymetry" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">bathymetry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gdf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bathymetry'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geom_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'aoi'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">map_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'satellite'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.bathymetry" title="Link to this definition">#</a></dt>
 <dd><p>Plot bathymetry.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -449,7 +428,7 @@ document.write(`
 <li><p><strong>gdf</strong> (<em>geopandas.GeoDataFrame</em><em>, </em><em>optional</em>) – Geodataframe to plot.</p></li>
 <li><p><strong>ax</strong> (<em>matplotlib.axes.Axes</em><em>, </em><em>optional</em>) – Axis.</p></li>
 <li><p><strong>data_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Data type from guidelines.</p></li>
-<li><p><strong>geometry_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Geometry type from guidelines.</p></li>
+<li><p><strong>geom_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Geometry type from guidelines.</p></li>
 <li><p><strong>map_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Map type from guidelines.</p></li>
 <li><p><strong>extent_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Extent type from guidelines.</p></li>
 </ul>
@@ -531,15 +510,35 @@ document.write(`
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="resilientplotterclass.rpclass.rpclass.create_video">
+<span class="sig-name descname"><span class="pre">create_video</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_paths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path_video</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1920,</span> <span class="pre">1080)</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.create_video" title="Link to this definition">#</a></dt>
+<dd><p>Create video from images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_paths</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – File paths to images.</p></li>
+<li><p><strong>file_path_video</strong> (<em>str</em>) – File path to video.</p></li>
+<li><p><strong>fps</strong> (<em>int</em><em>, </em><em>optional</em>) – Frames per second.</p></li>
+<li><p><strong>frame_size</strong> (<em>tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>, </em><em>optional</em>) – Frame size.</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Keyword arguments for <code class="xref py py-func docutils literal notranslate"><span class="pre">resilientplotterclass.video.create_video()</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="resilientplotterclass.rpclass.rpclass.geometries">
-<span class="sig-name descname"><span class="pre">geometries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gdf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.geometries" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">geometries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gdf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geom_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.geometries" title="Link to this definition">#</a></dt>
 <dd><p>Plot geometries using geopandas.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>gdf</strong> (<em>geopandas.GeoDataFrame</em>) – geometries to plot.</p></li>
 <li><p><strong>ax</strong> (<em>matplotlib.axes.Axes</em><em>, </em><em>optional</em>) – Axis.</p></li>
-<li><p><strong>geometry_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Geometry type from guidelines.</p></li>
+<li><p><strong>geom_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Geometry type from guidelines.</p></li>
 <li><p><strong>extent_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Extent type from guidelines.</p></li>
 <li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Keyword arguments for <a class="reference internal" href="../_functions/resilientplotterclass.geometries.plot_geometries.html#resilientplotterclass.geometries.plot_geometries" title="resilientplotterclass.geometries.plot_geometries"><code class="xref py py-func docutils literal notranslate"><span class="pre">resilientplotterclass.geometries.plot_geometries()</span></code></a>.</p></li>
 </ul>
@@ -568,20 +567,6 @@ document.write(`
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="resilientplotterclass.rpclass.rpclass.get_guideline_options">
-<span class="sig-name descname"><span class="pre">get_guideline_options</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.get_guideline_options" title="Link to this definition">#</a></dt>
-<dd><p>Get guideline options per guideline type.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Guideline options per guideline type.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="resilientplotterclass.rpclass.rpclass.get_guidelines">
 <span class="sig-name descname"><span class="pre">get_guidelines</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.get_guidelines" title="Link to this definition">#</a></dt>
 <dd><p>Get guidelines.</p>
@@ -597,14 +582,14 @@ document.write(`
 
 <dl class="py method">
 <dt class="sig sig-object py" id="resilientplotterclass.rpclass.rpclass.grid">
-<span class="sig-name descname"><span class="pre">grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'grid'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.grid" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geom_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'grid'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.grid" title="Link to this definition">#</a></dt>
 <dd><p>Plot grid using xugrid.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<em>xugrid.UgridDataArray</em>) – Data to plot.</p></li>
 <li><p><strong>ax</strong> (<em>matplotlib.axes.Axes</em><em>, </em><em>optional</em>) – Axis.</p></li>
-<li><p><strong>geometry_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Geometry type from guidelines.</p></li>
+<li><p><strong>geom_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Geometry type from guidelines.</p></li>
 <li><p><strong>extent_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Extent type from guidelines.</p></li>
 <li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Keyword arguments for <a class="reference internal" href="../_functions/resilientplotterclass.data_xugrid.grid.html#resilientplotterclass.data_xugrid.grid" title="resilientplotterclass.data_xugrid.grid"><code class="xref py py-func docutils literal notranslate"><span class="pre">resilientplotterclass.data_xugrid.grid()</span></code></a>.</p></li>
 </ul>
@@ -699,14 +684,14 @@ document.write(`
 
 <dl class="py method">
 <dt class="sig sig-object py" id="resilientplotterclass.rpclass.rpclass.interactive_geometries">
-<span class="sig-name descname"><span class="pre">interactive_geometries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gdf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.interactive_geometries" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">interactive_geometries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gdf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geom_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.interactive_geometries" title="Link to this definition">#</a></dt>
 <dd><p>Plot geometries interactively.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>gdf</strong> (<em>geopandas.GeoDataFrame</em>) – Geodataframe to plot.</p></li>
 <li><p><strong>ax</strong> (<em>matplotlib.axes.Axes</em><em>, </em><em>optional</em>) – Axis.</p></li>
-<li><p><strong>geometry_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Geometry type from guidelines.</p></li>
+<li><p><strong>geom_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Geometry type from guidelines.</p></li>
 <li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Keyword arguments for <code class="xref py py-func docutils literal notranslate"><span class="pre">resilientplotterclass.interactive.geometries_interactive()</span></code>.</p></li>
 </ul>
 </dd>
@@ -758,14 +743,14 @@ document.write(`
 
 <dl class="py method">
 <dt class="sig sig-object py" id="resilientplotterclass.rpclass.rpclass.pretty_geometries">
-<span class="sig-name descname"><span class="pre">pretty_geometries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gdf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'aoi'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">map_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'satellite'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.pretty_geometries" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">pretty_geometries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gdf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geom_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'aoi'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">map_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'satellite'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.pretty_geometries" title="Link to this definition">#</a></dt>
 <dd><p>Plot pretty geometries.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>gdf</strong> (<em>geopandas.GeoDataFrame</em>) – Geodataframe to plot.</p></li>
 <li><p><strong>ax</strong> (<em>matplotlib.axes.Axes</em><em>, </em><em>optional</em>) – Axis.</p></li>
-<li><p><strong>geometry_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Geometry type from guidelines.</p></li>
+<li><p><strong>geom_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Geometry type from guidelines.</p></li>
 <li><p><strong>map_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Map type from guidelines.</p></li>
 <li><p><strong>extent_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Extent type from guidelines.</p></li>
 </ul>
@@ -781,7 +766,7 @@ document.write(`
 
 <dl class="py method">
 <dt class="sig sig-object py" id="resilientplotterclass.rpclass.rpclass.pretty_grid">
-<span class="sig-name descname"><span class="pre">pretty_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gdf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'aoi'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">map_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'satellite'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.pretty_grid" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">pretty_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gdf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geom_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'aoi'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">map_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'satellite'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.pretty_grid" title="Link to this definition">#</a></dt>
 <dd><p>Plot pretty grid.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -789,8 +774,8 @@ document.write(`
 <li><p><strong>da</strong> (<em>xarray.DataArray</em><em> or </em><em>xugrid.UgridDataArray</em>) – DataArray or UgridDataArray to plot.</p></li>
 <li><p><strong>gdf</strong> (<em>geopandas.GeoDataFrame</em><em>, </em><em>optional</em>) – Geodataframe to plot.</p></li>
 <li><p><strong>ax</strong> (<em>matplotlib.axes.Axes</em><em>, </em><em>optional</em>) – Axis.</p></li>
-<li><p><strong>geometry_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Geometry type from guidelines.</p></li>
-<li><p><strong>geometry_type2</strong> (<em>str</em><em>, </em><em>optional</em>) – Geometry type from guidelines.</p></li>
+<li><p><strong>geom_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Geometry type from guidelines.</p></li>
+<li><p><strong>geom_type2</strong> (<em>str</em><em>, </em><em>optional</em>) – Geometry type from guidelines.</p></li>
 <li><p><strong>map_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Map type from guidelines.</p></li>
 <li><p><strong>extent_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Extent type from guidelines.</p></li>
 </ul>
@@ -800,6 +785,20 @@ document.write(`
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>tuple[matplotlib.figure.Figure, matplotlib.axes.Axes]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resilientplotterclass.rpclass.rpclass.print_guidelines">
+<span class="sig-name descname"><span class="pre">print_guidelines</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.print_guidelines" title="Link to this definition">#</a></dt>
+<dd><p>Print guidelines.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -854,7 +853,7 @@ document.write(`
 
 <dl class="py method">
 <dt class="sig sig-object py" id="resilientplotterclass.rpclass.rpclass.savefig">
-<span class="sig-name descname"><span class="pre">savefig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bbox_inches</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tight'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.savefig" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">savefig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">close</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bbox_inches</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tight'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.savefig" title="Link to this definition">#</a></dt>
 <dd><p>Save figure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -990,7 +989,7 @@ document.write(`
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<em>xugrid.UgridDataArray</em><em> or </em><em>xugrid.UgridDataset</em>) – Data to convert.</p></li>
 <li><p><strong>data_blueprint</strong> (<em>xarray.DataArray</em><em> or </em><em>xarray.Dataset</em><em>, </em><em>optional</em>) – Data blueprint.</p></li>
-<li><p><strong>kwargs</strong> – Keyword arguments for <a class="reference internal" href="../_functions/resilientplotterclass.utils.rasterise_xugrid.html#resilientplotterclass.utils.rasterise_xugrid" title="resilientplotterclass.utils.rasterise_xugrid"><code class="xref py py-func docutils literal notranslate"><span class="pre">resilientplotterclass.utils.rasterise_xugrid()</span></code></a>.</p></li>
+<li><p><strong>kwargs</strong> – Keyword arguments for <a class="reference internal" href="../_functions/resilientplotterclass.utils.rasterise_uda.html#resilientplotterclass.utils.rasterise_uda" title="resilientplotterclass.utils.rasterise_uda"><code class="xref py py-func docutils literal notranslate"><span class="pre">resilientplotterclass.utils.rasterise_uda()</span></code></a> or <a class="reference internal" href="../_functions/resilientplotterclass.utils.rasterise_uds.html#resilientplotterclass.utils.rasterise_uds" title="resilientplotterclass.utils.rasterise_uds"><code class="xref py py-func docutils literal notranslate"><span class="pre">resilientplotterclass.utils.rasterise_uds()</span></code></a>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1061,7 +1060,8 @@ document.write(`
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
 
   <div class="sidebar-secondary-item">
@@ -1078,9 +1078,9 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#resilientplotterclass.rpclass.rpclass.cartopy"><code class="docutils literal notranslate"><span class="pre">rpclass.cartopy()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#resilientplotterclass.rpclass.rpclass.contour"><code class="docutils literal notranslate"><span class="pre">rpclass.contour()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#resilientplotterclass.rpclass.rpclass.contourf"><code class="docutils literal notranslate"><span class="pre">rpclass.contourf()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#resilientplotterclass.rpclass.rpclass.create_video"><code class="docutils literal notranslate"><span class="pre">rpclass.create_video()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#resilientplotterclass.rpclass.rpclass.geometries"><code class="docutils literal notranslate"><span class="pre">rpclass.geometries()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#resilientplotterclass.rpclass.rpclass.get_cartopy"><code class="docutils literal notranslate"><span class="pre">rpclass.get_cartopy()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#resilientplotterclass.rpclass.rpclass.get_guideline_options"><code class="docutils literal notranslate"><span class="pre">rpclass.get_guideline_options()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#resilientplotterclass.rpclass.rpclass.get_guidelines"><code class="docutils literal notranslate"><span class="pre">rpclass.get_guidelines()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#resilientplotterclass.rpclass.rpclass.grid"><code class="docutils literal notranslate"><span class="pre">rpclass.grid()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#resilientplotterclass.rpclass.rpclass.imshow"><code class="docutils literal notranslate"><span class="pre">rpclass.imshow()</span></code></a></li>
@@ -1092,6 +1092,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#resilientplotterclass.rpclass.rpclass.plot_colormaps"><code class="docutils literal notranslate"><span class="pre">rpclass.plot_colormaps()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#resilientplotterclass.rpclass.rpclass.pretty_geometries"><code class="docutils literal notranslate"><span class="pre">rpclass.pretty_geometries()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#resilientplotterclass.rpclass.rpclass.pretty_grid"><code class="docutils literal notranslate"><span class="pre">rpclass.pretty_grid()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#resilientplotterclass.rpclass.rpclass.print_guidelines"><code class="docutils literal notranslate"><span class="pre">rpclass.print_guidelines()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#resilientplotterclass.rpclass.rpclass.quiver"><code class="docutils literal notranslate"><span class="pre">rpclass.quiver()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#resilientplotterclass.rpclass.rpclass.reproject"><code class="docutils literal notranslate"><span class="pre">rpclass.reproject()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#resilientplotterclass.rpclass.rpclass.savefig"><code class="docutils literal notranslate"><span class="pre">rpclass.savefig()</span></code></a></li>
@@ -1129,8 +1130,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1150,7 +1151,7 @@ document.write(`
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
     <br/>
   </p>
 </div>
@@ -1163,7 +1164,7 @@ document.write(`
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
 </p></div>
       
     </div>

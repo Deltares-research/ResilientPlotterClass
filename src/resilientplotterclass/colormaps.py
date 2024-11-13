@@ -54,8 +54,8 @@ def _get_colormaps():
     cmaps_contours.append(get_cmap_from_colors(scale_colors(get_colors_from_cmap('RdBu_r'), rgba_scales=(0.75, 0.75, 0.75, 1)), 'bedforms_contour'))
     cmaps.append(get_cmap_from_colors(get_colors_from_cmap('RdBu_r'), 'morphology'))
     cmaps_contours.append(get_cmap_from_colors(scale_colors(get_colors_from_cmap('RdBu_r'), rgba_scales=(0.75, 0.75, 0.75, 1)), 'morphology_contour'))
-    cmaps.append(get_cmap_from_colors(get_colors_from_cmap('terrain'), 'topography'))
-    cmaps_contours.append(get_cmap_from_colors(scale_colors(get_colors_from_cmap('terrain'), rgba_scales=(0.75, 0.75, 0.75, 1)), 'topography_contour'))
+    cmaps.append(get_cmap_from_colors(get_colors_from_cmap('RdBu_r'), 'diverging'))
+    cmaps_contours.append(get_cmap_from_colors(scale_colors(get_colors_from_cmap('RdBu_r'), rgba_scales=(0.75, 0.75, 0.75, 1)), 'diverging_contour'))
     
     # Add colormaps from text files
     file_path_cmaps = glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', '*.txt'))
