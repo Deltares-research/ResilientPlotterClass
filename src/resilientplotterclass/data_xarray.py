@@ -66,7 +66,7 @@ def pcolormesh(da, ax=None, xy_unit=None, skip=1, smooth=1, xlim=None, ylim=None
     
     # Append colorbar axis
     if append_axes_kwargs is not None and ('add_colorbar' not in kwargs or not kwargs['add_colorbar']):
-        kwargs['cbar_kwargs'] = kwargs.get('cbar_kwargs', {})
+        kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
         kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
     
     # Plot DataArray
@@ -142,7 +142,7 @@ def imshow(da, ax=None, xy_unit=None, skip=1, smooth=1, xlim=None, ylim=None, xl
 
     # Append colorbar axis
     if append_axes_kwargs is not None and ('add_colorbar' not in kwargs or not kwargs['add_colorbar']):
-        kwargs['cbar_kwargs'] = kwargs.get('cbar_kwargs', {})
+        kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
         kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
     
     # Plot DataArray
@@ -218,7 +218,7 @@ def scatter(ds, ax=None, xy_unit=None, skip=1, smooth=1, xlim=None, ylim=None, x
     
     # Append colorbar axis
     if append_axes_kwargs is not None and 'add_colorbar' in kwargs or kwargs['add_colorbar']:
-        kwargs['cbar_kwargs'] = kwargs.get('cbar_kwargs', {})
+        kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
         kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
 
     # Plot Dataset
@@ -294,7 +294,7 @@ def contourf(da, ax=None, xy_unit=None, skip=1, smooth=1, xlim=None, ylim=None, 
     
     # Append colorbar axis
     if append_axes_kwargs is not None and ('add_colorbar' not in kwargs or not kwargs['add_colorbar']):
-        kwargs['cbar_kwargs'] = kwargs.get('cbar_kwargs', {})
+        kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
         kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
     
     # Plot DataArray
@@ -370,7 +370,7 @@ def contour(da, ax=None, xy_unit=None, skip=1, smooth=1, xlim=None, ylim=None, x
     
     # Append colorbar axis
     if append_axes_kwargs is not None and 'add_colorbar' in kwargs or kwargs['add_colorbar']:
-        kwargs['cbar_kwargs'] = kwargs.get('cbar_kwargs', {})
+        kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
         kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
     
     # Plot DataArray
@@ -442,7 +442,7 @@ def quiver(ds, ax=None, xy_unit=None, skip=1, smooth=1, xlim=None, ylim=None, xl
     
     # Append colorbar axis
     if append_axes_kwargs is not None and 'add_colorbar' in kwargs or kwargs['add_colorbar']:
-        kwargs['cbar_kwargs'] = kwargs.get('cbar_kwargs', {})
+        kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
         kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
 
     # Smooth Dataset
@@ -525,7 +525,7 @@ def streamplot(ds, ax=None, xy_unit=None, skip=1, smooth=1, xlim=None, ylim=None
 
     # Append colorbar axis
     if append_axes_kwargs is not None and 'add_colorbar' in kwargs or kwargs['add_colorbar']:
-        kwargs['cbar_kwargs'] = kwargs.get('cbar_kwargs', {})
+        kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
         kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
 
     # Plot Dataset

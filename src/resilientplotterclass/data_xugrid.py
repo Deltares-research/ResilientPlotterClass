@@ -50,6 +50,11 @@ def pcolormesh(uda, ax=None, xy_unit=None, xlim=None, ylim=None, xlabel_kwargs=N
     # Rescale UgridudataArray
     uda = rpc.rescale.rescale(data=uda, scale_factor=scale_factor)
     
+    # Append colorbar axis
+    if append_axes_kwargs is not None and ('add_colorbar' not in kwargs or not kwargs['add_colorbar']):
+        kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
+        kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
+    
     # Plot UgridDataArray
     p = uda.ugrid.plot.pcolormesh(ax=ax, **kwargs)
 
@@ -107,6 +112,11 @@ def imshow(uda, ax=None, xy_unit=None, xlim=None, ylim=None, xlabel_kwargs=None,
     
     # Rescale UgridudataArray
     uda = rpc.rescale.rescale(data=uda, scale_factor=scale_factor)
+    
+    # Append colorbar axis
+    if append_axes_kwargs is not None and ('add_colorbar' not in kwargs or not kwargs['add_colorbar']):
+        kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
+        kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
     
     # Plot UgridDataArray
     p = uda.ugrid.plot.imshow(ax=ax, **kwargs)
@@ -167,6 +177,11 @@ def scatter(uda, ax=None, xy_unit=None, xlim=None, ylim=None, xlabel_kwargs=None
     # Rescale UgridudataArray
     uda = rpc.rescale.rescale(data=uda, scale_factor=scale_factor)
 
+    # Append colorbar axis
+    if append_axes_kwargs is not None and ('add_colorbar' not in kwargs or not kwargs['add_colorbar']):
+        kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
+        kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
+    
     # Plot UgridDataArray
     p = uda.ugrid.plot.scatter(ax=ax, **kwargs)
 
@@ -226,6 +241,11 @@ def contourf(uda, ax=None, xy_unit=None, xlim=None, ylim=None, xlabel_kwargs=Non
     # Rescale UgridudataArray
     uda = rpc.rescale.rescale(data=uda, scale_factor=scale_factor)
     
+    # Append colorbar axis
+    if append_axes_kwargs is not None and ('add_colorbar' not in kwargs or not kwargs['add_colorbar']):
+        kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
+        kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
+    
     # Plot UgridDataArray
     p = uda.ugrid.plot.contourf(ax=ax, **kwargs)
 
@@ -284,6 +304,11 @@ def contour(uda, ax=None, xy_unit=None, xlim=None, ylim=None, xlabel_kwargs=None
     
     # Rescale UgridudataArray
     uda = rpc.rescale.rescale(data=uda, scale_factor=scale_factor)
+
+    # Append colorbar axis
+    if append_axes_kwargs is not None and ('add_colorbar' not in kwargs or not kwargs['add_colorbar']):
+        kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
+        kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
     
     # Plot UgridDataArray
     p = uda.ugrid.plot.contour(ax=ax, **kwargs)
@@ -344,6 +369,11 @@ def quiver(uds, ax=None, xy_unit=None, xlim=None, ylim=None, xlabel_kwargs=None,
     # Rescale UgridDataSet
     uds = rpc.rescale.rescale(data=uds, scale_factor=scale_factor)
 
+    # Append colorbar axis
+    if append_axes_kwargs is not None and ('add_colorbar' not in kwargs or not kwargs['add_colorbar']):
+        kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
+        kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
+
     # Plot UgridDataSet
     p = uds.plot.quiver(ax=ax, **kwargs)
 
@@ -402,6 +432,11 @@ def grid(uda, ax=None, xy_unit=None, xlim=None, ylim=None, xlabel_kwargs=None, y
     
     # Rescale UgridudataArray
     uda = rpc.rescale.rescale(data=uda, scale_factor=scale_factor)
+
+    # Append colorbar axis
+    if append_axes_kwargs is not None and ('add_colorbar' not in kwargs or not kwargs['add_colorbar']):
+        kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
+        kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
     
     # Plot UgridDataArray
     p = uda.grid.plot(ax=ax, **kwargs)

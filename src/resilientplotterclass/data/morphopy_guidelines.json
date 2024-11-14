@@ -16,24 +16,24 @@
 
     "data_type": {
         "bathymetry": {
-            "pcolormesh": {},
-            "imshow": {"cbar_kwargs": {}},
-            "scatter": {"cbar_kwargs": {}},
-            "contourf": {"cbar_kwargs": {}},
+            "pcolormesh": {"cbar_kwargs": null},
+            "imshow": {"cbar_kwargs": null},
+            "scatter": {"cbar_kwargs": null},
+            "contourf": {"cbar_kwargs": null},
             "contour": {}
         },
         "bedforms": {
-            "pcolormesh": {"cbar_kwargs": {}},
-            "imshow": {"cbar_kwargs": {}},
-            "scatter": {"cbar_kwargs": {}},
-            "contourf": {"cbar_kwargs": {}},
+            "pcolormesh": {"cbar_kwargs": null},
+            "imshow": {"cbar_kwargs": null},
+            "scatter": {"cbar_kwargs": null},
+            "contourf": {"cbar_kwargs": null},
             "contour": {}
         },
         "morphology": {
-            "pcolormesh": {"cbar_kwargs": {}},
-            "imshow": {"cbar_kwargs": {}},
-            "scatter": {"cbar_kwargs": {}},
-            "contourf": {"cbar_kwargs": {}},
+            "pcolormesh": {"cbar_kwargs": null},
+            "imshow": {"cbar_kwargs": null},
+            "scatter": {"cbar_kwargs": null},
+            "contourf": {"cbar_kwargs": null},
             "contour": {}
         }
     },

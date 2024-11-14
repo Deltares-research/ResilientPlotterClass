@@ -233,7 +233,7 @@ class rpclass:
         dir_path_data = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
         with open(os.path.join(dir_path_data, 'default_guidelines.json')) as f:
             default_guidelines = json.load(f)
-
+        
         # Read project guidelines
         if project_guidelines is None:
             project_guidelines = {}
