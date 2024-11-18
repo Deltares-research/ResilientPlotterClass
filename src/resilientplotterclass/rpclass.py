@@ -1225,6 +1225,7 @@ class rpclass:
         :param crs:    Coordinate reference system.
         :type crs:     pyproj.CRS or rasterio.CRS or str
         :param kwargs: Keyword arguments for :func:`rioxarray.reproject`, :func:`resilientplotterclass.utils.reproject_xugrid` or :func:`geopandas.GeoDataFrame.to_crs`.
+        :type kwargs:  dict, optional
         :return:       Reprojected data.
         :rtype:        xarray.DataArray or xarray.Dataset or xugrid.UgridDataArray or xugrid.UgridDataset or geopandas.GeoDataFrame
 
@@ -1252,6 +1253,7 @@ class rpclass:
         :param data:   Data to convert.
         :type data:    xarray.DataArray or xarray.Dataset
         :param kwargs: Keyword arguments for :func:`resilientplotterclass.utils.to_unstructured`.
+        :type kwargs:  dict, optional
         :return:       Unstructured data.
         :rtype:        xugrid.UgridDataArray or xugrid.UgridDataset
         """
@@ -1276,6 +1278,7 @@ class rpclass:
         :param data_blueprint: Data blueprint.
         :type data_blueprint:  xarray.DataArray or xarray.Dataset, optional
         :param kwargs:         Keyword arguments for :func:`resilientplotterclass.utils.rasterise_uda` or :func:`resilientplotterclass.utils.rasterise_uds`.
+        :type kwargs:          dict, optional
         :return:               Structured data.
         :rtype:                xarray.DataArray or xarray.Dataset
         """

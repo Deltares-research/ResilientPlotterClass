@@ -20,33 +20,31 @@
                 "cmap": "bathymetry",
                 "center": false,
                 "zorder": 1,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "imshow": {
                 "cmap": "bathymetry",
                 "center": false,
                 "zorder": 1,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "scatter": {
                 "edgecolor": "none",
                 "cmap": "bathymetry",
                 "zorder": 1,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contourf": {
                 "cmap": "bathymetry",
                 "center": false,
-                "levels": 10,
                 "zorder": 1,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contour": {
                 "cmap": "bathymetry_contour",
                 "center": false,
                 "zorder": 1,
-                "levels": 10,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "quiver": {
                 "add_guide": false,
@@ -55,13 +53,19 @@
                 "angles": "xy",
                 "pivot": "tail",
                 "zorder": 1.5,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "streamplot": {
                 "add_guide": false,
                 "color": "black",
                 "zorder": 1.5,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
+            }
+        },
+        "image":{
+            "imshow": {
+                "zorder": 1,
+                "rgb": "band"
             }
         },
         "bathymetry": {
@@ -70,36 +74,34 @@
                 "center": false,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Bathymetry [m]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "imshow": {
                 "cmap": "bathymetry",
                 "center": false,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Bathymetry [m]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "scatter": {
                 "edgecolor": "none",
                 "cmap": "bathymetry",
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Bathymetry [m]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contourf": {
                 "cmap": "bathymetry",
                 "center": false,
-                "levels": 10,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Bathymetry [m]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contour": {
                 "cmap": "bathymetry_contour",
                 "center": false,
                 "zorder": 1,
-                "levels": 10,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             }
         },
         "bedforms": {
@@ -108,36 +110,34 @@
                 "center": false,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Bedforms [m]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "imshow": {
                 "cmap": "bedforms",
                 "center": false,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Bedforms [m]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "scatter": {
                 "edgecolor": "none",
                 "cmap": "bedforms",
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Bedforms [m]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contourf": {
                 "cmap": "bedforms",
                 "center": false,
-                "levels": 10,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Bedforms [m]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contour": {
                 "cmap": "bedforms_contour",
                 "center": false,
                 "zorder": 1,
-                "levels": 10,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             }
         },
         "morphology": {
@@ -146,36 +146,34 @@
                 "center": false,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Erosion/Sedimentation [m]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "imshow": {
                 "cmap": "morphology",
                 "center": false,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Erosion/Sedimentation [m]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "scatter": {
                 "edgecolor": "none",
                 "cmap": "morphology",
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Erosion/Sedimentation [m]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contourf": {
                 "cmap": "morphology",
                 "center": false,
-                "levels": 10,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Erosion/Sedimentation [m]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contour": {
                 "cmap": "morphology_contour",
                 "center": false,
                 "zorder": 1,
-                "levels": 10,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             }
         },
         "flow_velocity": {
@@ -184,36 +182,34 @@
                 "center": false,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Flow velocity [m/s]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "imshow": {
                 "cmap": "other",
                 "center": false,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Flow velocity [m/s]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "scatter": {
                 "edgecolor": "none",
                 "cmap": "other",
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Flow velocity [m/s]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contourf": {
                 "cmap": "other",
                 "center": false,
-                "levels": 10,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Flow velocity [m/s]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contour": {
                 "cmap": "other_contour",
                 "center": false,
                 "zorder": 1,
-                "levels": 10,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             }
         },
         "flow_direction": {
@@ -222,36 +218,34 @@
                 "center": false,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Flow direction [degN]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "imshow": {
                 "cmap": "cet_CET_C8s",
                 "center": false,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Flow direction [degN]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contourf": {
                 "cmap": "cet_CET_C8s",
                 "center": false,
-                "levels": 10,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Flow direction [degN]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "scatter": {
                 "edgecolor": "none",
                 "cmap": "cet_CET_C8s",
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Flow direction [degN]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contour": {
                 "cmap": "cet_CET_C8s",
                 "center": false,
                 "zorder": 1,
-                "levels": 10,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "quiver": {
                 "add_guide": false,
@@ -260,13 +254,13 @@
                 "angles": "xy",
                 "pivot": "tail",
                 "zorder": 1.5,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "streamplot": {
                 "add_guide": false,
                 "color": "black",
                 "zorder": 1.5,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             }
         },
         "wave_height": {
@@ -275,36 +269,34 @@
                 "center": false,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Wave height [m]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "imshow": {
                 "cmap": "other",
                 "center": false,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Wave height [m]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "scatter": {
                 "edgecolor": "none",
                 "cmap": "other",
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Wave height [m]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contourf": {
                 "cmap": "other",
                 "center": false,
-                "levels": 10,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Wave height [m]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contour": {
                 "cmap": "other_contour",
                 "center": false,
                 "zorder": 1,
-                "levels": 10,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             }
         },
         "wave_period": {
@@ -313,36 +305,34 @@
                 "center": false,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Wave period [s]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "imshow": {
                 "cmap": "other",
                 "center": false,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Wave period [s]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "scatter": {
                 "edgecolor": "none",
                 "cmap": "other",
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Wave period [s]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contourf": {
                 "cmap": "other",
                 "center": false,
-                "levels": 10,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Wave period [s]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contour": {
                 "cmap": "other_contour",
                 "center": false,
                 "zorder": 1,
-                "levels": 10,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             }
         },
         "wave_direction": {
@@ -351,36 +341,34 @@
                 "center": false,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Wave direction [degN]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "imshow": {
                 "cmap": "cet_CET_C8s",
                 "center": false,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Wave direction [degN]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "scatter": {
                 "edgecolor": "none",
                 "cmap": "cet_CET_C8s",
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Wave direction [degN]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contourf": {
                 "cmap": "cet_CET_C8s",
                 "center": false,
-                "levels": 10,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Wave direction [degN]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contour": {
                 "cmap": "cet_CET_C8s",
                 "center": false,
                 "zorder": 1,
-                "levels": 10,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "quiver": {
                 "add_guide": false,
@@ -389,13 +377,13 @@
                 "angles": "xy",
                 "pivot": "tail",
                 "zorder": 1.5,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "streamplot": {
                 "add_guide": false,
                 "color": "black",
                 "zorder": 1.5,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             }
         },
         "sediment_transport": {
@@ -403,37 +391,35 @@
                 "cmap": "sediment_transport",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {"label": "Sediment transport [?]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "cbar_kwargs": {"label": "Sediment transport [m3 s-1 m-1]"},
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "imshow": {
                 "cmap": "sediment_transport",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {"label": "Sediment transport [?]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "cbar_kwargs": {"label": "Sediment transport [m3 s-1 m-1]"},
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "scatter": {
                 "edgecolor": "none",
                 "cmap": "sediment_transport",
                 "zorder": 1,
-                "cbar_kwargs": {"label": "Sediment transport [?]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "cbar_kwargs": {"label": "Sediment transport [m3 s-1 m-1]"},
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contourf": {
                 "cmap": "sediment_transport",
                 "center": false,
-                "levels": 10,
                 "zorder": 1,
-                "cbar_kwargs": {"label": "Sediment transport [?]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "cbar_kwargs": {"label": "Sediment transport [m3 s-1 m-1]"},
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contour": {
                 "cmap": "sediment_transport",
                 "center": false,
                 "zorder": 1,
-                "levels": 10,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "quiver": {
                 "add_guide": false,
@@ -442,13 +428,13 @@
                 "angles": "xy",
                 "pivot": "tail",
                 "zorder": 1.5,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "streamplot": {
                 "add_guide": false,
                 "color": "black",
                 "zorder": 1.5,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             }
         },
         "sediment_concentration": {
@@ -457,36 +443,34 @@
                 "center": false,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Sediment concentration [?]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "imshow": {
                 "cmap": "sediment_transport",
                 "center": false,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Sediment concentration [?]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "scatter": {
                 "edgecolor": "none",
                 "cmap": "sediment_transport",
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Sediment concentration [?]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contourf": {
                 "cmap": "sediment_transport",
                 "center": false,
-                "levels": 10,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Sediment concentration [?]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contour": {
                 "cmap": "sediment_transport",
                 "center": false,
                 "zorder": 1,
-                "levels": 10,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "quiver": {
                 "add_guide": false,
@@ -495,13 +479,13 @@
                 "angles": "xy",
                 "pivot": "tail",
                 "zorder": 1.5,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "streamplot": {
                 "add_guide": false,
                 "color": "black",
                 "zorder": 1.5,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             }
         },
         "sediment_particle_size": {
@@ -510,36 +494,34 @@
                 "center": false,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Sediment particle size [m]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "imshow": {
                 "cmap": "sediment_particle_size",
                 "center": false,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Sediment particle size [m]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "scatter": {
                 "edgecolor": "none",
                 "cmap": "sediment_particle_size",
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Sediment particle size [m]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contourf": {
                 "cmap": "sediment_particle_size",
                 "center": false,
-                "levels": 10,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Sediment particle size [m]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contour": {
                 "cmap": "sediment_particle_size",
                 "center": false,
                 "zorder": 1,
-                "levels": 10,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "quiver": {
                 "add_guide": false,
@@ -548,13 +530,13 @@
                 "angles": "xy",
                 "pivot": "tail",
                 "zorder": 1.5,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "streamplot": {
                 "add_guide": false,
                 "color": "black",
                 "zorder": 1.5,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             }
         },
         "nsurveys": {
@@ -563,95 +545,89 @@
                 "center": false,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Number of Surveys [-]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "imshow": {
                 "cmap": "bathymetry",
                 "center": false,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Number of Surveys [-]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "scatter": {
                 "edgecolor": "none",
                 "cmap": "bathymetry",
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Number of Surveys [-]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contourf": {
                 "cmap": "bathymetry",
                 "center": false,
-                "levels": 10,
                 "zorder": 1,
                 "cbar_kwargs": {"label": "Number of Surveys [-]"},
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contour": {
                 "cmap": "bathymetry_contour",
                 "center": false,
                 "zorder": 1,
-                "levels": 10,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             }
         },
         "diverging": {
             "pcolormesh": {
                 "cmap": "diverging",
                 "zorder": 1,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "imshow": {
                 "cmap": "diverging",
                 "zorder": 1,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "scatter": {
                 "edgecolor": "none",
                 "cmap": "diverging",
                 "zorder": 1,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contourf": {
                 "cmap": "diverging",
-                "levels": 10,
                 "zorder": 1,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contour": {
                 "cmap": "diverging_contour",
                 "zorder": 1,
-                "levels": 10,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             }
         },
         "other": {
             "pcolormesh": {
                 "cmap": "other",
                 "zorder": 1,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "imshow": {
                 "cmap": "other",
                 "zorder": 1,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "scatter": {
                 "edgecolor": "none",
                 "cmap": "other",
                 "zorder": 1,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contourf": {
                 "cmap": "other",
-                "levels": 10,
                 "zorder": 1,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "contour": {
                 "zorder": 1,
-                "levels": 10,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "quiver": {
                 "add_guide": false,
@@ -660,13 +636,13 @@
                 "angles": "xy",
                 "pivot": "tail",
                 "zorder": 1.5,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             },
             "streamplot": {
                 "add_guide": false,
                 "color": "black",
                 "zorder": 1.5,
-                "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
             }
         }
     },
@@ -674,7 +650,7 @@
     "geom_type": {
         "geom": {
             "zorder": 2,
-            "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+            "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
         },
         "aoi": {
             "facecolor": "none",
@@ -682,14 +658,14 @@
             "linewidth": 1.5,
             "label": "Area of interest",
             "zorder": 2,
-            "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+            "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
         },
         "grid": {
             "color": "cyan",
             "linewidth": 0.5,
             "label": "Grid",
             "zorder": 2,
-            "append_axes_kwargs": {"position": "right", "size": "5%", "pad": 0.05}
+            "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.1}
         }
     },
 
