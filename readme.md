@@ -3,37 +3,8 @@
 
 A package to create resilient plots for geospatial data. This package is a wrapper around the plotting functionalities of [xarray](http://xarray.pydata.org/en/stable/), [xugrid](https://deltares.github.io/xugrid/), [geopandas](https://geopandas.org/), [contextily](https://contextily.readthedocs.io/en/latest/) and [cartopy](https://scitools.org.uk/cartopy/docs/latest/).
 
-
-## Prerequisites
-The following steps are required to install and use the ResilientPlotterClass:
-
-1. Install [Python](https://www.python.org/downloads)
-
-2. Install a python package manager (e.g., [Mamba](https://github.com/conda-forge/miniforge#mambaforge))
-
-3. Install [Git](https://git-scm.com/downloads)
-
-5. Install a code editor (e.g. [Virtual Studio Code](https://code.visualstudio.com/Download))
-
-## Installation
-The following steps describe how to install the ResilientPlotterClass as a standalone package:
-
-1. Clone the [ResilientPlotterClass Repository](https://github.com/Deltares-research/ResilientPlotterClass)
-
-2. Create a dedicated environment or use an existing one:
-    ```
-    mamba create --name rpc_env pip ipykernel
-    ```
-
-3. Activate the environment:
-    ```
-    mamba activate rpc_env
-    ```
-
-4. Install the ResilientPlotterClass:
-    ```
-    pip install -e c:\...\ResilientPlotterClass
-    ```
-
 ## Documentation
-The documentation for the ResilientPlotterClass is currently only available locally. After cloning the repository, the documation can be found in `ResilientPlotterClass/docs/documentation/_build/html/index.html`.
+[Documentation for the ResilientPlotterClass](https://deltares-research.github.io/ResilientPlotterClass/).
+
+## Installation guide
+[Installation guide for the ResilientPlotterClass](https://deltares-research.github.io/ResilientPlotterClass/_pages/_guides/00_installation_guide.html).
