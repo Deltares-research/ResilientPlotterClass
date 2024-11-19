@@ -130,10 +130,6 @@ def _rescale_xugrid(uda, scale_factor):
     :rtype:              xugrid.UgridDataArray
     """
     
-    # If scale factor is 1, return the original UgridDataArray
-    if scale_factor == 1:
-        return uda
-    
     # Function to rename the dimensions of the data
     def _rename_dims(da):
         # Define the new dimension names

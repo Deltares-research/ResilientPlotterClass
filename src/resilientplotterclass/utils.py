@@ -3,6 +3,23 @@ from shapely.geometry import Point
 import xarray as xr
 import xugrid as xu
 import numpy as np
+from resilientplotterclass.rescale import _rescale_xugrid
+
+# Function to rename the dimensions of the data
+def _rename_xugrid(uda):
+    """Rename dimensions of data.
+
+    :param uda: Data to rename dimensions.
+    :type uda:  xugrid.UgridDataArray or xugrid.UgridDataset
+    :return:    Standardised data.
+    :rtype:     xugrid.UgridDataArray or xugrid.UgridDataset
+    """
+
+    # Use rescale xugrid function with scale factor 1
+    uda_renamed = _rescale_xugrid(uda, 1)
+
+    # Return the standardised data
+    return uda_renamed
 
 def reproject_xugrid(uda, crs, **kwargs):
     """Reproject data.
@@ -43,28 +60,6 @@ def reproject_xugrid(uda, crs, **kwargs):
 
         # Return the reprojected grid
         return grid
-    
-    def _rename_dims(da):
-        # Define the new dimension names
-        NEW_DIMS_1D = {'node':'network1d_nNodes', 'edge':'network1d_nEdges', 'face':'network1d_nFaces',
-                       'Node':'network1d_nNodes', 'Edge':'network1d_nEdges', 'Face':'network1d_nFaces'}
-        NEW_DIMS_2D = {'node':'mesh2d_nNodes', 'edge':'mesh2d_nEdges', 'face':'mesh2d_nFaces',
-                       'Node':'mesh2d_nNodes', 'Edge':'mesh2d_nEdges', 'Face':'mesh2d_nFaces'}
-        
-        # Get the new dimension names
-        if isinstance(da.grid, xu.Ugrid1d):
-            NEW_DIMS = NEW_DIMS_1D
-        elif isinstance(da.grid, xu.Ugrid2d):
-            NEW_DIMS = NEW_DIMS_2D
-
-        # Rename the dimensions of the data
-        for dim in list(da.dims):
-            for new_dim in NEW_DIMS.keys():
-                if new_dim in dim:
-                    da = da.rename({dim: NEW_DIMS[new_dim]})
-        
-        # Return the renamed data
-        return da
 
     # Assign the coordinate arrays to the data
     if isinstance(uda, xu.UgridDataArray):
@@ -75,7 +70,7 @@ def reproject_xugrid(uda, crs, **kwargs):
         uda_rescaled = xu.UgridDataset(obj=xr.Dataset(uda), grids=grids)
 
     # Rename the dimensions of the data
-    uda_rescaled = _rename_dims(uda_rescaled)
+    uda_rescaled = _rename_xugrid(uda_rescaled)
     
     # Set the coordinate reference system
     uda_rescaled.grid.set_crs(crs)
@@ -83,6 +78,88 @@ def reproject_xugrid(uda, crs, **kwargs):
     # Return the reprojected data
     return uda_rescaled
 
+def rasterise_uds(uds, ds=None, bounds=None, resolution=None):
+    """Rasterise data.
+
+    :param uds:        Data to rasterise.
+    :type uds:         xugrid.UgridDataSet or xugrid.UgridDataArray
+    :param ds:         Data array to rasterise data on.
+    :type ds:          xarray.DataSet or xarray.DataArray, optional
+    :param bounds:     Bounds of the rasterised data.
+    :type bounds:      tuple, optional
+    :param resolution: Resolution of the rasterised data.
+    :type resolution:  float, optional
+    :return:           Rasterised data.
+    :rtype:            xarray.DataArray
+    """
+       
+    # Get x and y coordinates
+    if ds is not None:
+        xs = ds['x']
+        ys = ds['y']
+    elif bounds is not None and resolution is not None:
+        xmin, ymin, xmax, ymax = bounds
+        xs = np.linspace(xmin, xmax, int((xmax - xmin) / resolution) + 1)
+        ys = np.linspace(ymin, ymax, int((ymax - ymin) / resolution) + 1)
+    else:
+        raise ValueError('Either ds or bounds and resolution should be provided.')
+    
+    # Create x and y grids
+    xG, yG = np.meshgrid(xs, ys)
+
+    # Rename the dimensions of the data
+    uds = _rename_xugrid(uds)
+    
+    # Remove data variables that do not have nmesh2d_face dimension
+    if isinstance(uds, xu.UgridDataset):
+        for var in uds.data_vars:
+            if 'mesh2d_nFaces' not in uds[var].dims:
+                uds = uds.drop_vars(var)
+
+    # Remove coordinates that contain _index, _x, or _y
+    for coord in uds.coords:
+        if '_index' in coord or '_x' in coord or '_y' in coord:
+            uds = uds.drop_vars(coord)
+
+    # Remove dimensions that contain nodes or edges
+    for dim in uds.dims:
+        if 'node' in dim or 'edge' in dim or 'Node' in dim or 'Edge' in dim:
+            uds = uds.drop_dims(dim)
+    
+    # Get dataset
+    ds = uds.ugrid.sel_points(x=xG.flatten(), y=yG.flatten(), out_of_bounds='ignore')
+    
+    # Remove mesh2d_ from data variables
+    for var in ds.data_vars:
+        if 'mesh2d_' in var:
+            ds = ds.rename({var: var.replace('mesh2d_', '')})
+    
+    # Remove coordinates that contain _index, _x, or _y
+    for coord in ds.coords:
+        if '_index' in coord or '_x' in coord or '_y' in coord:
+            ds = ds.drop_vars(coord)
+
+    # Replace mesh2d_nFaces dimension with idx dimension
+    ds = ds.rename({'mesh2d_nFaces': 'idx'})
+    ds['idx'] = range(len(ds['idx']))
+
+    # Add x, and y coordinates
+    ds = ds.assign_coords(x=('idx', xG.flatten()), y=('idx', yG.flatten()))
+
+    # Set index
+    ds = ds.set_index(idx=('x', 'y'))
+
+    # Unstack index
+    ds = ds.unstack('idx')
+    
+    # Set coordinate reference system
+    ds = ds.rio.write_crs(uds.grid.crs)
+
+    # Return the rasterised data
+    return ds
+
+# OLD FUNCTION
+'''
 def rasterise_uda(uda, da=None, **kwargs):
     """Rasterise data.
 
@@ -137,83 +214,4 @@ def rasterise_uda(uda, da=None, **kwargs):
 
     # Return the rasterised data
     return da_data
-
-def rasterise_uds(uds, ds=None, bounds=None, resolution=None):
-    """Rasterise data.
-
-    :param uds:        Data to rasterise.
-    :type uds:         xugrid.UgridDataSet or xugrid.UgridDataArray
-    :param ds:         Data array to rasterise data on.
-    :type ds:          xarray.DataSet or xarray.DataArray, optional
-    :param bounds:     Bounds of the rasterised data.
-    :type bounds:      tuple, optional
-    :param resolution: Resolution of the rasterised data.
-    :type resolution:  float, optional
-    :return:           Rasterised data.
-    :rtype:            xarray.DataArray
-    """
-
-    # Get x and y coordinates
-    if ds is not None:
-        xs = ds['x']
-        ys = ds['y']
-    elif bounds is not None and resolution is not None:
-        xmin, ymin, xmax, ymax = bounds
-        xs = np.linspace(xmin, xmax, int((xmax - xmin) / resolution) + 1)
-        ys = np.linspace(ymin, ymax, int((ymax - ymin) / resolution) + 1)
-    else:
-        raise ValueError('Either ds or bounds and resolution should be provided.')
-    
-    # Create x and y grids
-    xG, yG = np.meshgrid(xs, ys)
-
-    # Remove data variables that do not have nmesh2d_face dimension
-    if isinstance(uds, xu.UgridDataset):
-        for var in uds.data_vars:
-            if 'nmesh2d_face' not in uds[var].dims:
-                uds = uds.drop_vars(var)
-
-    # Remove coordinates that contain _index, _x, or _y
-    for coord in uds.coords:
-        if '_index' in coord or '_x' in coord or '_y' in coord:
-            uds = uds.drop_vars(coord)
-
-    # Remove dimensions that contain nodes or edges
-    for dim in uds.dims:
-        if 'node' in dim or 'edge' in dim or 'Node' in dim or 'Edge' in dim:
-            uds = uds.drop_dims(dim)
-    
-    # Get dataset
-    ds = uds.ugrid.sel_points(x=xG.flatten(), y=yG.flatten(), out_of_bounds='ignore')
-    
-    # Remove mesh2d_ from data variables
-    for var in ds.data_vars:
-        if 'mesh2d_' in var:
-            ds = ds.rename({var: var.replace('mesh2d_', '')})
-    
-    # Remove coordinates that contain _index, _x, or _y
-    for coord in ds.coords:
-        if '_index' in coord or '_x' in coord or '_y' in coord:
-            ds = ds.drop_vars(coord)
-
-    # Replace mesh2d_nFaces dimension with idx dimension
-    ds = ds.rename({'nmesh2d_face': 'idx'})
-    ds['idx'] = range(len(ds['idx']))
-
-    # Add x, and y coordinates
-    ds = ds.assign_coords(x=('idx', xG.flatten()), y=('idx', yG.flatten()))
-
-    # Set index
-    ds = ds.set_index(idx=('x', 'y'))
-
-    # Unstack index
-    ds = ds.unstack('idx')
-
-    # Transpose data
-    ds = ds.transpose('y', 'x')
-    
-    # Set coordinate reference system
-    ds = ds.rio.write_crs(uds.grid.crs)
-
-    # Return the rasterised data
-    return ds
+'''

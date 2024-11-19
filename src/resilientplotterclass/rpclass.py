@@ -1270,13 +1270,17 @@ class rpclass:
         return data
     
     # Unstructured data to structured data
-    def to_structured(self, data, data_blueprint=None, **kwargs):
+    def to_structured(self, data, data_blueprint=None, bounds=None, resolution=None):
         """Unstructured data to structured data.
 
         :param data:           Data to convert.
         :type data:            xugrid.UgridDataArray or xugrid.UgridDataset
         :param data_blueprint: Data blueprint.
         :type data_blueprint:  xarray.DataArray or xarray.Dataset, optional
+        :param bounds:         Bounds of the rasterised data.
+        :type bounds:          tuple, optional
+        :param resolution:     Resolution of the rasterised data.
+        :type resolution:      float, optional
         :param kwargs:         Keyword arguments for :func:`resilientplotterclass.utils.rasterise_uda` or :func:`resilientplotterclass.utils.rasterise_uds`.
         :type kwargs:          dict, optional
         :return:               Structured data.
@@ -1284,10 +1288,8 @@ class rpclass:
         """
 
         # Convert unstructured data to structured data
-        if isinstance(data, xu.UgridDataset):
-            data = rpc.utils.rasterise_uds(data, data_blueprint, **kwargs)
-        elif isinstance(data, xu.UgridDataArray):
-            data = rpc.utils.rasterise_uda(data, data_blueprint, **kwargs)
+        if isinstance(data, xu.UgridDataArray) or isinstance(data, xu.UgridDataset):
+            data = rpc.utils.rasterise_uds(data, data_blueprint, bounds=bounds, resolution=resolution)
         else:
             raise TypeError('data type not supported. Please provide a xugrid.UgridDataArray or xugrid.UgridDataset. Received: {}'.format(type(data)))
         

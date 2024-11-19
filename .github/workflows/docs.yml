@@ -1,0 +1,40 @@
+name: update github pages with sphinx documentation for local package
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
+
+            - name: Set up Python 3.12
+              uses: actions/setup-python@v2
+              with:
+                python-version: 3.12
+            
+            - name: Install local package
+              run: pip install -e .[docs]
+
+            - name: Build sphinx documentation
+              run: sphinx-build -b html docs docs/_build
+
+            - name: Deploy to GitHub Pages
+              uses: peaceiris/actions-gh-pages@v3
+              with:
+                github_token: ${{ secrets.GITHUB_TOKEN }}
+                publish_dir: docs/_build
+                user_name: 'GitHub Actions'
+                user_email: ''
+                publish_branch: gh-pages
+                commit_message: 'Deploy documentation'
+
+            - name: Clean up
+              run: rm -rf docs/_build
+
+
+            
