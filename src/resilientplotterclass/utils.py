@@ -151,6 +151,9 @@ def rasterise_uds(uds, ds=None, bounds=None, resolution=None):
 
     # Unstack index
     ds = ds.unstack('idx')
+
+    # Transpose dimensions
+    ds = ds.transpose('y', 'x')
     
     # Set coordinate reference system
     ds = ds.rio.write_crs(uds.grid.crs)

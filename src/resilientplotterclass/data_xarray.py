@@ -217,7 +217,7 @@ def scatter(ds, ax=None, xy_unit=None, skip=1, smooth=1, xlim=None, ylim=None, x
         ds = ds.rolling(x=smooth, center=True).mean().rolling(y=smooth, center=True).mean()
     
     # Append colorbar axis
-    if append_axes_kwargs is not None and 'add_colorbar' in kwargs or kwargs['add_colorbar']:
+    if append_axes_kwargs is not None and ('add_colorbar' not in kwargs or not kwargs['add_colorbar']):
         kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
         kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
 
@@ -448,7 +448,10 @@ def quiver(ds, ax=None, xy_unit=None, skip=1, smooth=1, xlim=None, ylim=None, xl
     # Smooth Dataset
     if smooth > 1:
         ds = ds.rolling(x=smooth, center=True).mean().rolling(y=smooth, center=True).mean()
-    
+
+    # Transpose Dataset
+    ds = ds.transpose('x', 'y')
+
     # Plot Dataset
     p = ds.plot.quiver(ax=ax, **kwargs)
 
@@ -527,7 +530,7 @@ def streamplot(ds, ax=None, xy_unit=None, skip=1, smooth=1, xlim=None, ylim=None
     if append_axes_kwargs is not None and 'add_colorbar' in kwargs and kwargs['add_colorbar']:
         kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
         kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
-
+        
     # Plot Dataset
     p = ds.plot.streamplot(ax=ax, **kwargs)
 
