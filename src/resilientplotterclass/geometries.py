@@ -260,8 +260,14 @@ def _plot_gdf(gdf, ax, **kwargs):
     # Add string representation of keyword arguments to GeoDataFrame
     gdf['kwargs_str'] = gdf['kwargs'].apply(lambda x: str(x))
 
+    # Plot get the groups of GeoDataFrames with same string representation of keyword arguments
+    gdf_groups = gdf.groupby('kwargs_str')
+
+    # Sort GeoDataFrame based on minimum index
+    gdf_groups = sorted(gdf_groups, key=lambda x: x[1].index.min())
+
     # Plot groups of GeoDataFrames with same string representation of keyword arguments
-    for kwargs, gdf_group in gdf.groupby('kwargs_str'):
+    for kwargs, gdf_group in gdf_groups:
         # Evaluate string representation of keyword arguments
         kwargs = gdf_group['kwargs'].iloc[0]
         

@@ -65,7 +65,7 @@ def pcolormesh(da, ax=None, xy_unit=None, skip=1, smooth=1, xlim=None, ylim=None
         da = da.rolling(x=smooth, center=True).mean().rolling(y=smooth, center=True).mean()
     
     # Append colorbar axis
-    if append_axes_kwargs is not None and ('add_colorbar' not in kwargs or not kwargs['add_colorbar']):
+    if append_axes_kwargs is not None and ('add_colorbar' not in kwargs or kwargs['add_colorbar']):
         kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
         kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
     
@@ -141,7 +141,7 @@ def imshow(da, ax=None, xy_unit=None, skip=1, smooth=1, xlim=None, ylim=None, xl
         da = da.rolling(x=smooth, center=True).mean().rolling(y=smooth, center=True).mean()
 
     # Append colorbar axis
-    if append_axes_kwargs is not None and ('add_colorbar' not in kwargs or not kwargs['add_colorbar']) and 'rgb' not in kwargs:
+    if append_axes_kwargs is not None and ('add_colorbar' not in kwargs or kwargs['add_colorbar']) and 'rgb' not in kwargs:
         kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
         kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
     
@@ -217,7 +217,7 @@ def scatter(ds, ax=None, xy_unit=None, skip=1, smooth=1, xlim=None, ylim=None, x
         ds = ds.rolling(x=smooth, center=True).mean().rolling(y=smooth, center=True).mean()
     
     # Append colorbar axis
-    if append_axes_kwargs is not None and ('add_colorbar' not in kwargs or not kwargs['add_colorbar']):
+    if append_axes_kwargs is not None and (('add_colorbar' in kwargs and kwargs['add_colorbar']) or ('hue' in kwargs and kwargs['hue'] is not None)):
         kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
         kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
 
@@ -293,7 +293,7 @@ def contourf(da, ax=None, xy_unit=None, skip=1, smooth=1, xlim=None, ylim=None, 
         da = da.rolling(x=smooth, center=True).mean().rolling(y=smooth, center=True).mean()
     
     # Append colorbar axis
-    if append_axes_kwargs is not None and ('add_colorbar' not in kwargs or not kwargs['add_colorbar']):
+    if append_axes_kwargs is not None and ('add_colorbar' not in kwargs or kwargs['add_colorbar']):
         kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
         kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
     
@@ -369,7 +369,7 @@ def contour(da, ax=None, xy_unit=None, skip=1, smooth=1, xlim=None, ylim=None, x
         da = da.rolling(x=smooth, center=True).mean().rolling(y=smooth, center=True).mean()
     
     # Append colorbar axis
-    if append_axes_kwargs is not None and 'add_colorbar' in kwargs and kwargs['add_colorbar']:
+    if append_axes_kwargs is not None and ('add_colorbar' in kwargs and kwargs['add_colorbar']):
         kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
         kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
     
@@ -441,7 +441,7 @@ def quiver(ds, ax=None, xy_unit=None, skip=1, smooth=1, xlim=None, ylim=None, xl
         ds = ds.isel(x=slice(None, None, skip), y=slice(None, None, skip))
     
     # Append colorbar axis
-    if append_axes_kwargs is not None and 'add_colorbar' in kwargs and kwargs['add_colorbar']:
+    if append_axes_kwargs is not None and (('add_colorbar' in kwargs and kwargs['add_colorbar']) or ('hue' in kwargs and kwargs['hue'] is not None)):
         kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
         kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
 
@@ -527,7 +527,7 @@ def streamplot(ds, ax=None, xy_unit=None, skip=1, smooth=1, xlim=None, ylim=None
     ds = ds.sortby('y')
 
     # Append colorbar axis
-    if append_axes_kwargs is not None and 'add_colorbar' in kwargs and kwargs['add_colorbar']:
+    if append_axes_kwargs is not None and (('add_colorbar' in kwargs and kwargs['add_colorbar']) or ('hue' in kwargs and kwargs['hue'] is not None)):
         kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
         kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
         

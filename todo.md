@@ -16,6 +16,7 @@
 - Curved quiver
 - plot .grid file
 - Add notebook guidelines to better understand arguments
+- Automatic conversion of extent type based on provided crs (!)
 
 ## Helena:
 - Highlighting banks and other bedform features

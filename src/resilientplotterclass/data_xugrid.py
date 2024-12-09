@@ -51,7 +51,7 @@ def pcolormesh(uda, ax=None, xy_unit=None, xlim=None, ylim=None, xlabel_kwargs=N
     uda = rpc.rescale.rescale(data=uda, scale_factor=scale_factor)
     
     # Append colorbar axis
-    if append_axes_kwargs is not None and ('add_colorbar' not in kwargs or not kwargs['add_colorbar']):
+    if append_axes_kwargs is not None and ('add_colorbar' not in kwargs or kwargs['add_colorbar']):
         kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
         kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
     
@@ -114,7 +114,7 @@ def imshow(uda, ax=None, xy_unit=None, xlim=None, ylim=None, xlabel_kwargs=None,
     uda = rpc.rescale.rescale(data=uda, scale_factor=scale_factor)
     
     # Append colorbar axis
-    if append_axes_kwargs is not None and ('add_colorbar' not in kwargs or not kwargs['add_colorbar']):
+    if append_axes_kwargs is not None and ('add_colorbar' not in kwargs or kwargs['add_colorbar']):
         kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
         kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
     
@@ -178,7 +178,7 @@ def scatter(uda, ax=None, xy_unit=None, xlim=None, ylim=None, xlabel_kwargs=None
     uda = rpc.rescale.rescale(data=uda, scale_factor=scale_factor)
 
     # Append colorbar axis
-    if append_axes_kwargs is not None and ('add_colorbar' not in kwargs or not kwargs['add_colorbar']):
+    if append_axes_kwargs is not None and (('add_colorbar' in kwargs and kwargs['add_colorbar']) or ('hue' in kwargs and kwargs['hue'] is not None)):
         kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
         kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
     
@@ -242,7 +242,7 @@ def contourf(uda, ax=None, xy_unit=None, xlim=None, ylim=None, xlabel_kwargs=Non
     uda = rpc.rescale.rescale(data=uda, scale_factor=scale_factor)
     
     # Append colorbar axis
-    if append_axes_kwargs is not None and ('add_colorbar' not in kwargs or not kwargs['add_colorbar']):
+    if append_axes_kwargs is not None and ('add_colorbar' not in kwargs or kwargs['add_colorbar']):
         kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
         kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
     
@@ -306,7 +306,7 @@ def contour(uda, ax=None, xy_unit=None, xlim=None, ylim=None, xlabel_kwargs=None
     uda = rpc.rescale.rescale(data=uda, scale_factor=scale_factor)
 
     # Append colorbar axis
-    if append_axes_kwargs is not None and 'add_colorbar' in kwargs and kwargs['add_colorbar']:
+    if append_axes_kwargs is not None and ('add_colorbar' in kwargs and kwargs['add_colorbar']):
         kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
         kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
     
@@ -370,7 +370,7 @@ def quiver(uds, ax=None, xy_unit=None, xlim=None, ylim=None, xlabel_kwargs=None,
     uds = rpc.rescale.rescale(data=uds, scale_factor=scale_factor)
 
     # Append colorbar axis
-    if append_axes_kwargs is not None and ('add_colorbar' not in kwargs or not kwargs['add_colorbar']):
+    if append_axes_kwargs is not None and (('add_colorbar' in kwargs and kwargs['add_colorbar']) or ('hue' in kwargs and kwargs['hue'] is not None)):
         kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
         kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
 

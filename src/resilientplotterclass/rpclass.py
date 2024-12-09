@@ -107,7 +107,8 @@ class rpclass:
 
         # Define conflicting kwargs
         CONFLICT_DICT = {'color': ['cmap'],
-                         'cmap': ['color']}
+                         'colors': ['cmap'],
+                         'cmap': ['color', 'colors']}
 
         # Remove conflicting kwargs
         dict2 = {}
@@ -382,7 +383,7 @@ class rpclass:
         return fig, axs
 
     # Save figure
-    def savefig(self, fig, file_path, close=True, dpi=300, bbox_inches='tight', **kwargs):
+    def save_fig(self, fig, file_path, close=True, dpi=300, bbox_inches='tight', **kwargs):
         """Save figure.
 
         :param file_path:   File path to save figure.
