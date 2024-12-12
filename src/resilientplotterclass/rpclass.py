@@ -121,6 +121,12 @@ class rpclass:
                 key2 = [key2 for key2 in CONFLICT_DICT[key] if key2 in dict2.keys()][0]
                 print("\033[93m Warning: Conflicting kwargs ('{}' and '{}') using '{}'. \033[0m".format(key2, key, key2))
         
+        # Remove conflicting kwargs for colorbar
+        if 'add_colorbar' in dict2.keys() and not dict2['add_colorbar']:
+            if 'cbar_kwargs' in dict2.keys():
+                dict2.pop('cbar_kwargs')
+                print("\033[93m Warning: 'cbar_kwargs' removed because 'add_colorbar' is False. \033[0m")
+
         # Return dictionary without conflicting kwargs
         return dict2
 
@@ -439,7 +445,7 @@ class rpclass:
     # General plot methods
     # =============================================================================
     # Plot data using pcolormesh
-    def pcolormesh(self, data, ax=None, data_type=None, extent_type=None, **kwargs):
+    def pcolormesh(self, data, ax=None, data_type=None, extent_type=None, show_kwargs=False, **kwargs):
         """Plot data using pcolormesh.
 
         :param data:        Data to plot.
@@ -450,6 +456,8 @@ class rpclass:
         :type data_type:    str, optional
         :param extent_type: Extent type from guidelines.
         :type extent_type:  str, optional
+        :param show_kwargs: Show keyword arguments.
+        :type show_kwargs:  bool, optional
         :param kwargs:      Keyword arguments for :func:`resilientplotterclass.data_xarray.pcolormesh` or :func:`resilientplotterclass.data_xugrid.pcolormesh`.
         :type kwargs:       dict, optional
         :return:            Plot.
@@ -468,13 +476,16 @@ class rpclass:
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
         if data_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type], kwargs)
+            kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type].copy(), kwargs)
         if extent_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type], kwargs)
+            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
 
         # Remove conflicting kwargs
         kwargs = self._remove_dictonary_conflicts(kwargs)
 
+        # Show keyword arguments
+        if show_kwargs:
+            print('Keyword arguments for {}: {}'.format(plot_type, kwargs))
 
         # Plot data
         if isinstance(data, xr.DataArray):
@@ -488,7 +499,7 @@ class rpclass:
         return p
         
     # Plot data using imshow
-    def imshow(self, data, ax=None, data_type=None, extent_type=None, **kwargs):
+    def imshow(self, data, ax=None, data_type=None, extent_type=None, show_kwargs=False, **kwargs):
         """Plot data using imshow.
 
         :param data:        Data to plot.
@@ -499,6 +510,8 @@ class rpclass:
         :type data_type:    str, optional
         :param extent_type: Extent type from guidelines.
         :type extent_type:  str, optional
+        :param show_kwargs: Show keyword arguments.
+        :type show_kwargs:  bool, optional
         :param kwargs:      Keyword arguments for :func:`resilientplotterclass.data_xarray.imshow` or :func:`resilientplotterclass.data_xugrid.imshow`.
         :type kwargs:       dict, optional
         :return:            Plot.
@@ -517,12 +530,16 @@ class rpclass:
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
         if data_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type], kwargs)
+            kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type].copy(), kwargs)
         if extent_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type], kwargs)
+            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
 
         # Remove conflicting kwargs
         kwargs = self._remove_dictonary_conflicts(kwargs)
+        
+        # Show keyword arguments
+        if show_kwargs:
+            print('Keyword arguments for {}: {}'.format(plot_type, kwargs))
         
         # Plot data
         if isinstance(data, xr.DataArray):
@@ -536,7 +553,7 @@ class rpclass:
         return p
     
     # Plot data using scatter
-    def scatter(self, data, ax=None, data_type=None, extent_type=None, **kwargs):
+    def scatter(self, data, ax=None, data_type=None, extent_type=None, show_kwargs=False, **kwargs):
         """Plot data using scatter.
 
         :param data:        Data to plot.
@@ -547,6 +564,8 @@ class rpclass:
         :type data_type:    str, optional
         :param extent_type: Extent type from guidelines.
         :type extent_type:  str, optional
+        :param show_kwargs: Show keyword arguments.
+        :type show_kwargs:  bool, optional
         :param kwargs:      Keyword arguments for :func:`resilientplotterclass.data_xarray.scatter` or :func:`resilientplotterclass.data_xugrid.scatter`.
         :type kwargs:       dict, optional
         :return:            Plot.
@@ -565,12 +584,16 @@ class rpclass:
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
         if data_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type], kwargs)
+            kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type].copy(), kwargs)
         if extent_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type], kwargs)
+            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
 
         # Remove conflicting kwargs
         kwargs = self._remove_dictonary_conflicts(kwargs)
+
+        # Show keyword arguments
+        if show_kwargs:
+            print('Keyword arguments for {}: {}'.format(plot_type, kwargs))
 
         # Plot data
         if isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset):
@@ -584,7 +607,7 @@ class rpclass:
         return p
     
     # Plot data using contourf
-    def contourf(self, data, ax=None, data_type=None, extent_type=None, **kwargs):
+    def contourf(self, data, ax=None, data_type=None, extent_type=None, show_kwargs=False, **kwargs):
         """Plot data using contourf.
 
         :param data:        Data to plot.
@@ -595,6 +618,8 @@ class rpclass:
         :type data_type:    str, optional
         :param extent_type: Extent type from guidelines.
         :type extent_type:  str, optional
+        :param show_kwargs: Show keyword arguments.
+        :type show_kwargs:  bool, optional
         :param kwargs:      Keyword arguments for :func:`resilientplotterclass.data_xarray.contourf` or :func:`resilientplotterclass.data_xugrid.contourf`.
         :type kwargs:       dict, optional
         :return:            Plot.
@@ -613,12 +638,16 @@ class rpclass:
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
         if data_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type], kwargs)
+            kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type].copy(), kwargs)
         if extent_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type], kwargs)
+            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
 
         # Remove conflicting kwargs
         kwargs = self._remove_dictonary_conflicts(kwargs)
+
+        # Show keyword arguments
+        if show_kwargs:
+            print('Keyword arguments for {}: {}'.format(plot_type, kwargs))
 
         # Plot data
         if isinstance(data, xr.DataArray):
@@ -632,7 +661,7 @@ class rpclass:
         return p
     
     # Plot data using contour
-    def contour(self, data, ax=None, data_type=None, extent_type=None, **kwargs):
+    def contour(self, data, ax=None, data_type=None, extent_type=None, show_kwargs=False, **kwargs):
         """Plot data using contour.
 
         :param data:        Data to plot.
@@ -643,6 +672,8 @@ class rpclass:
         :type data_type:    str, optional
         :param extent_type: Extent type from guidelines.
         :type extent_type:  str, optional
+        :param show_kwargs: Show keyword arguments.
+        :type show_kwargs:  bool, optional
         :param kwargs:      Keyword arguments for :func:`resilientplotterclass.data_xarray.contour` or :func:`resilientplotterclass.data_xugrid.contour`.
         :type kwargs:       dict, optional
         :return:            Plot.
@@ -661,12 +692,16 @@ class rpclass:
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
         if data_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type], kwargs)
+            kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type].copy(), kwargs)
         if extent_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type], kwargs)
+            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
 
         # Remove conflicting kwargs
         kwargs = self._remove_dictonary_conflicts(kwargs)
+
+        # Show keyword arguments
+        if show_kwargs:
+            print('Keyword arguments for {}: {}'.format(plot_type, kwargs))
 
         # Plot data
         if isinstance(data, xr.DataArray):
@@ -680,7 +715,7 @@ class rpclass:
         return p
 
     # Plot data using quiver
-    def quiver(self, data, ax=None, data_type=None, extent_type=None, **kwargs):
+    def quiver(self, data, ax=None, data_type=None, extent_type=None, show_kwargs=False, **kwargs):
         """Plot data using quiver.
 
         :param data:        Data to plot.
@@ -691,6 +726,8 @@ class rpclass:
         :type data_type:    str, optional
         :param extent_type: Extent type from guidelines.
         :type extent_type:  str, optional
+        :param show_kwargs: Show keyword arguments.
+        :type show_kwargs:  bool, optional
         :param kwargs:      Keyword arguments for :func:`resilientplotterclass.data_xarray.quiver` or :func:`resilientplotterclass.data_xugrid.quiver`.
         :type kwargs:       dict, optional
         :return:            Plot.
@@ -709,12 +746,16 @@ class rpclass:
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
         if data_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type], kwargs)
+            kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type].copy(), kwargs)
         if extent_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type], kwargs)
+            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
         
         # Remove conflicting kwargs
         kwargs = self._remove_dictonary_conflicts(kwargs)
+
+        # Show keyword arguments
+        if show_kwargs:
+            print('Keyword arguments for {}: {}'.format(plot_type, kwargs))
 
         # Plot data
         if isinstance(data, xr.Dataset):
@@ -728,7 +769,7 @@ class rpclass:
         return p
 
     # Plot data using streamplot
-    def streamplot(self, da, ax=None, data_type=None, extent_type=None, **kwargs):
+    def streamplot(self, da, ax=None, data_type=None, extent_type=None, show_kwargs=False, **kwargs):
         """Plot data using streamplot.
 
         :param da:          Data to plot.
@@ -757,12 +798,16 @@ class rpclass:
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
         if data_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type], kwargs)
+            kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type].copy(), kwargs)
         if extent_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type], kwargs)
+            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
 
         # Remove conflicting kwargs
         kwargs = self._remove_dictonary_conflicts(kwargs)
+
+        # Show keyword arguments
+        if show_kwargs:
+            print('Keyword arguments for {}: {}'.format(plot_type, kwargs))
         
         # Plot data
         if isinstance(da, xr.Dataset):
@@ -774,7 +819,7 @@ class rpclass:
         return p
 
     # Plot grid using xugrid
-    def grid(self, data, ax=None, geom_type='grid', extent_type=None, **kwargs):
+    def grid(self, data, ax=None, geom_type='grid', extent_type=None, show_kwargs=False, **kwargs):
         """Plot grid using xugrid.
 
         :param data:          Data to plot.
@@ -785,6 +830,8 @@ class rpclass:
         :type geom_type:      str, optional
         :param extent_type:   Extent type from guidelines.
         :type extent_type:    str, optional
+        :param show_kwargs:   Show keyword arguments.
+        :type show_kwargs:    bool, optional
         :param kwargs:        Keyword arguments for :func:`resilientplotterclass.data_xugrid.grid`.
         :type kwargs:         dict, optional
         :return:              Axis.
@@ -800,12 +847,16 @@ class rpclass:
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
         if geom_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['geom_type'][geom_type], kwargs)
+            kwargs = self._combine_dictionaries(self.guidelines['geom_type'][geom_type].copy(), kwargs)
         if extent_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type], kwargs)
+            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
         
         # Remove conflicting kwargs
         kwargs = self._remove_dictonary_conflicts(kwargs)
+
+        # Show keyword arguments
+        if show_kwargs:
+            print('Keyword arguments for grid: {}'.format(kwargs))
         
         # Plot grid
         if isinstance(data, xu.UgridDataArray) or isinstance(data, xu.UgridDataset):
@@ -817,7 +868,7 @@ class rpclass:
         return ax
     
     # Plot geometries using geopandas
-    def geometries(self, gdf, ax=None, geom_type=None, extent_type=None, **kwargs):
+    def geometries(self, gdf, ax=None, geom_type=None, extent_type=None, show_kwargs=False, **kwargs):
         """Plot geometries using geopandas.
 
         :param gdf:           geometries to plot.
@@ -828,6 +879,8 @@ class rpclass:
         :type geom_type:      str, optional
         :param extent_type:   Extent type from guidelines.
         :type extent_type:    str, optional
+        :param show_kwargs:   Show keyword arguments.
+        :type show_kwargs:    bool, optional
         :param kwargs:        Keyword arguments for :func:`resilientplotterclass.geometries.plot_geometries`.
         :type kwargs:         dict, optional
         :return:              Axis.
@@ -843,12 +896,16 @@ class rpclass:
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
         if geom_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['geom_type'][geom_type], kwargs)
+            kwargs = self._combine_dictionaries(self.guidelines['geom_type'][geom_type].copy(), kwargs)
         if extent_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type], kwargs)
+            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
 
         # Remove conflicting kwargs
         kwargs = self._remove_dictonary_conflicts(kwargs)
+
+        # Show keyword arguments
+        if show_kwargs:
+            print('Keyword arguments for geometries: {}'.format(kwargs))
         
         # Plot geometries
         if isinstance(gdf, gpd.GeoDataFrame):
@@ -860,7 +917,7 @@ class rpclass:
         return ax
     
     # Plot basemap using contextily
-    def basemap(self, crs=None, ax=None, map_type=None, extent_type=None, **kwargs):
+    def basemap(self, crs=None, ax=None, map_type=None, extent_type=None, show_kwargs=False, **kwargs):
         """Plot basemap using contextily.
 
         :param crs:         Coordinate reference system.
@@ -871,6 +928,8 @@ class rpclass:
         :type map_type:     str, optional
         :param extent_type: Extent type from guidelines.
         :type extent_type:  str, optional
+        :param show_kwargs: Show keyword arguments.
+        :type show_kwargs:  bool, optional
         :param kwargs:      Keyword arguments for :func:`resilientplotterclass.basemaps.plot_basemap`.
         :type kwargs:       dict, optional
         :return:            None.
@@ -888,24 +947,30 @@ class rpclass:
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
         if map_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['map_type'][map_type], kwargs)
+            kwargs = self._combine_dictionaries(self.guidelines['map_type'][map_type].copy(), kwargs)
         if extent_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type], kwargs)
+            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
 
         # Remove conflicting kwargs
         kwargs = self._remove_dictonary_conflicts(kwargs)
+
+        # Show keyword arguments
+        if show_kwargs:
+            print('Keyword arguments for basemap: {}'.format(kwargs))
         
         # Plot basemap
         rpc.basemaps.plot_basemap(crs=crs, ax=ax, **kwargs)
     
     # Plot cartopy geometries using geopandas
-    def cartopy(self, ax=None, extent_type=None, **kwargs):
+    def cartopy(self, ax=None, extent_type=None, show_kwargs=False, **kwargs):
         """Plot cartopy geometries using geopandas.
 
         :param ax:          Axis.
         :type ax:           matplotlib.axes.Axes, optional
         :param extent_type: Extent type from guidelines.
         :type extent_type:  str, optional
+        :param show_kwargs: Show keyword arguments.
+        :type show_kwargs:  bool, optional
         :param kwargs:      Keyword arguments for :func:`resilientplotterclass.geometries.plot_geometries`.
         :type kwargs:       dict, optional
         :return:            Axis.
@@ -919,15 +984,15 @@ class rpclass:
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
         if extent_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type], kwargs)
+            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
         
         # Plot cartopy geometries
-        ax = rpc.geometries.plot_geometries(self.get_cartopy(), ax=ax, **kwargs)
+        ax = rpc.geometries.plot_geometries(self.get_cartopy(), ax=ax, show_kwargs=show_kwargs, **kwargs)
 
         # Return axis
         return ax
     
-    def interactive_data(self, data, data_type=None, **kwargs):
+    def interactive_data(self, data, data_type=None, show_kwargs=False, **kwargs):
         """Plot data interactively.
 
         :param data:        Data to plot.
@@ -936,6 +1001,8 @@ class rpclass:
         :type data_type:    str, optional
         :param extent_type: Extent type from guidelines.
         :type extent_type:  str, optional
+        :param show_kwargs: Show keyword arguments.
+        :type show_kwargs:  bool, optional
         :param kwargs:      Keyword arguments for :func:`resilientplotterclass.interactive.da_interactive` or :func:`resilientplotterclass.interactive.uda_interactive`.
         :type kwargs:       dict, optional
         :return:            Interactive plot.
@@ -948,10 +1015,14 @@ class rpclass:
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
         if data_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type], kwargs)
+            kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type].copy(), kwargs)
         
         # Remove conflicting kwargs
         kwargs = self._remove_dictonary_conflicts(kwargs)
+
+        # Show keyword arguments
+        if show_kwargs:
+            print('Keyword arguments for {}: {}'.format(plot_type, kwargs))
         
         # Plot data
         if isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset):
@@ -964,7 +1035,7 @@ class rpclass:
         # Return plot
         return p
     
-    def interactive_geometries(self, gdf, geom_type=None, **kwargs):
+    def interactive_geometries(self, gdf, geom_type=None, show_kwargs=False, **kwargs):
         """Plot geometries interactively.
 
         :param gdf:           Geodataframe to plot.
@@ -973,19 +1044,28 @@ class rpclass:
         :type ax:             matplotlib.axes.Axes, optional
         :param geom_type:     Geometry type from guidelines.
         :type geom_type:      str, optional
+        :param show_kwargs:   Show keyword arguments.
+        :type show_kwargs:    bool, optional
         :param kwargs:        Keyword arguments for :func:`resilientplotterclass.interactive.geometries_interactive`.
         :type kwargs:         dict, optional
         :return:              Interactive plot.
         :rtype:               holoviews.element.path.Polygons
         """
 
+        # Get plot_type (function name)
+        plot_type = inspect.currentframe().f_code.co_name
+
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
         if geom_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['geom_type'][geom_type], kwargs)
+            kwargs = self._combine_dictionaries(self.guidelines['geom_type'][geom_type].copy(), kwargs)
 
         # Remove conflicting kwargs
         kwargs = self._remove_dictonary_conflicts(kwargs)
+
+        # Show keyword arguments
+        if show_kwargs:
+            print('Keyword arguments for {}: {}'.format(plot_type, kwargs))
         
         # Plot geometries interactively
         p = rpc.interactive.interactive_gdf(gdf, **kwargs)
@@ -993,22 +1073,31 @@ class rpclass:
         # Return plot
         return p
     
-    def interactive_cartopy(self, **kwargs):
+    def interactive_cartopy(self, show_kwargs=False, **kwargs):
         """Plot cartopy geometries interactively.
 
         :param ax:          Axis.
         :type ax:           matplotlib.axes.Axes, optional
+        :param show_kwargs: Show keyword arguments.
+        :type show_kwargs:  bool, optional
         :param kwargs:      Keyword arguments for :func:`resilientplotterclass.interactive.interactive_gdf_cartopy`.
         :type kwargs:       dict, optional
         :return:            Interactive plot.
         :rtype:             holoviews.core.overlay.Overlay
         """
 
+        # Get plot_type (function name)
+        plot_type = inspect.currentframe().f_code.co_name
+
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
 
         # Remove conflicting kwargs
         kwargs = self._remove_dictonary_conflicts(kwargs)
+
+        # Show keyword arguments
+        if show_kwargs:
+            print('Keyword arguments for {}: {}'.format(plot_type, kwargs))
         
         # Plot cartopy geometries interactively 
         p = rpc.interactive.interactive_gdf_cartopy(self.get_cartopy(), **kwargs)
@@ -1016,12 +1105,15 @@ class rpclass:
         # Return plot
         return p
     
-    def interactive_basemap(self, map_type=None, **kwargs):
+    def interactive_basemap(self, map_type=None, show_kwargs=False, **kwargs):
         """Plot basemap interactively.
 
         :return: 
         :rtype:  
         """
+
+        # Get plot_type (function name)
+        plot_type = inspect.currentframe().f_code.co_name
 
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         if map_type is None:
@@ -1029,6 +1121,10 @@ class rpclass:
 
         # Remove conflicting kwargs
         kwargs = self._remove_dictonary_conflicts(kwargs)
+
+        # Show keyword arguments
+        if show_kwargs:
+            print('Keyword arguments for {}: {}'.format(plot_type, kwargs))
 
         # Plot basemap interactively
         p = rpc.interactive.interactive_basemap(map_type=map_type, **kwargs)
