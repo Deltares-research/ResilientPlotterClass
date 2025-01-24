@@ -94,11 +94,13 @@ class rpclass:
         return dict3
     
     # Remove conflicting kwargs from dictionary
-    def _remove_dictonary_conflicts(self, dict, warn=True):
+    def _remove_dictonary_conflicts(self, dict, plot_type=None, warn=True):
         """ Remove conflicting kwargs from dictionary, prioritising the last kwargs.
 
         :param dict: Dictionary.
         :type dict:  dict
+        :param plot_type: Plot type.
+        :type plot_type:  str
         :param warn: Print warning if conflicting kwargs.
         :type warn:  bool, optional
         :return:     Dictionary without conflicting kwargs.
@@ -122,7 +124,7 @@ class rpclass:
                 print("\033[93m Warning: Conflicting kwargs ('{}' and '{}') using '{}'. \033[0m".format(key2, key, key2))
         
         # Remove conflicting kwargs for colorbar
-        if 'add_colorbar' in dict2.keys() and not dict2['add_colorbar']:
+        if ('add_colorbar' in dict2.keys() and not dict2['add_colorbar']) or (plot_type in ['contour', 'quiver', 'streamplot'] and 'add_colorbar' not in dict2.keys()):
             if 'cbar_kwargs' in dict2.keys():
                 dict2.pop('cbar_kwargs')
                 print("\033[93m Warning: 'cbar_kwargs' removed because 'add_colorbar' is False. \033[0m")
@@ -318,7 +320,7 @@ class rpclass:
         display(s)
 
     # Set cartopy
-    def set_cartopy(self, features=None, bounds=None, crs=None):
+    def set_cartopy(self, features=None, bounds=None, crs=None, buffer=0.1):
         """Set cartopy geometries.
 
         :param features: List of features to get.
@@ -327,6 +329,7 @@ class rpclass:
         :type bounds:    list[float], optional
         :param crs:      Coordinate reference system of the cartopy geometries.
         :type crs:       str, optional
+        :param buffer:   Buffer ratio to apply to the bounds.
         :return:         None.
         :rtype:          None
         """
@@ -337,7 +340,7 @@ class rpclass:
         crs = self.guidelines['general']['crs'] if crs is None else crs
 
         # Set cartopy geometries
-        self.gdf_cartopy = rpc.geometries.get_gdf_cartopy(features=features, bounds=bounds, crs=crs)
+        self.gdf_cartopy = rpc.geometries.get_gdf_cartopy(features=features, bounds=bounds, crs=crs, buffer=buffer)
 
     # Get cartopy
     def get_cartopy(self):
@@ -422,7 +425,7 @@ class rpclass:
             raise TypeError('fig must be a matplotlib.figure.Figure or holoviews.element.chart.Element or holoviews.element.chart.Overlay or holoviews.element.chart.DynamicMap. Received: {}'.format(type(fig)))
         
     # Create video
-    def create_video(self, file_paths, file_path_video, fps=5, frame_size=(1920, 1080), **kwargs):
+    def create_video(self, file_paths, file_path_video, fps=5, **kwargs):
         """Create video from images.
 
         :param file_paths:      File paths to images.
@@ -431,15 +434,13 @@ class rpclass:
         :type file_path_video:  str
         :param fps:             Frames per second.
         :type fps:              int, optional
-        :param frame_size:      Frame size.
-        :type frame_size:       tuple[int, int], optional
         :param kwargs:          Keyword arguments for :func:`resilientplotterclass.video.create_video`.
         :type kwargs:           dict, optional
         :return:                None.
         """
 
         # Create video
-        rpc.videos.create_video(file_paths, file_path_video, fps=fps, frame_size=frame_size, **kwargs)
+        rpc.videos.create_video(file_paths, file_path_video, fps=fps, **kwargs)
 
     # =============================================================================
     # General plot methods
@@ -481,7 +482,7 @@ class rpclass:
             kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
 
         # Remove conflicting kwargs
-        kwargs = self._remove_dictonary_conflicts(kwargs)
+        kwargs = self._remove_dictonary_conflicts(kwargs, plot_type)
 
         # Show keyword arguments
         if show_kwargs:
@@ -535,7 +536,7 @@ class rpclass:
             kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
 
         # Remove conflicting kwargs
-        kwargs = self._remove_dictonary_conflicts(kwargs)
+        kwargs = self._remove_dictonary_conflicts(kwargs, plot_type)
         
         # Show keyword arguments
         if show_kwargs:
@@ -589,7 +590,7 @@ class rpclass:
             kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
 
         # Remove conflicting kwargs
-        kwargs = self._remove_dictonary_conflicts(kwargs)
+        kwargs = self._remove_dictonary_conflicts(kwargs, plot_type)
 
         # Show keyword arguments
         if show_kwargs:
@@ -643,7 +644,7 @@ class rpclass:
             kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
 
         # Remove conflicting kwargs
-        kwargs = self._remove_dictonary_conflicts(kwargs)
+        kwargs = self._remove_dictonary_conflicts(kwargs, plot_type)
 
         # Show keyword arguments
         if show_kwargs:
@@ -697,7 +698,7 @@ class rpclass:
             kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
 
         # Remove conflicting kwargs
-        kwargs = self._remove_dictonary_conflicts(kwargs)
+        kwargs = self._remove_dictonary_conflicts(kwargs, plot_type)
 
         # Show keyword arguments
         if show_kwargs:
@@ -751,7 +752,7 @@ class rpclass:
             kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
         
         # Remove conflicting kwargs
-        kwargs = self._remove_dictonary_conflicts(kwargs)
+        kwargs = self._remove_dictonary_conflicts(kwargs, plot_type)
 
         # Show keyword arguments
         if show_kwargs:
@@ -803,7 +804,7 @@ class rpclass:
             kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
 
         # Remove conflicting kwargs
-        kwargs = self._remove_dictonary_conflicts(kwargs)
+        kwargs = self._remove_dictonary_conflicts(kwargs, plot_type)
 
         # Show keyword arguments
         if show_kwargs:
@@ -986,8 +987,12 @@ class rpclass:
         if extent_type is not None:
             kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
         
+        # Show keyword arguments
+        if show_kwargs:
+            print('Keyword arguments for cartopy: {}'.format(kwargs))
+            
         # Plot cartopy geometries
-        ax = rpc.geometries.plot_geometries(self.get_cartopy(), ax=ax, show_kwargs=show_kwargs, **kwargs)
+        ax = rpc.geometries.plot_geometries(self.get_cartopy(), ax=ax, **kwargs)
 
         # Return axis
         return ax
@@ -1018,7 +1023,7 @@ class rpclass:
             kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type].copy(), kwargs)
         
         # Remove conflicting kwargs
-        kwargs = self._remove_dictonary_conflicts(kwargs)
+        kwargs = self._remove_dictonary_conflicts(kwargs, plot_type)
 
         # Show keyword arguments
         if show_kwargs:
@@ -1061,7 +1066,7 @@ class rpclass:
             kwargs = self._combine_dictionaries(self.guidelines['geom_type'][geom_type].copy(), kwargs)
 
         # Remove conflicting kwargs
-        kwargs = self._remove_dictonary_conflicts(kwargs)
+        kwargs = self._remove_dictonary_conflicts(kwargs, plot_type)
 
         # Show keyword arguments
         if show_kwargs:
@@ -1093,7 +1098,7 @@ class rpclass:
         kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
 
         # Remove conflicting kwargs
-        kwargs = self._remove_dictonary_conflicts(kwargs)
+        kwargs = self._remove_dictonary_conflicts(kwargs, plot_type)
 
         # Show keyword arguments
         if show_kwargs:
@@ -1120,7 +1125,7 @@ class rpclass:
             map_type = self.guidelines['general']['map_type']
 
         # Remove conflicting kwargs
-        kwargs = self._remove_dictonary_conflicts(kwargs)
+        kwargs = self._remove_dictonary_conflicts(kwargs, plot_type)
 
         # Show keyword arguments
         if show_kwargs:
@@ -1279,8 +1284,6 @@ class rpclass:
         :type ax:              matplotlib.axes.Axes, optional
         :param geom_type:      Geometry type from guidelines.
         :type geom_type:       str, optional
-        :param geom_type2:     Geometry type from guidelines.
-        :type geom_type2:      str, optional
         :param map_type:       Map type from guidelines.
         :type map_type:        str, optional
         :param extent_type:    Extent type from guidelines.

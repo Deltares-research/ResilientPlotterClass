@@ -372,7 +372,7 @@ def contour(da, ax=None, xy_unit=None, skip=1, smooth=1, xlim=None, ylim=None, x
     if append_axes_kwargs is not None and ('add_colorbar' in kwargs and kwargs['add_colorbar']):
         kwargs['cbar_kwargs'] = {} if 'cbar_kwargs' not in kwargs or kwargs['cbar_kwargs'] is None else kwargs['cbar_kwargs']
         kwargs['cbar_kwargs']['cax'] = rpc.axes.append_cbar_axis(ax=ax, append_axes_kwargs=append_axes_kwargs)
-    
+
     # Plot DataArray
     p = da.plot.contour(ax=ax, **kwargs)
 
