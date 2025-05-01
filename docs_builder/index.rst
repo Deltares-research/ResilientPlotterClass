@@ -27,6 +27,6 @@ and :doc:`API reference <_pages/api_reference>` detailing every module, class an
     :hidden:
     
     Home <self>
-    Guides <_pages/guides/>
-    API Reference <_pages/api_reference>
+    Guides <_pages/guides>
+    API reference <_pages/api_reference>
 
