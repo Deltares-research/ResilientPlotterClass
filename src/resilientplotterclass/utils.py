@@ -83,7 +83,7 @@ def rasterise_uds(uds, ds=None, bounds=None, resolution=None):
 
     :param uds:        Data to rasterise.
     :type uds:         xugrid.UgridDataSet or xugrid.UgridDataArray
-    :param ds:         Data array to rasterise data on.
+    :param ds:         Data to rasterise data on.
     :type ds:          xarray.DataSet or xarray.DataArray, optional
     :param bounds:     Bounds of the rasterised data.
     :type bounds:      tuple, optional
@@ -130,9 +130,10 @@ def rasterise_uds(uds, ds=None, bounds=None, resolution=None):
     ds = uds.ugrid.sel_points(x=xG.flatten(), y=yG.flatten(), out_of_bounds='ignore')
     
     # Remove mesh2d_ from data variables
-    for var in ds.data_vars:
-        if 'mesh2d_' in var:
-            ds = ds.rename({var: var.replace('mesh2d_', '')})
+    if isinstance(ds, xu.UgridDataset):
+        for var in ds.data_vars:
+            if 'mesh2d_' in var:
+                ds = ds.rename({var: var.replace('mesh2d_', '')})
     
     # Remove coordinates that contain _index, _x, or _y
     for coord in ds.coords:
@@ -153,68 +154,10 @@ def rasterise_uds(uds, ds=None, bounds=None, resolution=None):
     ds = ds.unstack('idx')
 
     # Transpose dimensions
-    ds = ds.transpose('y', 'x')
+    ds = ds.transpose('y', 'x', ...)
     
     # Set coordinate reference system
     ds = ds.rio.write_crs(uds.grid.crs)
 
     # Return the rasterised data
     return ds
-
-# OLD FUNCTION
-'''
-def rasterise_uda(uda, da=None, **kwargs):
-    """Rasterise data.
-
-    :param uda:    Data to rasterise.
-    :type uda:     xugrid.DataArray
-    :param da:     Data array to rasterise data on.
-    :type da:      xarray.DataArray, optional
-    :param kwargs: Keyword arguments for :func:`xugrid.Ugrid.grid.rasterize`.
-    :type kwargs:  dict, optional
-    :return:       Rasterised data.
-    :rtype:        xarray.DataArray
-
-    See also: `xugrid.Ugrid.grid.rasterize <https://deltares.github.io/xugrid/api/xugrid.UgridDatasetAccessor.rasterize.html>`_,
-              `xugrid.Ugrid.grid.rasterize_like <https://deltares.github.io/xugrid/api/xugrid.UgridDatasetAccessor.rasterize_like.html>`_.
-    """
-
-    # Create data array with grid indices
-    if da is not None:
-        x, y, zG = uda.grid.rasterize_like(da.x, da.y)
-    else:
-        x, y, zG = uda.grid.rasterize(**kwargs)
-    da_grid = xr.DataArray(zG, dims=['y', 'x'], coords={'y': y, 'x': x})
-    da_grid = da_grid.where(da_grid != -1)
-
-    # Transpose data array
-    da_grid = da_grid.transpose('y', 'x')
-
-    # Initialise data array with data
-    da_data = da_grid.copy(deep=True)
-    da_data.values = da_data.values * np.nan
-
-    # Get dimension to rasterise
-    dim = uda.dims[0]
-
-    # Get indices of dimension
-    idxs = list(set(da_grid.values.flatten()))
-    
-    # Rasterise data
-    for idx in idxs:
-        # Get x and y coordinates of index
-        idx_xy = np.where(da_grid.values == idx)
-
-        # Skip if no data
-        if len(idx_xy[0]) == 0:
-            continue
-        
-        # Set value
-        da_data[idx_xy] = uda.sel({dim: idx})
-
-    # Set coordinate reference system
-    da_data = da_data.rio.write_crs(uda.grid.crs)
-
-    # Return the rasterised data
-    return da_data
-'''

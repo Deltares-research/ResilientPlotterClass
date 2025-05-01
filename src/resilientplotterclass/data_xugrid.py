@@ -446,4 +446,4 @@ def grid(uda, ax=None, xy_unit=None, xlim=None, ylim=None, xlabel_kwargs=None, y
                          title_kwargs=title_kwargs, aspect_kwargs=aspect_kwargs, grid_kwargs=grid_kwargs)
     
     # Return plot
-    return p
+    return ax

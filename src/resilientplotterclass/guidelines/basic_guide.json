@@ -1,0 +1,49 @@
+{
+    "metadata": {
+        "title": "Basic guide guidelines",
+        "date": "2025-05-01",
+        "author(s)": "Ruben White"
+    },
+    
+    "general": {
+        "crs": "EPSG:28992",
+        "vrl": "MSL",
+        "xy_unit": null,
+        "cartopy_bounds": [135000, 585000, 170000, 610000],
+        "cartopy_features": ["land", "ocean", "lakes", "rivers", "coastline", "borders", "states"]
+    },
+
+    "data": {
+    },
+
+    "geom":{
+    },
+
+    "data_style": {
+    },
+
+    "geom_style": {
+    },
+
+    "map_style": {
+    },
+
+    "extent_style": {
+        "default": {
+            "xlim": [135000, 170000],
+            "ylim": [585000, 610000]
+        }
+    },
+
+    "interactive_data_style": {
+    },
+
+    "interactive_geom_style": {
+    },
+
+    "interactive_map_style": {
+    },
+
+    "interactive_extent_style": {
+    }
+}

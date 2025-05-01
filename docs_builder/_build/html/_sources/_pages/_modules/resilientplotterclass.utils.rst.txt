@@ -8,7 +8,6 @@
 
    .. autosummary::
    
-      rasterise_uda
       rasterise_uds
       reproject_xugrid
    

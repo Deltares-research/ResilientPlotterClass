@@ -72,7 +72,7 @@ def _clip_gdf_cartopy(gdf, bounds):
         # Create a geodataframe for the feature
         gdf_feature = gpd.GeoDataFrame({'geometry':[geometry],
                                         'kwargs':[kwargs]},
-                                        index = [idx], crs=gdf.crs)
+                                        index=[idx], crs=gdf.crs)
         
         # Concatenate the geodataframe to the dissolved geodataframe
         gdf_dissolved = pd.concat([gdf_dissolved, gdf_feature])
@@ -98,24 +98,24 @@ def get_gdf_cartopy(features=None, bounds=None, crs=None, buffer=0.1):
     """
     
     # Define cartopy features and their styles
-    CFEATURES = {'borders':cfeature.BORDERS,
-                 'coastline':cfeature.COASTLINE,
-                 'lakes':cfeature.LAKES,
-                 'land':cfeature.LAND,
-                 'ocean':cfeature.OCEAN,
-                 'rivers':cfeature.RIVERS,
-                 'states':cfeature.STATES}
-    KWARGS = {'borders':{'color':'black', 'linewidth':1, 'linestyle':'-', 'zorder':0.03},
-              'coastline':{'color':'black', 'linewidth':1, 'linestyle':'-', 'zorder':0.03},
-              'lakes':{'facecolor':[0.59375 , 0.71484375, 0.8828125], 'edgecolor':'none', 'zorder':0.02},
-              'land':{'facecolor':[0.9375 , 0.9375 , 0.859375], 'edgecolor':'none', 'zorder':0.01},
-              'ocean':{'facecolor':[0.59375 , 0.71484375, 0.8828125], 'edgecolor':'none', 'zorder':0.01},
-              'rivers':{'color':[0.59375 , 0.71484375, 0.8828125], 'linewidth':1, 'linestyle':'-', 'zorder':0.02},
-              'states':{'facecolor':'none', 'edgecolor':'black', 'linewidth':1, 'linestyle':':' , 'zorder':0.03}}
+    CFEATURES={'borders':cfeature.BORDERS,
+               'coastline':cfeature.COASTLINE,
+               'lakes':cfeature.LAKES,
+               'land':cfeature.LAND,
+               'ocean':cfeature.OCEAN,
+               'rivers':cfeature.RIVERS,
+               'states':cfeature.STATES}
+    KWARGS={'borders':{'color':'black', 'linewidth':1, 'linestyle':'-', 'zorder':0.03},
+            'coastline':{'color':'black', 'linewidth':1, 'linestyle':'-', 'zorder':0.03},
+            'lakes':{'facecolor':[0.59375, 0.71484375, 0.8828125], 'edgecolor':'none', 'zorder':0.02},
+            'land':{'facecolor':[0.9375, 0.9375, 0.859375], 'edgecolor':'none', 'zorder':0.01},
+            'ocean':{'facecolor':[0.59375, 0.71484375, 0.8828125], 'edgecolor':'none', 'zorder':0.01},
+            'rivers':{'color':[0.59375, 0.71484375, 0.8828125], 'linewidth':1, 'linestyle':'-', 'zorder':0.02},
+            'states':{'facecolor':'none', 'edgecolor':'black', 'linewidth':1, 'linestyle':':', 'zorder':0.03}}
     
     # Get the cartopy features
     if features is None:
-        features = ['land','ocean','lakes','rivers','coastline','borders','states']
+        features = ['land', 'ocean', 'lakes', 'rivers', 'coastline', 'borders', 'states']
     
     # Convert the crs to a pyproj.CRS
     if isinstance(crs, pyprojCRS):
@@ -130,7 +130,7 @@ def get_gdf_cartopy(features=None, bounds=None, crs=None, buffer=0.1):
         raise ValueError('CRS type not supported. Please provide a pyproj.CRS, rasterio.CRS or str object.')
     
     # Create a GeoDataFrame for the cartopy features
-    gdf_cartopy = gpd.GeoDataFrame()
+    gdf_cartopy_ls = []
     for feature in features:
         # Get the cartopy geometries
         geometries_ = list(CFEATURES[feature].with_scale('10m').geometries())
@@ -154,10 +154,10 @@ def get_gdf_cartopy(features=None, bounds=None, crs=None, buffer=0.1):
             geometries = MultiLineString(geometries)
         
         # Create a GeoDataFrame for the cartopy feature
-        gdf_feature = gpd.GeoDataFrame({'geometry':[geometries], 'kwargs':[KWARGS[feature]]}, index=[feature], crs='EPSG:4326')        
+        gdf_cartopy_ls.append(gpd.GeoDataFrame({'geometry':[geometries], 'kwargs':[KWARGS[feature]]}, index=[feature], crs='EPSG:4326')) 
         
-        # Concatenate the GeoDataFrame to the cartopy features
-        gdf_cartopy = pd.concat([gdf_cartopy, gdf_feature])
+    # Concatenate the GeoDataFrame to the cartopy features
+    gdf_cartopy = gpd.GeoDataFrame(pd.concat(gdf_cartopy_ls), crs='EPSG:4326')
     
     # Clip the cartopy geodataframe
     if bounds is not None:
@@ -340,14 +340,14 @@ def plot_geometries(gdf, ax=None, xy_unit=None, xlim=None, ylim=None, xlabel_kwa
     # Get the rescale parameters
     scale_factor, _, _ = rpc.rescale.get_rescale_parameters(data=gdf, xy_unit=xy_unit)
     
-    # Rescale the DataArray
+    # Rescale the GeoDataFrame
     gdf = rpc.rescale.rescale(data=gdf, scale_factor=scale_factor)
 
     # Append colorbar axis
     if append_axes_kwargs is not None and 'cax' not in kwargs and 'legend' in kwargs and kwargs['legend']:
         kwargs['cax'] = rpc.axes.append_cbar_axis(ax, append_axes_kwargs)
     
-    # Plot DataArray
+    # Plot GeoDataFrame
     ax = _plot_gdf(gdf, ax=ax, **kwargs)
     
     # Format axis
