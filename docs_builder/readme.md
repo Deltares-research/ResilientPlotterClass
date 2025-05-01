@@ -55,4 +55,11 @@ The following steps describe how to build the documentation for the ResilientPlo
     ```
    
 4. Copy the html documentation from the `docs_builder\_build\html` directory to the `docs` directory of the ResilientPlotterClass repository
+    ```
+    xcopy /s /e /y _build\html\* ..\docs
+    ```
 
+5. Add an empty `.nojekyll` file to the `docs` directory to prevent GitHub Pages from ignoring the leading underscores
+    ```
+    echo. > ..\docs\.nojekyll
+    ```
