@@ -3,8 +3,8 @@
 
 A package to create resilient plots for geospatial data. This package is a wrapper around the plotting functionalities of [xarray](http://xarray.pydata.org/en/stable/), [xugrid](https://deltares.github.io/xugrid/), [geopandas](https://geopandas.org/), [matplotlib](https://matplotlib.org/stable/index.html), [contextily](https://contextily.readthedocs.io/en/latest/), [cartopy](https://scitools.org.uk/cartopy/docs/latest/) and [folium](https://python-visualization.github.io/folium/latest/).
 
-## Documentation
-[Documentation for the ResilientPlotterClass](https://deltares-research.github.io/ResilientPlotterClass/).
+---
+* ### [Documentation](https://deltares-research.github.io/ResilientPlotterClass/)
+* ### [Installation guide](https://deltares-research.github.io/ResilientPlotterClass/_pages/_guides/00_installation_guide.html)
+* ### [API reference](https://deltares-research.github.io/ResilientPlotterClass/_api/index.html)
 
-## Installation guide
-[Installation guide for the ResilientPlotterClass](https://deltares-research.github.io/ResilientPlotterClass/_pages/_guides/00_installation_guide.html).
