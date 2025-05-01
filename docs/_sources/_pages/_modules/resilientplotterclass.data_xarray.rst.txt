@@ -10,6 +10,7 @@
    
       contour
       contourf
+      grid
       imshow
       pcolormesh
       quiver

@@ -5,7 +5,32 @@ import numpy as np
 from branca.element import Element, Figure
 from folium.plugins import Draw
 
-def _explore_image(da, m, cmap='Spectral_r', vmin=None, vmax=None, legend=None, legend_kwds={}, **kwargs):    
+def _explore_image(da, m, cmap='Spectral_r', vmin=None, vmax=None, legend=None, legend_kwds={}, **kwargs):
+    """"Plot data interactively using folium.
+
+    :param da:                 Data to plot.
+    :type da:                  xarray.DataArray
+    :param m:                  Folium map to plot on.
+    :type m:                   folium.Map, optional
+    :param cmap:               Colormap to use.
+    :type cmap:                str, optional
+    :param vmin:               Minimum value for colormap.
+    :type vmin:                float, optional
+    :param vmax:               Maximum value for colormap.
+    :type vmax:                float, optional
+    :param legend:             Whether to show legend.
+    :type legend:              bool, optional
+    :param legend_kwds:        Keyword arguments for legend.
+    :type legend_kwds:         dict, optional
+    :param kwargs:             Keyword arguments for :func:`folium.raster_layers.ImageOverlay`.
+    :type kwargs:              dict, optional
+    :return:                   Plot.
+    :rtype:                    folium.Map
+
+    :See also: `folium.raster_layers.ImageOverlay <https://python-visualization.github.io/folium/latest/reference.html#folium.raster_layers.ImageOverlay>`_
+    :See also: `folium.LinearColormap <https://python-visualization.github.io/folium/latest/advanced_guide/colormaps.html>`_
+    """
+        
     # Convert da to number
     if not np.issubdtype(da.dtype, np.number):
         da = da.astype(float)
@@ -103,6 +128,27 @@ def pcolormesh(da, m=None, skip=1, smooth=1, **kwargs):
     return imshow(da, m=m, skip=skip, smooth=smooth, **kwargs)
 
 def imshow(da, m=None, skip=1, smooth=1, **kwargs):
+    """Plot data interactively using imshow.
+
+    :param da:                 Data to plot.
+    :type da:                  xarray.DataArray
+    :param m:                  Folium map to plot on.
+    :type m:                   folium.Map, optional
+    :param skip:               Plot every nth value in x and y direction.
+    :type skip:                int, optional
+    :param smooth:             Smooth data array with rolling mean in x and y direction.
+    :type smooth:              int, optional
+    :param xlim:               x limits.
+    :type xlim:                list[float], optional
+    :param ylim:               y limits.
+    :type ylim:                list[float], optional
+    
+    :param kwargs:             Keyword arguments for :func:`resilientplotterclass.interactive._explore_image`.
+    :type kwargs:              dict, optional
+    :return:                   Plot.
+    :rtype:                    folium.Map
+    """
+
     # Reproject DataArray
     if da.rio.crs != 'EPSG:4326':
         print("\033[93m Reprojecting DataArray to EPSG:4326.\033[0m")
@@ -149,6 +195,20 @@ def streamplot(da, m=None, skip=1, smooth=1, **kwargs):
     raise NotImplementedError('streamplot plot not implemented yet')
 
 def plot_geometries(gdf, m=None, **kwargs):
+    """Plot geometries interactively using folium.
+
+    :param gdf:                GeoDataFrame to plot.
+    :type gdf:                 geopandas.GeoDataFrame
+    :param m:                  Folium map to plot on.
+    :type m:                   folium.Map, optional
+    :param kwargs:             Keyword arguments for :func:`geopandas.explore`.
+    :type kwargs:              dict, optional
+    :return:                   Plot.
+    :rtype:                    folium.Map
+
+    :See also: `geopandas.explore <https://geopandas.org/en/stable/docs/reference/api/geopandas.GeoDataFrame.explore.html>`_
+    """
+
     # Reproject GeoDataFrame
     if gdf.crs != 'EPSG:4326':
         print("\033[93m Reprojecting GeoDataFrame to EPSG:4326.\033[0m")
@@ -168,6 +228,12 @@ def plot_geometries(gdf, m=None, **kwargs):
     return m
 
 class Draw(Draw):
+    """Wrapper for folium.plugins.Draw to add a button to export the map.
+
+    :param Draw: Folium Draw object.
+    :type Draw: folium.plugins.Draw
+    """
+
     def render(self, **kwargs):
         super().render(**kwargs)
 

@@ -1,8 +1,9 @@
 # Packages
 import folium
 import geopandas as gpd
+import html
 import inspect
-from IPython.display import display
+from IPython.display import display, HTML
 import json
 import matplotlib.pyplot as plt
 import os
@@ -95,19 +96,50 @@ class rpclass:
         # Return combined dictionary
         return dict3
     
+    # Substitute string in dictionary
+    def _substitute_str_in_dict(self, dict1, org_str=None, new_str=None):
+        """Recursively substitute string in dictionary.
+
+        :param dict1:   Dictionary.
+        :type dict1:    dict
+        :param org_str: Original string to substitute.
+        :type org_str:  str
+        :param new_str: New string to substitute.
+        :type new_str:  str
+        :return:        Dictionary with substituted strings.
+        :rtype:         dict
+        """
+
+        # Check if original string and new string are set
+        if org_str is None or new_str is None:
+            return dict1
+
+        # Substitute string in dictionary
+        for key, value in dict1.items():
+            if isinstance(value, dict):
+                dict1[key] = self._substitute_str_in_dict(value, org_str, new_str)
+            elif isinstance(value, str):
+                dict1[key] = value.replace(org_str, new_str)
+
+        # Return dictionary with substituted strings
+        return dict1
+    
     # Remove conflicting kwargs
-    def _remove_conflicting_kwargs(self, dict, plot_type=None, warn=True):
+    def _remove_conflicting_kwargs(self, dict1, plot_style=None, warn=True, reverse=True):
         """ Remove conflicting kwargs from dictionary, prioritising the last kwargs.
 
-        :param dict: Dictionary.
-        :type dict:  dict
-        :param plot_type: Plot type.
-        :type plot_type:  str
-        :param warn: Print warning if conflicting kwargs.
-        :type warn:  bool, optional
-        :return:     Dictionary without conflicting kwargs.
-        :rtype:      dict
+        :param dict1:     Dictionary.
+        :type dict1:      dict
+        :param plot_style: Plot style.
+        :type plot_style:  str
+        :param warn:      Print warning if conflicting kwargs.
+        :type warn:       bool, optional
+        :return:          Dictionary without conflicting kwargs.
+        :rtype:           dict
         """
+
+        # Check if dictionary must be reversed
+        i = -1 if reverse else 1
 
         # Define conflicting kwargs
         CONFLICT_DICT = {'color': ['cmap'],
@@ -116,17 +148,17 @@ class rpclass:
 
         # Remove conflicting kwargs
         dict2 = {}
-        for key in list(dict.keys())[::-1]:
+        for key in list(dict1.keys())[::i]:
             if key not in CONFLICT_DICT.keys():
-                dict2[key] = dict[key]
+                dict2[key] = dict1[key]
             elif not any([conflict in dict2.keys() for conflict in CONFLICT_DICT[key]]):
-                dict2[key] = dict[key]
+                dict2[key] = dict1[key]
             elif warn:
                 key2 = [key2 for key2 in CONFLICT_DICT[key] if key2 in dict2.keys()][0]
                 print("\033[93m Warning: Conflicting kwargs ('{}' and '{}') using '{}'. \033[0m".format(key2, key, key2))
         
         # Remove conflicting kwargs for colorbar
-        if ('add_colorbar' in dict2.keys() and not dict2['add_colorbar']) or (plot_type in ['contour', 'quiver', 'streamplot'] and 'add_colorbar' not in dict2.keys()):
+        if ('add_colorbar' in dict2.keys() and not dict2['add_colorbar']) or (plot_style in ['contour', 'quiver', 'streamplot'] and 'add_colorbar' not in dict2.keys()):
             if 'cbar_kwargs' in dict2.keys():
                 dict2.pop('cbar_kwargs')
                 print("\033[93m Warning: 'cbar_kwargs' removed because 'add_colorbar' is False. \033[0m")
@@ -135,17 +167,17 @@ class rpclass:
         return dict2
 
     # Get keyword arguments
-    def _get_kwargs(self, data_type=None, geom_type=None, map_type=None, extent_type=None, interactive=False, show_kwargs=False, **kwargs):
+    def _get_kwargs(self, data_style=None, geom_style=None, map_style=None, extent_style=None, interactive=False, show_kwargs=False, **kwargs):
         """Get keyword arguments.
 
-        :param data_type:    Data type from guidelines.
-        :type data_type:     str, optional
-        :param geom_type:    Geometry type from guidelines.
-        :type geom_type:     str, optional
-        :param map_type:     Map type from guidelines.
-        :type map_type:      str, optional
-        :param extent_type:  Extent type from guidelines.
-        :type extent_type:   str, optional
+        :param data_style:   Data type from guidelines.
+        :type data_style:    str, optional
+        :param geom_style:   Geometry type from guidelines.
+        :type geom_style:    str, optional
+        :param map_style:    Map type from guidelines.
+        :type map_style:     str, optional
+        :param extent_style: Extent type from guidelines.
+        :type extent_style:  str, optional
         :param interactive:  Interactive plot.
         :type interactive:   bool, optional
         :param show_kwargs:  Show keyword arguments.
@@ -157,21 +189,21 @@ class rpclass:
         """
         # Get parameters and arguments
         parameters, arguments = [], []
-        if data_type is not None:
-            parameters.append('data_type' if not interactive else 'interactive_data_type')
-            arguments.append(data_type)
-        if geom_type is not None:
-            parameters.append('geom_type' if not interactive else 'interactive_geom_type')
-            arguments.append(geom_type)
-        if map_type is not None:
-            parameters.append('map_type' if not interactive else 'interactive_map_type')
-            arguments.append(map_type)
-        if extent_type is not None:
-            parameters.append('extent_type' if not interactive else 'interactive_extent_type')
-            arguments.append(extent_type)
+        if data_style is not None:
+            parameters.append('data_style' if not interactive else 'interactive_data_style')
+            arguments.append(data_style)
+        if geom_style is not None:
+            parameters.append('geom_style' if not interactive else 'interactive_geom_style')
+            arguments.append(geom_style)
+        if map_style is not None:
+            parameters.append('map_style' if not interactive else 'interactive_map_style')
+            arguments.append(map_style)
+        if extent_style is not None:
+            parameters.append('extent_style' if not interactive else 'interactive_extent_style')
+            arguments.append(extent_style)
         
         # Get plot type (name of the function calling this method)
-        plot_type = inspect.stack()[1].function
+        plot_style = inspect.stack()[1].function
 
         # Get guidelines
         guideline_kwargs_ls = []
@@ -182,11 +214,11 @@ class rpclass:
             if argument not in self.guidelines[parameter].keys():
                 raise ValueError("{} '{}' not in guidelines. Available: {}".format(parameter, argument, list(self.guidelines[parameter].keys())))
             
-            if parameter in ['data_type', 'interactive_data_type']:
-                # Check if data_type is in guidelines
-                if plot_type not in self.guidelines[parameter][argument].keys():
-                    raise ValueError('plot_type {} not in guidelines. Available: {}'.format(plot_type, list(self.guidelines[parameter][argument].keys())))
-                guideline_kwargs_ls.append(self.guidelines[parameter][argument][plot_type].copy())
+            if parameter in ['data_style', 'interactive_data_style']:
+                # Check if plot_style is in guidelines
+                if plot_style not in self.guidelines[parameter][argument].keys():
+                    raise ValueError('plot_style {} not in guidelines. Available: {}'.format(plot_style, list(self.guidelines[parameter][argument].keys())))
+                guideline_kwargs_ls.append(self.guidelines[parameter][argument][plot_style].copy())
             else:
                 guideline_kwargs_ls.append(self.guidelines[parameter][argument].copy())
 
@@ -197,59 +229,76 @@ class rpclass:
             kwargs = self._combine_dictionaries(guideline_kwargs, kwargs)
         
         # Remove conflicting kwargs
-        kwargs = self._remove_conflicting_kwargs(kwargs, plot_type)
+        kwargs = self._remove_conflicting_kwargs(kwargs, plot_style)
 
         # Show keyword arguments
         if show_kwargs:
-            print('Keyword arguments for {}: {}'.format(plot_type, kwargs))
+            print('Keyword arguments for {}: {}'.format(plot_style, kwargs))
         
         # Return keyword arguments
         return kwargs
-    
-    # Get guidelines dataframe
-    def _get_df_guidelines(self, guidelines, section):
-        """Get guidelines dataframe.	
 
-        :param guidelines: Guidelines.
-        :type guidelines:  dict
-        :return:           General guidelines dataframe.
-        :rtype:            pandas.DataFrame
+    # Show guideline levels
+    def _show_guideline_levels(self, dict1, level, indent):
+        """Recursively show guideline levels.
+
+        :param dict:   Dictionary.
+        :type dict:    dict
+        :param level:  Level of the dictionary.
+        :type level:   int
+        :param indent: Indent for the dictionary.
+        :type indent:  int
+        :return:       HTML string of the dictionary.
+        :rtype:        str
         """
 
-        # Create dataframe
-        df_guidelines = gpd.GeoDataFrame({key: [value] for key, value in guidelines[section].items()}, index=[''])
+        indent_px = indent * level
+        html_str = ""
 
-        # Sort dataframe
-        df_guidelines = df_guidelines[list(guidelines[section].keys())]
+        for key, value in dict1.items():
+            safe_key = html.escape(str(key))
+            if isinstance(value, dict):
+                html_str += f"""
+                <div style="margin-left: {indent_px}px">
+                    <details>
+                        <summary><strong>{safe_key}</strong></summary>
+                        {self._show_guideline_levels(value, level + 1, indent)}
+                    </details>
+                </div>
+                """
+            else:
+                safe_value = html.escape(str(value))
+                html_str += f"""
+                <div style="margin-left: {indent_px}px">
+                    <strong>{safe_key}:</strong> {safe_value}
+                </div>
+                """
 
-        # Return dataframe
-        return df_guidelines
+        return html_str
 
-    # Get argument guidelines dataframe
-    def _get_df_argument_guidelines(self, guidelines, default_guidelines, project_guidelines):
-        """Get argument guidelines dataframe.
+    # Get guideline origins dataframe
+    def _get_df_guideline_origins(self, guidelines, default_guidelines, project_guidelines):
+        """Get guideline origins dataframe.
 
-        :param guidelines:       Guidelines.
-        :type guidelines:        dict
+        :param guidelines:         Guidelines.
+        :type guidelines:          dict
         :param default_guidelines: Default guidelines.
         :type default_guidelines:  dict
         :param project_guidelines: Project guidelines.
         :type project_guidelines:  dict
-        :param guidelines_type:  Guidelines type.
-        :type guidelines_type:   str
-        :return:                 Argument guidelines dataframe.
-        :rtype:                  pandas.DataFrame
+        :return:                   Guideline origins dataframe.
+        :rtype:                    pandas.DataFrame
         """
         
         # Get guidelines
         def _get_guideline(guidelines, parameter, argument, method):
-            if parameter in guidelines.keys() and parameter == 'data_type' and argument in guidelines[parameter].keys() and method in guidelines[parameter][argument].keys():
+            if parameter in guidelines.keys() and parameter == 'data_style' and argument in guidelines[parameter].keys() and method in guidelines[parameter][argument].keys():
                 guideline = guidelines[parameter][argument][method] # Data type
-            elif parameter in guidelines.keys() and parameter == 'geom_type' and argument in guidelines[parameter].keys() and method in ['grid', 'geometries']:
+            elif parameter in guidelines.keys() and parameter == 'geom_style' and argument in guidelines[parameter].keys() and method in ['grid', 'geometries']:
                 guideline = guidelines[parameter][argument] # Geom type
-            elif parameter in guidelines.keys() and parameter == 'map_type' and argument in guidelines[parameter].keys() and method in ['basemap']:
+            elif parameter in guidelines.keys() and parameter == 'map_style' and argument in guidelines[parameter].keys() and method in ['basemap']:
                 guideline = guidelines[parameter][argument] # Map type
-            elif parameter in guidelines.keys() and parameter == 'extent_type' and argument in guidelines[parameter].keys():
+            elif parameter in guidelines.keys() and parameter == 'extent_style' and argument in guidelines[parameter].keys():
                 guideline = guidelines[parameter][argument] # Extent type
             else:
                 guideline = None
@@ -281,7 +330,8 @@ class rpclass:
                     'quiver': [], 'streamplot': [], 'grid': [], 'geometries': [], 'basemap': [], 'cartopy': []}
 
         # Add parameters, arguments and methods
-        for parameter in ['data_type', 'geom_type', 'map_type', 'extent_type']:
+        styles = ['data_style', 'geom_style', 'map_style', 'extent_style', 'interactive_data_style', 'interactive_geom_style', 'interactive_map_style', 'interactive_extent_style']
+        for parameter in styles:
             if parameter not in guidelines.keys():
                 continue
             for argument in guidelines[parameter]:
@@ -291,16 +341,16 @@ class rpclass:
                     methods[method].append(_compare_guidelines(guidelines, default_guidelines, project_guidelines, parameter, argument, method))
 
         # Create dataframe
-        df_guidelines = pd.DataFrame({'parameter': parameters, 'argument': arguments, **methods})
+        df_guideline_origins = pd.DataFrame({'parameter': parameters, 'argument': arguments, **methods})
 
         # Set multi-index
-        df_guidelines = df_guidelines.set_index(['parameter', 'argument'])
+        df_guideline_origins = df_guideline_origins.set_index(['parameter', 'argument'])
 
-        # Reindex argument guidelines dataframe
-        df_guidelines = df_guidelines.reindex(['data_type', 'geom_type', 'map_type', 'extent_type'], level=0)
+        # Reindex dataframe
+        df_guideline_origins = df_guideline_origins.reindex(styles, level=0)
 
         # Return dataframe
-        return df_guidelines
+        return df_guideline_origins
 
     # =============================================================================
     # Guidelines methods
@@ -316,8 +366,8 @@ class rpclass:
         """
 
         # Read default guidelines
-        dir_path_data = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
-        with open(os.path.join(dir_path_data, 'default_guidelines.json')) as f:
+        dir_path_guidelines = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'guidelines')
+        with open(os.path.join(dir_path_guidelines, 'default.json')) as f:
             default_guidelines = json.load(f)
         
         # Read project guidelines
@@ -326,8 +376,13 @@ class rpclass:
         elif isinstance(project_guidelines, dict):
             project_guidelines = project_guidelines
         elif isinstance(project_guidelines, str):
-            if os.path.exists(os.path.join(dir_path_data, project_guidelines)) and not os.path.exists(project_guidelines):
-                project_guidelines = os.path.join(dir_path_data, project_guidelines)
+            __, ext = os.path.splitext(project_guidelines)
+            if ext == '':
+                project_guidelines = project_guidelines + '.json'
+            elif ext != '.json':
+                raise ValueError('Project guidelines must be a json file. Received: {}'.format(ext))
+            if os.path.exists(os.path.join(dir_path_guidelines, project_guidelines)) and not os.path.exists(project_guidelines):
+                project_guidelines = os.path.join(dir_path_guidelines, project_guidelines)
             with open(project_guidelines) as f:
                 project_guidelines = json.load(f)
         else:
@@ -336,20 +391,17 @@ class rpclass:
         # Combine guidelines, prioritising project guidelines
         guidelines = self._combine_dictionaries(default_guidelines, project_guidelines)
 
+        # Substitute strings in guidelines
+        guidelines = self._substitute_str_in_dict(guidelines, '@vrl', guidelines['general']['vrl'])
+
         # Remove conflicting kwargs from guidelines
-        guidelines = self._remove_conflicting_kwargs(guidelines, warn=False)
+        guidelines = self._remove_conflicting_kwargs(guidelines, warn=False, reverse=False)
 
         # Set guidelines
         self.guidelines = guidelines
 
-        # Set metadata guidelines dataframe
-        self._df_metadata_guidelines = self._get_df_guidelines(guidelines, 'metadata')
-
-        # Set general guidelines dataframe
-        self._df_general_guidelines = self._get_df_guidelines(guidelines, 'general')
-
-        # Set argument guidelines dataframe
-        self._df_argument_guidelines = self._get_df_argument_guidelines(guidelines, default_guidelines, project_guidelines)
+        # Set guideline origins dataframe
+        self._df_guideline_origins = self._get_df_guideline_origins(guidelines, default_guidelines, project_guidelines)
     
     # Get guidelines
     def get_guidelines(self):
@@ -362,40 +414,49 @@ class rpclass:
         # Return guidelines
         return self.guidelines
     
-    # Print guidelines
-    def show_guidelines(self):
+    # Show guidelines
+    def show_guidelines(self, indent=20, open=True):
         """Show guidelines.
 
         :return: None.
         :rtype:  None
         """
 
-        # Print metadata guidelines dataframe
-        s = self._df_metadata_guidelines.style
-        s = s.set_properties(**{'text-align': 'center'}).set_caption('Metadata')
-        s = s.set_table_styles([{'selector': 'th', 'props': [('text-align', 'center')]},
-                                {'selector': 'thead', 'props': [('border-bottom', '2px solid black')]},
-                                {'selector': 'caption', 'props': [('font-weight', 'bold')]}])
-        display(s)
+        # Set open
+        open = 'open' if open else 'closed'
 
-        # Print general guidelines dataframe
-        s = self._df_general_guidelines.style
-        s = s.set_properties(**{'text-align': 'center'}).set_caption('General')
-        s = s.set_table_styles([{'selector': 'th', 'props': [('text-align', 'center')]},
-                                {'selector': 'thead', 'props': [('border-bottom', '2px solid black')]},
-                                {'selector': 'caption', 'props': [('font-weight', 'bold')]}])
-        display(s)
+        # Show guidelines
+        html_str = f"""
+        <details {open}>
+            <summary><strong>Guidelines</strong></summary>
+            <div style="margin-left: {indent}px">
+                {self._show_guideline_levels(self.get_guidelines(), 0, indent)}
+            </div>
+        </details>
+        """
+        display(HTML(html_str))
+    
+    # Show guideline origins
+    def show_guideline_origins(self):
+        """Show guideline origins.
 
-        # Print argument guidelines dataframe
-        s = self._df_argument_guidelines.style
-        for _, df_group in self._df_argument_guidelines.groupby(level=0):
-            s = s.set_properties(**{'text-align': 'center'})
-            s = s.set_table_styles({df_group.index[0]: [{'selector': '', 'props': 'border-top: 2px solid black'}]}, overwrite=False, axis=1)
-        s = s.set_caption('Arguments (D: Default, P: Project, D=P: Default equal to Project, D+P: Default merged with Project)')
-        s = s.set_table_styles([{'selector': 'thread', 'props': [('border-top', '2px solid black')]},
+        :return: None.
+        :rtype:  None
+        """
+
+        # Show guidelines
+        self.show_guidelines(open=False)
+
+        # Show guideline origins dataframe
+        style = self._df_guideline_origins.style
+        for _, df_group in self._df_guideline_origins.groupby(level=0):
+            style = style.set_properties(**{'text-align': 'center'})
+            style = style.set_table_styles({df_group.index[0]: [{'selector': '', 'props': 'border-top: 2px solid black'}]}, overwrite=False, axis=1)
+        style = style.set_caption('Guideline Origins (D: Default, P: Project, D=P: Default equal to Project, D+P: Default merged with Project)')
+        style = style.set_table_styles([{'selector': 'thread', 'props': [('border-top', '2px solid black')]},
                                 {'selector': 'caption', 'props': [('font-weight', 'bold')]}], overwrite=False)
-        display(s)
-
+        display(style)
+        
     # =============================================================================
     # Cartopy methods
     # =============================================================================
@@ -416,7 +477,7 @@ class rpclass:
         
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         features = self.guidelines['general']['cartopy_features'] if features is None else features
-        bounds = self.guidelines['general']['bounds'] if bounds is None else bounds
+        bounds = self.guidelines['general']['cartopy_bounds'] if bounds is None else bounds
         crs = self.guidelines['general']['crs'] if crs is None else crs
 
         # Set cartopy geometries
@@ -583,27 +644,27 @@ class rpclass:
     # =============================================================================
     # Plot methods
     # =============================================================================    
-    def pcolormesh(self, data, ax=None, m=None, data_type=None, extent_type=None, interactive=None, show_kwargs=False, **kwargs):
+    def pcolormesh(self, data, ax=None, m=None, data_style=None, extent_style=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot data using pcolormesh.
 
-        :param data:        Data to plot.
-        :type data:         xarray.DataArray or xugrid.UgridDataArray, optional
-        :param ax:          Axis.
-        :type ax:           matplotlib.axes.Axes, optional
-        :param m:           Map.
-        :type m:            folium.Map, optional
-        :param data_type:   Data type from guidelines.
-        :type data_type:    str, optional
-        :param extent_type: Extent type from guidelines.
-        :type extent_type:  str, optional
-        :param interactive: Interactive plot.
-        :type interactive:  bool, optional
-        :param show_kwargs: Show keyword arguments.
-        :type show_kwargs:  bool, optional
-        :param kwargs:      Keyword arguments for :func:`resilientplotterclass.data_xarray.pcolormesh` or :func:`resilientplotterclass.data_xugrid.pcolormesh`.
-        :type kwargs:       dict, optional
-        :return:            Plot.
-        :rtype:             matplotlib.collections.QuadMesh or geoviews.element.chart.Image
+        :param data:         Data to plot.
+        :type data:          xarray.DataArray or xugrid.UgridDataArray, optional
+        :param ax:           Axis.
+        :type ax:            matplotlib.axes.Axes, optional
+        :param m:            Map.
+        :type m:             folium.Map, optional
+        :param data_style:   Data type from guidelines.
+        :type data_style:    str, optional
+        :param extent_style: Extent type from guidelines.
+        :type extent_style:  str, optional
+        :param interactive:  Interactive plot.
+        :type interactive:   bool, optional
+        :param show_kwargs:  Show keyword arguments.
+        :type show_kwargs:   bool, optional
+        :param kwargs:       Keyword arguments for :func:`resilientplotterclass.data_xarray.pcolormesh` or :func:`resilientplotterclass.data_xugrid.pcolormesh`.
+        :type kwargs:        dict, optional
+        :return:             Plot.
+        :rtype:              matplotlib.collections.QuadMesh or geoviews.element.chart.Image
         """
 
         # Determine if plot is interactive
@@ -615,7 +676,7 @@ class rpclass:
             interactive = False
         
         # Get keyword arguments
-        kwargs = self._get_kwargs(data_type=data_type, extent_type=extent_type, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
+        kwargs = self._get_kwargs(data_style=data_style, extent_style=extent_style, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
 
         # Plot data
         if isinstance(data, xr.DataArray) and not interactive:
@@ -633,27 +694,27 @@ class rpclass:
         return p
         
     # Plot data using imshow
-    def imshow(self, data, ax=None, m=None, data_type=None, extent_type=None, interactive=None, show_kwargs=False, **kwargs):
+    def imshow(self, data, ax=None, m=None, data_style=None, extent_style=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot data using imshow.
 
-        :param data:        Data to plot.
-        :type data:         xarray.DataArray or xugrid.UgridDataArray, optional
-        :param ax:          Axis.
-        :type ax:           matplotlib.axes.Axes, optional
-        :param m:           Map.
-        :type m:            folium.Map, optional
-        :param data_type:   Data type from guidelines.
-        :type data_type:    str, optional
-        :param extent_type: Extent type from guidelines.
-        :type extent_type:  str, optional
-        :param interactive: Interactive plot.
-        :type interactive:  bool, optional
-        :param show_kwargs: Show keyword arguments.
-        :type show_kwargs:  bool, optional
-        :param kwargs:      Keyword arguments for :func:`resilientplotterclass.data_xarray.imshow` or :func:`resilientplotterclass.data_xugrid.imshow`.
-        :type kwargs:       dict, optional
-        :return:            Plot.
-        :rtype:             matplotlib.collections.QuadMesh or geoviews.element.chart.Image 
+        :param data:         Data to plot.
+        :type data:          xarray.DataArray or xugrid.UgridDataArray, optional
+        :param ax:           Axis.
+        :type ax:            matplotlib.axes.Axes, optional
+        :param m:            Map.
+        :type m:             folium.Map, optional
+        :param data_style:   Data type from guidelines.
+        :type data_style:    str, optional
+        :param extent_style: Extent type from guidelines.
+        :type extent_style:  str, optional
+        :param interactive:  Interactive plot.
+        :type interactive:   bool, optional
+        :param show_kwargs:  Show keyword arguments.
+        :type show_kwargs:   bool, optional
+        :param kwargs:       Keyword arguments for :func:`resilientplotterclass.data_xarray.imshow` or :func:`resilientplotterclass.data_xugrid.imshow`.
+        :type kwargs:        dict, optional
+        :return:             Plot.
+        :rtype:              matplotlib.collections.QuadMesh or geoviews.element.chart.Image 
         """
         
         # Determine if plot is interactive
@@ -665,7 +726,7 @@ class rpclass:
             interactive = False
         
         # Get keyword arguments
-        kwargs = self._get_kwargs(data_type=data_type, extent_type=extent_type, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
+        kwargs = self._get_kwargs(data_style=data_style, extent_style=extent_style, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
 
         # Plot data
         if isinstance(data, xr.DataArray) and not interactive:
@@ -683,27 +744,27 @@ class rpclass:
         return p
     
     # Plot data using scatter
-    def scatter(self, data, ax=None, m=None, data_type=None, extent_type=None, interactive=None, show_kwargs=False, **kwargs):
+    def scatter(self, data, ax=None, m=None, data_style=None, extent_style=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot data using scatter.
 
-        :param data:        Data to plot.
-        :type data:         xarray.DataArray or xarray.Dataset or xugrid.UgridDataArray, optional
-        :param ax:          Axis.
-        :type ax:           matplotlib.axes.Axes, optional
-        :param m:           Map.
-        :type m:            folium.Map, optional
-        :param data_type:   Data type from guidelines.
-        :type data_type:    str, optional
-        :param extent_type: Extent type from guidelines.
-        :type extent_type:  str, optional
-        :param interactive: Interactive plot.
-        :type interactive:  bool, optional
-        :param show_kwargs: Show keyword arguments.
-        :type show_kwargs:  bool, optional
-        :param kwargs:      Keyword arguments for :func:`resilientplotterclass.data_xarray.scatter` or :func:`resilientplotterclass.data_xugrid.scatter`.
-        :type kwargs:       dict, optional
-        :return:            Plot.
-        :rtype:             matplotlib.collections.QuadMesh
+        :param data:         Data to plot.
+        :type data:          xarray.DataArray or xarray.Dataset or xugrid.UgridDataArray, optional
+        :param ax:           Axis.
+        :type ax:            matplotlib.axes.Axes, optional
+        :param m:            Map.
+        :type m:             folium.Map, optional
+        :param data_style:   Data type from guidelines.
+        :type data_style:    str, optional
+        :param extent_style: Extent type from guidelines.
+        :type extent_style:  str, optional
+        :param interactive:  Interactive plot.
+        :type interactive:   bool, optional
+        :param show_kwargs:  Show keyword arguments.
+        :type show_kwargs:   bool, optional
+        :param kwargs:       Keyword arguments for :func:`resilientplotterclass.data_xarray.scatter` or :func:`resilientplotterclass.data_xugrid.scatter`.
+        :type kwargs:        dict, optional
+        :return:             Plot.
+        :rtype:              matplotlib.collections.QuadMesh
         """
 
         # Determine if plot is interactive
@@ -715,7 +776,7 @@ class rpclass:
             interactive = False
 
         # Get keyword arguments
-        kwargs = self._get_kwargs(data_type=data_type, extent_type=extent_type, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
+        kwargs = self._get_kwargs(data_style=data_style, extent_style=extent_style, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
 
         # Plot data
         if (isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset)) and not interactive:
@@ -733,27 +794,27 @@ class rpclass:
         return p
     
     # Plot data using contourf
-    def contourf(self, data, ax=None, m=None, data_type=None, extent_type=None, interactive=None, show_kwargs=False, **kwargs):
+    def contourf(self, data, ax=None, m=None, data_style=None, extent_style=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot data using contourf.
 
-        :param data:        Data to plot.
-        :type data:         xarray.DataArray or xugrid.UgridDataArray, optional
-        :param ax:          Axis.
-        :type ax:           matplotlib.axes.Axes,
-        :param m:           Map.
-        :type m:            folium.Map, optional
-        :param data_type:   Data type from guidelines.
-        :type data_type:    str, optional
-        :param extent_type: Extent type from guidelines.
-        :type extent_type:  str, optional
-        :param interactive: Interactive plot.
-        :type interactive:  bool, optional
-        :param show_kwargs: Show keyword arguments.
-        :type show_kwargs:  bool, optional
-        :param kwargs:      Keyword arguments for :func:`resilientplotterclass.data_xarray.contourf` or :func:`resilientplotterclass.data_xugrid.contourf`.
-        :type kwargs:       dict, optional
-        :return:            Plot.
-        :rtype:             matplotlib.collections.QuadMesh
+        :param data:         Data to plot.
+        :type data:          xarray.DataArray or xugrid.UgridDataArray, optional
+        :param ax:           Axis.
+        :type ax:            matplotlib.axes.Axes,
+        :param m:            Map.
+        :type m:             folium.Map, optional
+        :param data_style:   Data type from guidelines.
+        :type data_style:    str, optional
+        :param extent_style: Extent type from guidelines.
+        :type extent_style:  str, optional
+        :param interactive:  Interactive plot.
+        :type interactive:   bool, optional
+        :param show_kwargs:  Show keyword arguments.
+        :type show_kwargs:   bool, optional
+        :param kwargs:       Keyword arguments for :func:`resilientplotterclass.data_xarray.contourf` or :func:`resilientplotterclass.data_xugrid.contourf`.
+        :type kwargs:        dict, optional
+        :return:             Plot.
+        :rtype:              matplotlib.collections.QuadMesh
         """
 
         # Determine if plot is interactive
@@ -765,7 +826,7 @@ class rpclass:
             interactive = False
         
         # Get keyword arguments
-        kwargs = self._get_kwargs(data_type=data_type, extent_type=extent_type, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
+        kwargs = self._get_kwargs(data_style=data_style, extent_style=extent_style, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
 
         # Plot data
         if isinstance(data, xr.DataArray) and not interactive:
@@ -783,27 +844,27 @@ class rpclass:
         return p
     
     # Plot data using contour
-    def contour(self, data, ax=None, m=None, data_type=None, extent_type=None, interactive=None, show_kwargs=False, **kwargs):
+    def contour(self, data, ax=None, m=None, data_style=None, extent_style=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot data using contour.
 
-        :param data:        Data to plot.
-        :type data:         xarray.DataArray or xugrid.UgridDataArray, optional
-        :param ax:          Axis.
-        :type ax:           matplotlib.axes.Axes or folium.Map, optional
-        :param m:           Map.
-        :type m:            folium.Map, optional
-        :param data_type:   Data type from guidelines.
-        :type data_type:    str, optional
-        :param extent_type: Extent type from guidelines.
-        :type extent_type:  str, optional
-        :param interactive: Interactive plot.
-        :type interactive:  bool, optional
-        :param show_kwargs: Show keyword arguments.
-        :type show_kwargs:  bool, optional
-        :param kwargs:      Keyword arguments for :func:`resilientplotterclass.data_xarray.contour` or :func:`resilientplotterclass.data_xugrid.contour`.
-        :type kwargs:       dict, optional
-        :return:            Plot.
-        :rtype:             matplotlib.collections.QuadMesh
+        :param data:         Data to plot.
+        :type data:          xarray.DataArray or xugrid.UgridDataArray, optional
+        :param ax:           Axis.
+        :type ax:            matplotlib.axes.Axes or folium.Map, optional
+        :param m:            Map.
+        :type m:             folium.Map, optional
+        :param data_style:   Data type from guidelines.
+        :type data_style:    str, optional
+        :param extent_style: Extent type from guidelines.
+        :type extent_style:  str, optional
+        :param interactive:  Interactive plot.
+        :type interactive:   bool, optional
+        :param show_kwargs:  Show keyword arguments.
+        :type show_kwargs:   bool, optional
+        :param kwargs:       Keyword arguments for :func:`resilientplotterclass.data_xarray.contour` or :func:`resilientplotterclass.data_xugrid.contour`.
+        :type kwargs:        dict, optional
+        :return:             Plot.
+        :rtype:              matplotlib.collections.QuadMesh
         """
 
         # Determine if plot is interactive
@@ -815,7 +876,7 @@ class rpclass:
             interactive = False
 
         # Get keyword arguments
-        kwargs = self._get_kwargs(data_type=data_type, extent_type=extent_type, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
+        kwargs = self._get_kwargs(data_style=data_style, extent_style=extent_style, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
 
         # Plot data
         if isinstance(data, xr.DataArray) and not interactive:
@@ -833,27 +894,27 @@ class rpclass:
         return p
 
     # Plot data using quiver
-    def quiver(self, data, ax=None, m=None, data_type=None, extent_type=None, interactive=None, show_kwargs=False, **kwargs):
+    def quiver(self, data, ax=None, m=None, data_style=None, extent_style=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot data using quiver.
 
-        :param data:        Data to plot.
-        :type data:         xarray.Dataset or xugrid.UgridDataArray or xugrid.UgridDataset, optional
-        :param ax:          Axis.
-        :type ax:           matplotlib.axes.Axes, optional
-        :param m:           Map.
-        :type m:            folium.Map, optional
-        :param data_type:   Data type from guidelines.
-        :type data_type:    str, optional
-        :param extent_type: Extent type from guidelines.
-        :type extent_type:  str, optional
-        :param interactive: Interactive plot.
-        :type interactive:  bool, optional
-        :param show_kwargs: Show keyword arguments.
-        :type show_kwargs:  bool, optional
-        :param kwargs:      Keyword arguments for :func:`resilientplotterclass.data_xarray.quiver` or :func:`resilientplotterclass.data_xugrid.quiver`.
-        :type kwargs:       dict, optional
-        :return:            Plot.
-        :rtype:             matplotlib.collections.QuadMesh
+        :param data:         Data to plot.
+        :type data:          xarray.Dataset or xugrid.UgridDataArray or xugrid.UgridDataset, optional
+        :param ax:           Axis.
+        :type ax:            matplotlib.axes.Axes, optional
+        :param m:            Map.
+        :type m:             folium.Map, optional
+        :param data_style:   Data type from guidelines.
+        :type data_style:    str, optional
+        :param extent_style: Extent type from guidelines.
+        :type extent_style:  str, optional
+        :param interactive:  Interactive plot.
+        :type interactive:   bool, optional
+        :param show_kwargs:  Show keyword arguments.
+        :type show_kwargs:   bool, optional
+        :param kwargs:       Keyword arguments for :func:`resilientplotterclass.data_xarray.quiver` or :func:`resilientplotterclass.data_xugrid.quiver`.
+        :type kwargs:        dict, optional
+        :return:             Plot.
+        :rtype:              matplotlib.collections.QuadMesh
         """
 
         # Determine if plot is interactive
@@ -865,7 +926,7 @@ class rpclass:
             interactive = False
 
         # Get keyword arguments
-        kwargs = self._get_kwargs(data_type=data_type, extent_type=extent_type, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
+        kwargs = self._get_kwargs(data_style=data_style, extent_style=extent_style, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
 
         # Plot data
         if isinstance(data, xr.Dataset) and not interactive:
@@ -883,27 +944,27 @@ class rpclass:
         return p
 
     # Plot data using streamplot
-    def streamplot(self, da, ax=None, m=None, data_type=None, extent_type=None, interactive=None, show_kwargs=False, **kwargs):
+    def streamplot(self, da, ax=None, m=None, data_style=None, extent_style=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot data using streamplot.
 
-        :param da:          Data to plot.
-        :type da:           xarray.Dataset, optional
-        :param ax:          Axis.
-        :type ax:           matplotlib.axes.Axes, optional
-        :param m:           Map.
-        :type m:            folium.Map, optional
-        :param data_type:   Data type from guidelines.
-        :type data_type:    str, optional
-        :param extent_type: Extent type from guidelines.
-        :type extent_type:  str, optional
-        :param interactive: Interactive plot.
-        :type interactive:  bool, optional
-        :param show_kwargs: Show keyword arguments.
-        :type show_kwargs:  bool, optional
-        :param kwargs:      Keyword arguments for :func:`resilientplotterclass.data_xarray.streamplot`.
-        :type kwargs:       dict, optional
-        :return:            Plot.
-        :rtype:             matplotlib.collections.QuadMesh
+        :param da:           Data to plot.
+        :type da:            xarray.Dataset, optional
+        :param ax:           Axis.
+        :type ax:            matplotlib.axes.Axes, optional
+        :param m:            Map.
+        :type m:             folium.Map, optional
+        :param data_style:   Data type from guidelines.
+        :type data_style:    str, optional
+        :param extent_style: Extent type from guidelines.
+        :type extent_style:  str, optional
+        :param interactive:  Interactive plot.
+        :type interactive:   bool, optional
+        :param show_kwargs:  Show keyword arguments.
+        :type show_kwargs:   bool, optional
+        :param kwargs:       Keyword arguments for :func:`resilientplotterclass.data_xarray.streamplot`.
+        :type kwargs:        dict, optional
+        :return:             Plot.
+        :rtype:              matplotlib.collections.QuadMesh
         """
         
         # Determine if plot is interactive
@@ -915,7 +976,7 @@ class rpclass:
             interactive = False
 
         # Get keyword arguments
-        kwargs = self._get_kwargs(data_type=data_type, extent_type=extent_type, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
+        kwargs = self._get_kwargs(data_style=data_style, extent_style=extent_style, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
 
         # Plot data
         if isinstance(da, xr.Dataset) and not interactive:
@@ -929,27 +990,27 @@ class rpclass:
         return p
 
     # Plot grid using xugrid
-    def grid(self, data, ax=None, m=None, geom_type='grid', extent_type=None, interactive=None, show_kwargs=False, **kwargs):
+    def grid(self, data, ax=None, m=None, geom_style='grid', extent_style=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot grid using xugrid.
 
-        :param data:          Data to plot.
-        :type data:           xarray.DataArray or xugrid.UgridDataArray, optional
-        :param ax:            Axis.
-        :type ax:             matplotlib.axes.Axes, optional
-        :param m:             Map.
-        :type m:              folium.Map, optional
-        :param geom_type:     Geometry type from guidelines.
-        :type geom_type:      str, optional
-        :param extent_type:   Extent type from guidelines.
-        :type extent_type:    str, optional
-        :param interactive:   Interactive plot.
-        :type interactive:    bool, optional
-        :param show_kwargs:   Show keyword arguments.
-        :type show_kwargs:    bool, optional
-        :param kwargs:        Keyword arguments for :func:`resilientplotterclass.data_xarray.grid` or :func:`resilientplotterclass.data_xugrid.grid`.
-        :type kwargs:         dict, optional
-        :return:              Axis.
-        :rtype:               matplotlib.axes.Axes
+        :param data:           Data to plot.
+        :type data:            xarray.DataArray or xugrid.UgridDataArray, optional
+        :param ax:             Axis.
+        :type ax:              matplotlib.axes.Axes, optional
+        :param m:              Map.
+        :type m:               folium.Map, optional
+        :param geom_style:     Geometry type from guidelines.
+        :type geom_style:      str, optional
+        :param extent_style:   Extent type from guidelines.
+        :type extent_style:    str, optional
+        :param interactive:    Interactive plot.
+        :type interactive:     bool, optional
+        :param show_kwargs:    Show keyword arguments.
+        :type show_kwargs:     bool, optional
+        :param kwargs:         Keyword arguments for :func:`resilientplotterclass.data_xarray.grid` or :func:`resilientplotterclass.data_xugrid.grid`.
+        :type kwargs:          dict, optional
+        :return:               Axis.
+        :rtype:                matplotlib.axes.Axes
         """
 
         # Determine if plot is interactive
@@ -961,7 +1022,7 @@ class rpclass:
             interactive = False
 
         # Get keyword arguments
-        kwargs = self._get_kwargs(geom_type=geom_type, extent_type=extent_type, show_kwargs=show_kwargs, **kwargs)
+        kwargs = self._get_kwargs(geom_style=geom_style, extent_style=extent_style, show_kwargs=show_kwargs, **kwargs)
 
         # Plot grid
         if (isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset)) and not interactive:
@@ -979,27 +1040,27 @@ class rpclass:
         return ax
     
     # Plot geometries using geopandas
-    def geometries(self, gdf, ax=None, m=None, geom_type=None, extent_type=None, interactive=None, show_kwargs=False, **kwargs):
+    def geometries(self, gdf, ax=None, m=None, geom_style=None, extent_style=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot geometries using geopandas.
 
-        :param gdf:           geometries to plot.
-        :type gdf:            geopandas.GeoDataFrame
-        :param ax:            Axis.
-        :type ax:             matplotlib.axes.Axes or folium.Map, optional
-        :param m:             Map.
-        :type m:              folium.Map, optional
-        :param geom_type:     Geometry type from guidelines.
-        :type geom_type:      str, optional
-        :param extent_type:   Extent type from guidelines.
-        :type extent_type:    str, optional
-        :param interactive:   Interactive plot.
-        :type interactive:    bool, optional
-        :param show_kwargs:   Show keyword arguments.
-        :type show_kwargs:    bool, optional
-        :param kwargs:        Keyword arguments for :func:`resilientplotterclass.geometries.plot_geometries`.
-        :type kwargs:         dict, optional
-        :return:              Axis.
-        :rtype:               matplotlib.axes.Axes or geoviews.element.chart.Polygons
+        :param gdf:            geometries to plot.
+        :type gdf:             geopandas.GeoDataFrame
+        :param ax:             Axis.
+        :type ax:              matplotlib.axes.Axes or folium.Map, optional
+        :param m:              Map.
+        :type m:               folium.Map, optional
+        :param geom_style:     Geometry type from guidelines.
+        :type geom_style:      str, optional
+        :param extent_style:   Extent type from guidelines.
+        :type extent_style:    str, optional
+        :param interactive:    Interactive plot.
+        :type interactive:     bool, optional
+        :param show_kwargs:    Show keyword arguments.
+        :type show_kwargs:     bool, optional
+        :param kwargs:         Keyword arguments for :func:`resilientplotterclass.geometries.plot_geometries`.
+        :type kwargs:          dict, optional
+        :return:               Axis.
+        :rtype:                matplotlib.axes.Axes or geoviews.element.chart.Polygons
         """
 
         # Determine if plot is interactive
@@ -1011,7 +1072,7 @@ class rpclass:
             interactive = False
             
         # Get keyword arguments
-        kwargs = self._get_kwargs(geom_type=geom_type, extent_type=extent_type, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
+        kwargs = self._get_kwargs(geom_style=geom_style, extent_style=extent_style, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
         
         # Plot geometries
         if isinstance(gdf, gpd.GeoDataFrame) and not interactive:
@@ -1025,27 +1086,27 @@ class rpclass:
         return ax
     
     # Plot basemap using contextily
-    def basemap(self, crs=None, ax=None, m=None, map_type=None, extent_type=None, interactive=None, show_kwargs=False, **kwargs):
+    def basemap(self, crs=None, ax=None, m=None, map_style=None, extent_style=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot basemap using contextily.
 
-        :param crs:         Coordinate reference system.
-        :type crs:          pyproj.CRS or rasterio.CRS or str, optional
-        :param ax:          Axis.
-        :type ax:           matplotlib.axes.Axes or folium.Map, optional
-        :param m:           Map.
-        :type m:            folium.Map, optional
-        :param map_type:    Map type from guidelines.
-        :type map_type:     str, optional
-        :param extent_type: Extent type from guidelines.
-        :type extent_type:  str, optional
-        :param interactive: Interactive plot.
-        :type interactive:  bool, optional
-        :param show_kwargs: Show keyword arguments.
-        :type show_kwargs:  bool, optional
-        :param kwargs:      Keyword arguments for :func:`resilientplotterclass.basemaps.plot_basemap`.
-        :type kwargs:       dict, optional
-        :return:            Axis.
-        :rtype:             matplotlib.axes.Axes or holoviews.element.tiles.Tiles
+        :param crs:          Coordinate reference system.
+        :type crs:           pyproj.CRS or rasterio.CRS or str, optional
+        :param ax:           Axis.
+        :type ax:            matplotlib.axes.Axes or folium.Map, optional
+        :param m:            Map.
+        :type m:             folium.Map, optional
+        :param map_style:    Map type from guidelines.
+        :type map_style:     str, optional
+        :param extent_style: Extent type from guidelines.
+        :type extent_style:  str, optional
+        :param interactive:  Interactive plot.
+        :type interactive:   bool, optional
+        :param show_kwargs:  Show keyword arguments.
+        :type show_kwargs:   bool, optional
+        :param kwargs:       Keyword arguments for :func:`resilientplotterclass.basemaps.plot_basemap`.
+        :type kwargs:        dict, optional
+        :return:             Axis.
+        :rtype:              matplotlib.axes.Axes or holoviews.element.tiles.Tiles
         """
 
         # Determine if plot is interactive
@@ -1059,7 +1120,7 @@ class rpclass:
         # Get keyword arguments
         if crs is None:
             crs = self.guidelines['general']['crs']
-        kwargs = self._get_kwargs(map_type=map_type, extent_type=extent_type, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
+        kwargs = self._get_kwargs(map_style=map_style, extent_style=extent_style, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
         
         # Plot basemap
         if (isinstance(crs, pyprojCRS) or isinstance(crs, rasterioCRS) or isinstance(crs, str)) and not interactive:
@@ -1073,15 +1134,15 @@ class rpclass:
         return ax
     
     # Plot cartopy geometries using geopandas
-    def cartopy(self, ax=None, m=None, extent_type=None, interactive=None, show_kwargs=False, **kwargs):
+    def cartopy(self, ax=None, m=None, extent_style=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot cartopy geometries using geopandas.
 
         :param ax:          Axis.
         :type ax:           matplotlib.axes.Axes or folium.Map, optional
         :param m:           Map.
         :type m:            folium.Map, optional
-        :param extent_type: Extent type from guidelines.
-        :type extent_type:  str, optional
+        :param extent_style: Extent type from guidelines.
+        :type extent_style:  str, optional
         :param interactive: Interactive plot.
         :type interactive:  bool, optional
         :param show_kwargs: Show keyword arguments.
@@ -1101,7 +1162,7 @@ class rpclass:
             interactive = False
 
         # Get keyword arguments
-        kwargs = self._get_kwargs(extent_type=extent_type, show_kwargs=show_kwargs, **kwargs)
+        kwargs = self._get_kwargs(extent_style=extent_style, show_kwargs=show_kwargs, **kwargs)
         
         # Plot cartopy geometries
         if not interactive:

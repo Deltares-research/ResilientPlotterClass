@@ -46,7 +46,7 @@ The following steps describe how to build the documentation for the ResilientPlo
 
 2. Navigate to the `docs_builder` directory of the ResilientPlotterClass repository
     ```
-    cd /d c:\...\ResilientPlotterClass\docs_builder
+    cd c:\...\ResilientPlotterClass\docs_builder
     ```
 
 3. Build the html documentation

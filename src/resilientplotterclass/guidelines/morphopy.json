@@ -1,0 +1,66 @@
+{
+    "metadata": {
+        "title": "Morphopy guidelines",
+        "date": "2025-05-01",
+        "author(s)": "Ruben White"
+    },
+    
+    "general": {
+        "crs": null,
+        "vrl": null,
+        "xy_unit": null,
+        "cartopy_bounds": null,
+        "cartopy_features": ["land", "ocean", "lakes", "rivers", "coastline", "borders", "states"],
+    },
+    
+    "data": {
+    },
+
+    "geom":{
+    },
+
+    "data_type": {
+        "bathymetry": {
+            "pcolormesh": {"cbar_kwargs": null},
+            "imshow": {"cbar_kwargs": null},
+            "scatter": {"cbar_kwargs": null},
+            "contourf": {"cbar_kwargs": null},
+            "contour": {}
+        },
+        "bedforms": {
+            "pcolormesh": {"cbar_kwargs": null},
+            "imshow": {"cbar_kwargs": null},
+            "scatter": {"cbar_kwargs": null},
+            "contourf": {"cbar_kwargs": null},
+            "contour": {}
+        },
+        "morphology": {
+            "pcolormesh": {"cbar_kwargs": null},
+            "imshow": {"cbar_kwargs": null},
+            "scatter": {"cbar_kwargs": null},
+            "contourf": {"cbar_kwargs": null},
+            "contour": {}
+        }
+    },
+
+    "geom_type": {
+    },
+
+    "map_type": {
+    },
+
+    "extent_type": {
+    },
+    
+    "interactive_data_style": {
+    },
+
+    "interactive_geom_style": {
+    },
+
+    "interactive_map_style": {
+    },
+
+    "interactive_extent_style": {
+    }
+}

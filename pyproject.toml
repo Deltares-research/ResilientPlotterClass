@@ -1,6 +1,6 @@
 [project]
 name = "resilientplotterclass"
-version = "0.5"
+version = "1.0"
 authors = [{name="Math van Soest"}, {name="Ruben White"}]
 description = "A package to create resilient plots for geospatial data"
 readme = "readme.md"
@@ -13,16 +13,10 @@ dependencies = [
     'matplotlib',
     'contextily',
     'cartopy',
+    'folium',
     'colorcet',
     'cmocean',
     'opencv-python',
-
-    'holoviews',
-    'geoviews',
-    'hvplot',
-    'datashader',
-    'jupyter_bokeh',
-    'dask[dataframe]'
 ]
 
 [project.optional-dependencies]
@@ -46,4 +40,4 @@ build-backend = "setuptools.build_meta"
 include-package-data = true
 
 [tool.setuptools.package-data]
-resilientplotterclass = ["data/*"]
+resilientplotterclass = ["cmaps/*", "guidelines/*"]

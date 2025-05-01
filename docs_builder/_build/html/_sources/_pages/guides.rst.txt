@@ -11,7 +11,7 @@ The guides provide detailed instructions on how to install and use the Resilient
 * :doc:`_guides/05_plotting_geometries`
 * :doc:`_guides/06_plotting_basemaps`
 * :doc:`_guides/07_utilities`
-* :doc:`_guides/99_old_guide`
+* :doc:`_guides/08_interactive_maps`
 
 .. toctree::
     :maxdepth: 2
@@ -27,4 +27,4 @@ The guides provide detailed instructions on how to install and use the Resilient
      Plotting Geometries <_guides/05_plotting_geometries>
      Plotting Basemaps <_guides/06_plotting_basemaps>
      Utilities <_guides/07_utilities>
-     Old Guide <_guides/99_old_guide>
+     Interactive Maps <_guides/08_interactive_maps>

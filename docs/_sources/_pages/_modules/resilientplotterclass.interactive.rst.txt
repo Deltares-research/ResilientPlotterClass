@@ -8,9 +8,18 @@
 
    .. autosummary::
    
-      interactive_basemap
-      interactive_da
-      interactive_gdf
-      interactive_gdf_cartopy
-      interactive_uda
+      contour
+      contourf
+      imshow
+      pcolormesh
+      plot_geometries
+      quiver
+      scatter
+      streamplot
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Draw
    

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>axes.append_cbar_axis &#8212; resilientplotterclass 0.5 documentation</title>
+    <title>axes.append_cbar_axis &#8212; resilientplotterclass 1.0 documentation</title>
   
   
   
@@ -16,8 +16,8 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
-  <!-- 
-    this give us a css class that will be invisible only if js is disabled 
+  <!--
+    this give us a css class that will be invisible only if js is disabled
   -->
   <noscript>
     <style>
@@ -27,20 +27,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=db78e746"></script>
+    <script src="../../_static/documentation_options.js?v=f2a433a1"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -120,8 +120,8 @@
       
     
     
-    <img src="../../_static/Resilient_Plotter_Class_Logo.png" class="logo__image only-light" alt="resilientplotterclass 0.5 documentation - Home"/>
-    <img src="../../_static/Resilient_Plotter_Class_Logo.png" class="logo__image only-dark pst-js-only" alt="resilientplotterclass 0.5 documentation - Home"/>
+    <img src="../../_static/Resilient_Plotter_Class_Logo.png" class="logo__image only-light" alt="resilientplotterclass 1.0 documentation - Home"/>
+    <img src="../../_static/Resilient_Plotter_Class_Logo.png" class="logo__image only-dark pst-js-only" alt="resilientplotterclass 1.0 documentation - Home"/>
   
   
 </a></div>
@@ -293,6 +293,7 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../_classes/classes.html">Classes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../_classes/resilientplotterclass.interactive.Draw.html">interactive.Draw</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../_classes/resilientplotterclass.rpclass.rpclass.html">rpclass.rpclass</a></li>
 </ul>
 </details></li>
@@ -304,6 +305,7 @@
 <li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.colormaps.register_colormaps.html">colormaps.register_colormaps</a></li>
 <li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.data_xarray.contour.html">data_xarray.contour</a></li>
 <li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.data_xarray.contourf.html">data_xarray.contourf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.data_xarray.grid.html">data_xarray.grid</a></li>
 <li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.data_xarray.imshow.html">data_xarray.imshow</a></li>
 <li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.data_xarray.pcolormesh.html">data_xarray.pcolormesh</a></li>
 <li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.data_xarray.quiver.html">data_xarray.quiver</a></li>
@@ -318,14 +320,16 @@
 <li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.data_xugrid.scatter.html">data_xugrid.scatter</a></li>
 <li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.geometries.get_gdf_cartopy.html">geometries.get_gdf_cartopy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.geometries.plot_geometries.html">geometries.plot_geometries</a></li>
-<li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.interactive.interactive_basemap.html">interactive.interactive_basemap</a></li>
-<li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.interactive.interactive_da.html">interactive.interactive_da</a></li>
-<li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.interactive.interactive_gdf.html">interactive.interactive_gdf</a></li>
-<li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.interactive.interactive_gdf_cartopy.html">interactive.interactive_gdf_cartopy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.interactive.interactive_uda.html">interactive.interactive_uda</a></li>
+<li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.interactive.contour.html">interactive.contour</a></li>
+<li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.interactive.contourf.html">interactive.contourf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.interactive.imshow.html">interactive.imshow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.interactive.pcolormesh.html">interactive.pcolormesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.interactive.plot_geometries.html">interactive.plot_geometries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.interactive.quiver.html">interactive.quiver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.interactive.scatter.html">interactive.scatter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.interactive.streamplot.html">interactive.streamplot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.rescale.get_rescale_parameters.html">rescale.get_rescale_parameters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.rescale.rescale.html">rescale.rescale</a></li>
-<li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.utils.rasterise_uda.html">utils.rasterise_uda</a></li>
 <li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.utils.rasterise_uds.html">utils.rasterise_uds</a></li>
 <li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.utils.reproject_xugrid.html">utils.reproject_xugrid</a></li>
 <li class="toctree-l2"><a class="reference internal" href="resilientplotterclass.videos.create_video.html">videos.create_video</a></li>
@@ -338,9 +342,14 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -469,13 +478,13 @@
   </nav></div>
 
   <div class="sidebar-secondary-item">
-
-  <div class="tocsection sourcelink">
-    <a href="../../_sources/_pages/_functions/resilientplotterclass.axes.append_cbar_axis.rst.txt">
-      <i class="fa-solid fa-file-lines"></i> Show Source
-    </a>
-  </div>
-</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/_pages/_functions/resilientplotterclass.axes.append_cbar_axis.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
 
 </div></div>
               
@@ -490,8 +499,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -502,7 +511,7 @@
 
   <p class="copyright">
     
-      © Copyright 2024, Math van Soest &amp; Ruben White.
+      © Copyright 2025, Math van Soest &amp; Ruben White.
       <br/>
     
   </p>
@@ -524,7 +533,8 @@
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
 </p></div>
       
     </div>
