@@ -1,230 +1,204 @@
-import geopandas as gpd
-import holoviews as hv
-import holoviews.operation.datashader as hd
-import hvplot.pandas
-import hvplot.xarray
-from pyproj import CRS as pyprojCRS
-from rasterio.crs import CRS as rasterioCRS
-import resilientplotterclass as rpc
-import xarray as xr
-import xugrid as xu
+import folium
+import matplotlib.pyplot as plt
+from matplotlib.colors import to_hex
+import numpy as np
+from branca.element import Element, Figure
+from folium.plugins import Draw
 
-def _get_georeference_bool(data=None, crs=None):
-    """Check if the data is georeferenced in WGS 84 (EPSG:4326).
+def _explore_image(da, m, cmap='Spectral_r', vmin=None, vmax=None, legend=None, legend_kwds={}, **kwargs):    
+    # Convert da to number
+    if not np.issubdtype(da.dtype, np.number):
+        da = da.astype(float)
 
-    :param data:    Data or geometries to rescale. If ``None``, the crs is used to determine the rescale parameters.
-    :type data:     xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray, xugrid.UgridDataset, geopandas.GeoDataFrame, optional
-    :param crs:     Coordinate reference system of the data. If ``None``, the crs is determined automatically based on the data.
-    :type crs:      pyproj.CRS or rasterio.CRS or str, optional
-    :return:        Boolean indicating if the data is georeferenced in WGS 84 (EPSG:4326).
-    :rtype:         bool
-    """
+    # Get cmap
+    cmap = plt.get_cmap(cmap)
 
-    # Get the coordiante reference system of the data
-    if isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset):
-        crs = data.rio.crs
-    elif isinstance(data, xu.UgridDataArray) or isinstance(data, xu.UgridDataset):
-        crs = data.grid.crs
-    elif isinstance(data, gpd.GeoDataFrame):
-        crs = data.crs
-    elif data is None:
-        crs = crs
+    # Get vmin and vmax
+    if vmin is None:
+        vmin = da.min().values
+    if vmax is None:
+        vmax = da.max().values
+
+    # Get legend
+    if legend is None:
+        legend = True if da.ndim == 2 else False
+
+    # Default kwargs
+    kwargs.setdefault('mercator_project', True)
+    
+    # Normalise values
+    da = ((da - vmin) / (vmax - vmin)).clip(0, 1)
+
+    # Get colors
+    if da.ndim == 2 or (da.ndim == 3 and da.shape[0] == 1):
+        rgba = cmap(da.values).reshape((*da.shape, 4))
+    elif da.ndim == 3 and da.shape[0] == 3:
+        rgb = da.values.transpose(1, 2, 0)
+        rgba = np.concatenate([rgb, np.ones((*rgb.shape[:2], 1))], axis=2)
     else:
-        raise TypeError('data type not supported. Please provide a xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray, xugrid.UgridDataset or geopandas.GeoDataFrame.')
-        
-    # Convert the crs to a pyproj.CRS
-    if isinstance(crs, pyprojCRS):
-        crs = crs
-    elif isinstance(crs, rasterioCRS):
-        crs = pyprojCRS.from_string(crs.to_string())
-    elif isinstance(crs, str):
-        crs = pyprojCRS.from_string(crs)
-    elif crs is None:
-        crs = crs
-    else:
-        raise TypeError('crs type not supported. Please provide a pyproj.CRS, rasterio.CRS or str object.')
+        raise ValueError('DataArray must be 2D or 3D with shape (3, y, x)')
     
-    # Check if the data is georeferenced
-    if crs == pyprojCRS.from_epsg(4326):
-        return True
-    else:
-        return False
+    # Fix color range for mercator projection
+    if 'mercator_project' in kwargs and kwargs['mercator_project']:
+        # Find first two non-nan values
+        nan_indices = np.where(np.isnan(da.values))
 
-def interactive_da(da, xy_unit=None, **kwargs):
-    """Plot data as an interactive plot.
+        # If there are less than two non-nan values, set first two values to 0 and 1
+        if len(nan_indices[0]) < 2:
+            nan_indices = (np.array([0, 0]), np.array([0, 1]))
 
-    :param da:      DataArray to plot.
-    :type da:       xarray.DataArray
-    :param xy_unit: Unit of the x and y coordinates. If ``None``, the unit is determined automatically based on the data.
-    :type xy_unit:  str, optional
-    :param kwargs:  Keyword arguments for :func:`holoviews.opts`.
-    :type kwargs:   dict, optional
-    :return:        Interactive plot.
-    :rtype:         holoviews.core.spaces.DynamicMap
+        # Set first two values to 0 and 1
+        rgba[nan_indices[0][0], nan_indices[1][0], :3] = 0
+        rgba[nan_indices[0][1], nan_indices[1][1], :3] = 1
 
-    See also: `holoviews.element.raster.Raster <https://holoviews.org/reference/elements/bokeh/Raster.html>`_,
-              `holoviews.opts <https://holoviews.org/user_guide/Customizing_Plots.html>`_.
-    """
+    # Convert range to 0-255
+    rgba = (rgba * 255).astype(np.uint8)
 
-    # Get the rescale parameters
-    scale_factor, xlabel, ylabel = rpc.rescale.get_rescale_parameters(data=da, xy_unit=xy_unit)
+    # Get bounds
+    bounds = da.rio.bounds()
+    bounds = [[bounds[1], bounds[0]], [bounds[3], bounds[2]]]
+
+    # Create image
+    img = folium.raster_layers.ImageOverlay(image=rgba, bounds=bounds, **kwargs)
     
-    # Rescale the DataArray
-    da = rpc.rescale.rescale(data=da, scale_factor=scale_factor)
+    # Add to map
+    m.add_child(img)
 
-    # Get rasterization
-    rasterize = kwargs.pop('rasterize', True)
+    # Add legend
+    if legend:
+        # Get colors
+        colors = cmap(np.linspace(0, 1, 256))
 
-    # Get x and y dimensions
-    x = kwargs.pop('x', da.dims[1])
-    y = kwargs.pop('y', da.dims[0])
+        # Convert colors to hex
+        colors = [to_hex(color) for color in colors]
 
-    # Check if the DataArray is georeferenced
-    geo = _get_georeference_bool(data=da)
+        # Create colormap
+        cmap = folium.LinearColormap(colors, vmin=vmin, vmax=vmax, **legend_kwds)
 
-    # Get the label
-    label = kwargs.pop('label', '')
-
-    # Get the colorbar label
-    if 'long_name' in da.attrs and 'units' in da.attrs:
-        kwargs.setdefault('clabel', '{} [{}]'.format(da.attrs['long_name'], da.attrs['units']))
-        
-    # Plot the DataArray
-    if rasterize:
-        da_plot = hd.rasterize(da.hvplot(x=x, y=y, geo=geo, label=label)).opts(**kwargs)
-    else:
-        da_plot = da.hvplot(x=x, y=y, geo=geo, label=label).opts(**kwargs)
-
-    # Format the plot
-    da_plot = da_plot.opts(width=550, height=550, xlabel=xlabel, ylabel=ylabel, title='', aspect='equal', show_grid=True, active_tools=['pan', 'wheel_zoom'])
+        # Add to map
+        m.add_child(cmap)
     
-    # Return the plot
-    return da_plot
+    # Return map
+    return m
 
-def interactive_uda(uda, xy_unit=None, **kwargs):
-    pass
+def _set_map_bounds(m, bounds):
+    # Convert bounds to list
+    bounds = [[bounds[1], bounds[0]], [bounds[3], bounds[2]]]
 
-def interactive_gdf(gdf, xy_unit=None, **kwargs):
-    """Plot GeoDataFrame as an interactive plot.
+    # Get map bounds
+    map_bounds = m.get_bounds()
 
-    :param gdf:     GeoDataFrame to plot.
-    :type gdf:      geopandas.GeoDataFrame
-    :param xy_unit: Unit of the x and y coordinates. If ``None``, the unit is determined automatically based on the data.
-    :type xy_unit:  str, optional
-    :param kwargs:  Keyword arguments for :func:`holoviews.opts`.
-    :type kwargs:   dict, optional
-    :return:        Interactive plot.
-    :rtype:         holoviews.element.path.Polygons
+    # Combine bounds
+    if np.all(np.array(map_bounds) != None):
+        bounds = [[min(bounds[0][0], map_bounds[0][0]), min(bounds[0][1], map_bounds[0][1])],
+                  [max(bounds[1][0], map_bounds[1][0]), max(bounds[1][1], map_bounds[1][1])]]
 
-    See also: `holoviews.element.path.Polygons <https://holoviews.org/reference/elements/bokeh/Polygons.html>`_,
-              `holoviews.opts <https://holoviews.org/user_guide/Customizing_Plots.html>`_.
-    """
+    # Set bounds
+    m.fit_bounds(bounds)
 
-    # Get the rescale parameters
-    scale_factor, xlabel, ylabel = rpc.rescale.get_rescale_parameters(data=gdf, xy_unit=xy_unit)
+    # Return map
+    return m
+
+def pcolormesh(da, m=None, skip=1, smooth=1, **kwargs):
+    return imshow(da, m=m, skip=skip, smooth=smooth, **kwargs)
+
+def imshow(da, m=None, skip=1, smooth=1, **kwargs):
+    # Reproject DataArray
+    if da.rio.crs != 'EPSG:4326':
+        print("\033[93m Reprojecting DataArray to EPSG:4326.\033[0m")
+        da = da.rio.reproject('EPSG:4326')
     
-    # Rescale the GeoDataFrame
-    gdf = rpc.rescale.rescale(data=gdf, scale_factor=scale_factor)
+    # Get map
+    if m is None:
+         m = folium.Map()
 
-    # Check if the GeoDataFrame is georeferenced
-    geo = _get_georeference_bool(data=gdf)
+    # Set map bounds
+    m = _set_map_bounds(m, da.rio.bounds())
 
-    # Get the column
-    c = kwargs.pop('c', None)
-        
-    # Get the label
-    label = kwargs.pop('label', '')
+    # Reproject DataArray
+    if da.rio.crs != 'EPSG:4326':
+        da = da.rio.reproject('EPSG:4326')
 
- 
-    # Plot the GeoDataFrame
-    gdf_plot = gdf.hvplot(geo=geo, c=c, label=label).opts(**kwargs)
+    # Skip DataArray values
+    if skip > 1:
+        da = da.isel(x=slice(None, None, skip), y=slice(None, None, skip))
+
+    # Smooth DataArray
+    if smooth > 1:
+        da = da.rolling(x=smooth, center=True).mean().rolling(y=smooth, center=True).mean()
     
-    # Format the plot
-    gdf_plot = gdf_plot.opts(width=550, height=550, xlabel=xlabel, ylabel=ylabel, title='', aspect='equal', show_grid=True, active_tools=['pan', 'wheel_zoom'])
+    # Plot DataArray
+    m = _explore_image(da, m=m, **kwargs)
     
-    # Return the plot
-    return gdf_plot
+    # Return plot
+    return m
 
-def interactive_gdf_cartopy(gdf, xy_unit=None, **kwargs):
-    """Plot GeoDataFrame with cartopy geometries as an interactive plot.
+def scatter(da, m=None, skip=1, smooth=1, **kwargs):
+    raise NotImplementedError('scatter plot not implemented yet')
 
-    :param gdf:     GeoDataFrame with cartopy geometries to plot.
-    :type gdf:      geopandas.GeoDataFrame
-    :param xy_unit: Unit of the x and y coordinates. If ``None``, the unit is determined automatically based on the data.
-    :type xy_unit:  str, optional
-    :param kwargs:  Keyword arguments for :func:`holoviews.opts`.
-    :type kwargs:   dict, optional
-    :return:        Interactive plot.
-    :rtype:         holoviews.core.overlay.Overlay
+def contourf(da, m=None, skip=1, smooth=1, **kwargs):
+    raise NotImplementedError('contourf plot not implemented yet')
 
-    See also: `holoviews.core.overlay.Overlay <https://holoviews.org/reference/containers/bokeh/Overlay.html>`_,
-              `holoviews.opts <https://holoviews.org/user_guide/Customizing_Plots.html>`_.
-    """
+def contour(da, m=None, skip=1, smooth=1, **kwargs):
+    raise NotImplementedError('contour plot not implemented yet')
 
-    # Get the rescale parameters
-    scale_factor, xlabel, ylabel = rpc.rescale.get_rescale_parameters(data=gdf, xy_unit=xy_unit)
+def quiver(da, m=None, skip=1, smooth=1, **kwargs):
+    raise NotImplementedError('quiver plot not implemented yet')
+
+def streamplot(da, m=None, skip=1, smooth=1, **kwargs):
+    raise NotImplementedError('streamplot plot not implemented yet')
+
+def plot_geometries(gdf, m=None, **kwargs):
+    # Reproject GeoDataFrame
+    if gdf.crs != 'EPSG:4326':
+        print("\033[93m Reprojecting GeoDataFrame to EPSG:4326.\033[0m")
+        gdf = gdf.to_crs('EPSG:4326')
     
-    # Rescale the GeoDataFrame
-    gdf = rpc.rescale.rescale(data=gdf, scale_factor=scale_factor)
+    # Get map
+    if m is None:
+         m = folium.Map()
 
-    # Seperate and explode cartopy geometries
-    gdf_land = gpd.GeoDataFrame(geometry=[geom for geom in gdf.loc['land', 'geometry'].geoms]) if 'land' in gdf.index else None
-    gdf_ocean = gpd.GeoDataFrame(geometry=[geom for geom in gdf.loc['ocean', 'geometry'].geoms]) if 'ocean' in gdf.index else None
-    gdf_lakes = gpd.GeoDataFrame(geometry=[geom for geom in gdf.loc['lakes', 'geometry'].geoms]) if 'lakes' in gdf.index else None
-    gdf_coastline = gpd.GeoDataFrame(geometry=[geom for geom in gdf.loc['coastline', 'geometry'].geoms]) if 'coastline' in gdf.index else None
-    gdf_states = gpd.GeoDataFrame(geometry=[geom for geom in gdf.loc['states', 'geometry'].geoms]) if 'states' in gdf.index else None
+    # Set map bounds
+    m = _set_map_bounds(m, gdf.total_bounds)
 
-    # Check if the GeoDataFrame is georeferenced
-    geo = _get_georeference_bool(gdf)
-    
-    # Plot the cartopy geometries
-    cartopy_plots = []
-    if gdf_ocean is not None:
-        kwargs_ = {**{'color': 'lightblue', 'line_color': 'none'}, **kwargs}
-        cartopy_plots.append(gdf_ocean.hvplot(geo=geo).opts(**kwargs_))
-    if gdf_land is not None:
-        kwargs_ = {**{'color': 'antiquewhite', 'line_color': 'none'}, **kwargs}
-        cartopy_plots.append(gdf_land.hvplot(geo=geo).opts(**kwargs_))
-    if gdf_lakes is not None:
-        kwargs_ = {**{'color': 'lightblue', 'line_color': 'none'}, **kwargs}
-        cartopy_plots.append(gdf_lakes.hvplot(geo=geo).opts(**kwargs_))
-    if gdf_coastline is not None:
-        kwargs_ = {**{'color': 'black', 'line_width': 1, 'line_dash': 'solid'}, **kwargs}
-        cartopy_plots.append(gdf_coastline.hvplot(geo=geo).opts(**kwargs_))
-    if gdf_states is not None:
-        kwargs_ = {**{'color': 'none', 'line_width': 1, 'line_dash': 'dotted'}, **kwargs}
-        cartopy_plots.append(gdf_states.hvplot(geo=geo).opts(**kwargs_))
-    
-    # Combine the plots
-    for cartopy_plot in cartopy_plots:
-        cartopy_plot = cartopy_plot.opts(width=550, height=550, xlabel=xlabel, ylabel=ylabel, title='', aspect='equal', show_grid=True, active_tools=['pan', 'wheel_zoom'])
-    cartopy_plot = hv.Overlay(cartopy_plots)
+    # Plot GeoDataFrame
+    gdf.explore(m=m, **kwargs)
 
-    # Format the plot
-    cartopy_plot = cartopy_plot.opts(width=550, height=550, xlabel=xlabel, ylabel=ylabel, title='', aspect='equal', show_grid=True, active_tools=['pan', 'wheel_zoom'])
-    
-    # Return the plot
-    return cartopy_plot
+    # Return plot
+    return m
 
-def interactive_basemap(map_type, **kwargs):
-    """Plot an interactive basemap.
+class Draw(Draw):
+    def render(self, **kwargs):
+        super().render(**kwargs)
 
-    :param map_type: Type of the basemap to plot.
-    :type map_type:  str, optional
-    :param kwargs:   Keyword arguments for :func:`holoviews.opts`.
-    :type kwargs:    dict, optional
-    :return:         Interactive basemap.
-    :rtype:          holoviews.element.tiles.WMTS
+        figure = self.get_root()
+        assert isinstance(
+            figure, Figure
+        ), "You cannot render this Element if it is not in a Figure."
 
-    See also: `holoviews.element.tiles.tile_sources <https://holoviews.org/reference/elements/bokeh/Tiles.html>`_,
-              `holoviews.opts <https://holoviews.org/user_guide/Customizing_Plots.html>`_.
-    """
+        export_style = """
+            <style>
+                #export {
+                    position: absolute;
+                    bottom: 12px;
+                    left: 12px;
+                    z-index: 1000;
+                    background: white;
+                    outline: 2px solid rgba(0, 0, 0, 0.2);
+                    padding: 7px;
+                    border-radius: 2px;
+                    cursor: pointer;
+                    font-size: 12px;
+                    text-decoration: none;
+                }
 
-    # Plot the basemap
-    basemap_plot = hv.element.tiles.tile_sources[map_type]().opts(**kwargs)
-
-    # Format the plot
-    basemap_plot = basemap_plot.opts(width=550, height=550, title='', aspect='equal', show_grid=True, active_tools=['pan', 'wheel_zoom'])
-    
-    # Return the plot
-    return basemap_plot
+                #export:hover {
+                    background: #f0f0f0;
+                }
+            </style>
+        """
+        export_button = """<a href='#' id='export'>💾</a>"""
+        if self.export:
+            # Add button to figure
+            figure.header.add_child(Element(export_style), name="export")
+            figure.html.add_child(Element(export_button), name="export_button")

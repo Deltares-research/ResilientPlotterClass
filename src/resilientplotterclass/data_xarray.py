@@ -1,7 +1,10 @@
+import geopandas as gpd
 import matplotlib.pyplot as plt
 import numpy as np
 import resilientplotterclass as rpc
+from shapely.geometry import LineString, MultiLineString
 import xarray as xr
+from resilientplotterclass.geometries import _plot_gdf
 
 def pcolormesh(da, ax=None, xy_unit=None, skip=1, smooth=1, xlim=None, ylim=None, xlabel_kwargs=None, ylabel_kwargs=None, title_kwargs=None, aspect_kwargs=None, grid_kwargs=None, append_axes_kwargs=None, **kwargs):
     """Plot data using pcolormesh.
@@ -541,4 +544,95 @@ def streamplot(ds, ax=None, xy_unit=None, skip=1, smooth=1, xlim=None, ylim=None
     # Return plot
     return p
 
+def grid(da, ax=None, xy_unit=None, skip=1, smooth=1, xlim=None, ylim=None, xlabel_kwargs=None, ylabel_kwargs=None, title_kwargs=None, aspect_kwargs=None, grid_kwargs=None, append_axes_kwargs=None, **kwargs):
+    """Plot data using grid.
+    
+    :param da:                 Data to plot.
+    :type da:                  xarray.DataArray
+    :param ax:                 Axis.
+    :type ax:                  matplotlib.axes.Axes, optional
+    :param xy_unit:            Unit to rescale the x and y dimensions to. If ``None``, the unit is determined automatically based on the input data.
+    :type xy_unit:             str, optional
+    :param skip:               Plot every nth value in x and y direction.
+    :type skip:                int, optional
+    :param smooth:             Smooth data array with rolling mean in x and y direction.
+    :type smooth:              int, optional
+    :param xlim:               x limits.
+    :type xlim:                list[float], optional
+    :param ylim:               y limits.
+    :type ylim:                list[float], optional
+    :param xlabel_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_xlabel`.
+    :type xlabel_kwargs:       dict, optional
+    :param ylabel_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_ylabel`.
+    :type ylabel_kwargs:       dict, optional
+    :param title_kwargs:       Keyword arguments for :func:`matplotlib.axis.set_title`.
+    :type title_kwargs:        dict, optional
+    :param aspect_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_aspect`.
+    :type aspect_kwargs:       dict, optional
+    :param grid_kwargs:        Keyword arguments for :func:`matplotlib.axis.grid`.
+    :type grid_kwargs:         dict, optional
+    :param append_axes_kwargs: Keyword arguments for :func:`mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes`.
+    :type append_axes_kwargs:  dict, optional
+    :param kwargs:             Keyword arguments for `xarray.plot.grid`.
+    :type kwargs:              dict, optional
+    :return:                   Plot.
+    :rtype:                    matplotlib.collections.QuadMesh
 
+    :See also: `matplotlib.axis.set_xlabel <https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_xlabel.html>`_,
+               `matplotlib.axis.set_ylabel <https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_ylabel.html>`_,
+               `matplotlib.axis.set_title <https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_title.html>`_,
+               `matplotlib.axis.set_aspect <https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_aspect.html>`_,
+               `matplotlib.axis.grid <https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.grid.html>`_,
+               `mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes <https://matplotlib.org/stable/api/_as_gen/mpl_toolkits.axes_grid1.axes_divider.AxesDivider.html#mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes>`_
+    """
+    
+    # Initialise axis
+    if ax is None:
+        _, ax = plt.subplots(1, 1, figsize=(10, 10))
+    
+    # Get the rescale parameters
+    scale_factor, _, _ = rpc.rescale.get_rescale_parameters(data=da, xy_unit=xy_unit)
+
+    # Get bounds and resolution
+    xmin, ymin, xmax, ymax = da.rio.bounds()
+    xres, yres = da.rio.resolution()
+
+    # Shift bounds to center of pixel
+    xmin = xmin + xres/2
+    ymin = ymin - yres/2
+    xmax = xmax - xres/2
+    ymax = ymax + yres/2
+
+    # Apply skip factor
+    if skip > 1:
+        xres = xres * skip
+        yres = yres * skip
+    
+    # Shift bounds to edges of pixel
+    xmin = xmin - xres/2
+    ymin = ymin + yres/2
+    xmax = xmax + xres/2
+    ymax = ymax - yres/2
+
+    # Adjust bounds to fix skip factor
+    ymin = ymax - np.ceil((ymax - ymin)/yres) * yres
+    xmax = xmin + np.floor((xmax - xmin)/xres) * xres
+
+    # Get grid GeoDataFrame
+    lines = []
+    lines.extend(LineString([(xmin, y), (xmax, y)]) for y in np.arange(ymax, ymin+yres, yres))
+    lines.extend(LineString([(x, ymin), (x, ymax)]) for x in np.arange(xmin, xmax+xres, xres))
+    gdf_grid = gpd.GeoDataFrame(geometry=[MultiLineString(lines)], crs=da.rio.crs)
+
+    # Rescale the GeoDataFrame
+    gdf_grid = rpc.rescale.rescale(data=gdf_grid, scale_factor=scale_factor)
+
+    # Plot GeoDataFrame
+    ax = _plot_gdf(gdf_grid, ax=ax, **kwargs)
+
+    # Format axis
+    ax = rpc.axes.format(data=gdf_grid, ax=ax, xy_unit=xy_unit, xlim=xlim, ylim=ylim, xlabel_kwargs=xlabel_kwargs, ylabel_kwargs=ylabel_kwargs,
+                         title_kwargs=title_kwargs, aspect_kwargs=aspect_kwargs, grid_kwargs=grid_kwargs)
+    
+    # Return plot
+    return ax

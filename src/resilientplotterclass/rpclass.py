@@ -1,13 +1,14 @@
 # Packages
+import folium
 import geopandas as gpd
-import holoviews as hv
 import inspect
 from IPython.display import display
 import json
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 import os
 import pandas as pd
+from pyproj import CRS as pyprojCRS
+from rasterio.crs import CRS as rasterioCRS
 import xarray as xr
 import xugrid as xu
 import resilientplotterclass as rpc
@@ -27,6 +28,7 @@ class rpclass:
         :return:                   None.
         :rtype:                    None
         """
+
         # Set guidelines
         self.set_guidelines(project_guidelines)
 
@@ -35,14 +37,14 @@ class rpclass:
             self.set_cartopy()
         else:
             self.gdf_cartopy = None
-            
+        
         # Register colormaps
         rpc.colormaps.register_colormaps()
         import colorcet as cc    # See also: https://colorcet.holoviz.org/
         import cmocean.cm as cmo # See also: https://matplotlib.org/cmocean/
 
     # =============================================================================
-    # Support methods
+    # Guideline support methods
     # =============================================================================
     # Combine dictionaries recursively
     def _combine_dictionaries(self, dict1, dict2, max_depth=4):
@@ -93,8 +95,8 @@ class rpclass:
         # Return combined dictionary
         return dict3
     
-    # Remove conflicting kwargs from dictionary
-    def _remove_dictonary_conflicts(self, dict, plot_type=None, warn=True):
+    # Remove conflicting kwargs
+    def _remove_conflicting_kwargs(self, dict, plot_type=None, warn=True):
         """ Remove conflicting kwargs from dictionary, prioritising the last kwargs.
 
         :param dict: Dictionary.
@@ -132,6 +134,78 @@ class rpclass:
         # Return dictionary without conflicting kwargs
         return dict2
 
+    # Get keyword arguments
+    def _get_kwargs(self, data_type=None, geom_type=None, map_type=None, extent_type=None, interactive=False, show_kwargs=False, **kwargs):
+        """Get keyword arguments.
+
+        :param data_type:    Data type from guidelines.
+        :type data_type:     str, optional
+        :param geom_type:    Geometry type from guidelines.
+        :type geom_type:     str, optional
+        :param map_type:     Map type from guidelines.
+        :type map_type:      str, optional
+        :param extent_type:  Extent type from guidelines.
+        :type extent_type:   str, optional
+        :param interactive:  Interactive plot.
+        :type interactive:   bool, optional
+        :param show_kwargs:  Show keyword arguments.
+        :type show_kwargs:   bool, optional
+        :param kwargs:       Keyword arguments.
+        :type kwargs:        dict, optional
+        :return:             Keyword arguments.
+        :rtype:              dict
+        """
+        # Get parameters and arguments
+        parameters, arguments = [], []
+        if data_type is not None:
+            parameters.append('data_type' if not interactive else 'interactive_data_type')
+            arguments.append(data_type)
+        if geom_type is not None:
+            parameters.append('geom_type' if not interactive else 'interactive_geom_type')
+            arguments.append(geom_type)
+        if map_type is not None:
+            parameters.append('map_type' if not interactive else 'interactive_map_type')
+            arguments.append(map_type)
+        if extent_type is not None:
+            parameters.append('extent_type' if not interactive else 'interactive_extent_type')
+            arguments.append(extent_type)
+        
+        # Get plot type (name of the function calling this method)
+        plot_type = inspect.stack()[1].function
+
+        # Get guidelines
+        guideline_kwargs_ls = []
+        for parameter, argument in zip(parameters, arguments):
+            # Check if parameter and argument are in guidelines
+            if parameter not in self.guidelines.keys():
+                raise ValueError("{} not in guidelines. Available: {}".format(parameter, list(self.guidelines.keys())))
+            if argument not in self.guidelines[parameter].keys():
+                raise ValueError("{} '{}' not in guidelines. Available: {}".format(parameter, argument, list(self.guidelines[parameter].keys())))
+            
+            if parameter in ['data_type', 'interactive_data_type']:
+                # Check if data_type is in guidelines
+                if plot_type not in self.guidelines[parameter][argument].keys():
+                    raise ValueError('plot_type {} not in guidelines. Available: {}'.format(plot_type, list(self.guidelines[parameter][argument].keys())))
+                guideline_kwargs_ls.append(self.guidelines[parameter][argument][plot_type].copy())
+            else:
+                guideline_kwargs_ls.append(self.guidelines[parameter][argument].copy())
+
+        # Combine guidelines and user keyword arguments, prioritising user keyword arguments
+        if not interactive:
+            kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
+        for guideline_kwargs in guideline_kwargs_ls:
+            kwargs = self._combine_dictionaries(guideline_kwargs, kwargs)
+        
+        # Remove conflicting kwargs
+        kwargs = self._remove_conflicting_kwargs(kwargs, plot_type)
+
+        # Show keyword arguments
+        if show_kwargs:
+            print('Keyword arguments for {}: {}'.format(plot_type, kwargs))
+        
+        # Return keyword arguments
+        return kwargs
+    
     # Get guidelines dataframe
     def _get_df_guidelines(self, guidelines, section):
         """Get guidelines dataframe.	
@@ -228,6 +302,9 @@ class rpclass:
         # Return dataframe
         return df_guidelines
 
+    # =============================================================================
+    # Guidelines methods
+    # =============================================================================
     # Set guidelines
     def set_guidelines(self, project_guidelines=None):
         """Set guidelines.
@@ -260,7 +337,7 @@ class rpclass:
         guidelines = self._combine_dictionaries(default_guidelines, project_guidelines)
 
         # Remove conflicting kwargs from guidelines
-        guidelines = self._remove_dictonary_conflicts(guidelines, warn=False)
+        guidelines = self._remove_conflicting_kwargs(guidelines, warn=False)
 
         # Set guidelines
         self.guidelines = guidelines
@@ -286,8 +363,8 @@ class rpclass:
         return self.guidelines
     
     # Print guidelines
-    def print_guidelines(self):
-        """Print guidelines.
+    def show_guidelines(self):
+        """Show guidelines.
 
         :return: None.
         :rtype:  None
@@ -319,6 +396,9 @@ class rpclass:
                                 {'selector': 'caption', 'props': [('font-weight', 'bold')]}], overwrite=False)
         display(s)
 
+    # =============================================================================
+    # Cartopy methods
+    # =============================================================================
     # Set cartopy
     def set_cartopy(self, features=None, bounds=None, crs=None, buffer=0.1):
         """Set cartopy geometries.
@@ -357,19 +437,8 @@ class rpclass:
         # Return cartopy geometries
         return self.gdf_cartopy
     
-    # Plot custom colormaps
-    def plot_colormaps(self):
-        """Plot custom colormaps.
-
-        :return: None.
-        :rtype:  None
-        """
-
-        # Plot custom colormaps
-        rpc.colormaps.plot_colormaps()
-    
     # =============================================================================
-    # Plot methods
+    # Plot support methods
     # =============================================================================
     # Create figure and axes
     def subplots(self, *args, **kwargs):
@@ -390,15 +459,66 @@ class rpclass:
         
         # Return figure and axes
         return fig, axs
+    
+    def map(self, **kwargs):
+        """Create map.
+
+        :param kwargs: Keyword arguments for :func:`folium.Map`.
+        :type kwargs:  dict, optional
+        :return:       Map.
+        :rtype:        folium.Map
+
+        See also: `folium.Map() <https://python-visualization.github.io/folium/modules.html#folium.folium.Map>`_
+        """
+
+        # Create map
+        m = folium.Map(**kwargs)
+
+        # Create map
+        return m
+        
+    # Show figure
+    def show(self, fig=None, m=None, **kwargs):
+        """Show figure.
+
+        :param fig:    Figure to show.
+        :type fig:     matplotlib.figure.Figure
+        :param m:      Map to show.
+        :type m:       folium.Map
+        :param kwargs: Keyword arguments for :func:`matplotlib.pyplot.show`.
+        :type kwargs:  dict, optional
+        :return:       None.
+        :rtype:        None
+
+        See also: `matplotlib.pyplot.show() <https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html>`_
+        """
+        # Determine if plot is interactive
+        fig = m if fig is None else fig
+        if isinstance(fig, plt.Figure):
+            interactive = False
+        elif isinstance(fig, folium.Map):
+            interactive = True
+        else:
+            raise TypeError('fig must be a matplotlib.figure.Figure or folium.Map. Received: {}'.format(type(fig)))
+
+        # Show figure
+        if not interactive:
+            fig.tight_layout()
+            plt.show(**kwargs)
+        else:
+            if 'draw' in kwargs.keys() and kwargs['draw']:
+                rpc.interactive.Draw(export=True, filename="draw.geojson").add_to(m)
+            folium.LayerControl().add_to(m)
+            display(m)
 
     # Save figure
-    def save_fig(self, fig, file_path, close=True, dpi=300, bbox_inches='tight', **kwargs):
+    def save(self, fig=None, m=None, file_path=None, **kwargs):
         """Save figure.
 
         :param file_path:   File path to save figure.
         :type file_path:    str
         :param fig:         Figure to save.
-        :type fig:          matplotlib.figure.Figure or holoviews.element.chart.Element or holoviews.element.chart.Overlay or holoviews.element.chart.DynamicMap
+        :type fig:          matplotlib.figure.Figure or folium.Map
         :param dpi:         Dots per inch.
         :type dpi:          int, optional
         :param bbox_inches: Bounding box in inches.
@@ -410,20 +530,27 @@ class rpclass:
 
         See also: `matplotlib.figure.Figure.savefig() <https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure.savefig>`_
         """
-
-        # Save figure
+        # Determine if plot is interactive
+        fig = m if fig is None else fig
         if isinstance(fig, plt.Figure):
-            fig.savefig(file_path, dpi=dpi, bbox_inches=bbox_inches, **kwargs)
-        elif any(isinstance(fig, getattr(hv, x)) for x in ['Overlay', 'Element', 'DynamicMap']):
-            # Remove file extension
-            file_path = file_path.rsplit('.', maxsplit=1)[0]
-            
-            # Save figure
-            renderer = hv.renderer('bokeh')
-            renderer.save(fig, file_path, fmt='html')
+            interactive = False
+        elif isinstance(fig, folium.Map):
+            interactive = True
         else:
-            raise TypeError('fig must be a matplotlib.figure.Figure or holoviews.element.chart.Element or holoviews.element.chart.Overlay or holoviews.element.chart.DynamicMap. Received: {}'.format(type(fig)))
+            raise TypeError('fig must be a matplotlib.figure.Figure or folium.Map. Received: {}'.format(type(fig)))
         
+        # Determine if file path is set
+        if file_path is None:
+            raise ValueError('file_path must be set. Received: {}'.format(file_path))
+        
+        # Save figure
+        if not interactive:
+            kwargs.setdefault('dpi', 300)
+            kwargs.setdefault('bbox_inches', 'tight')
+            fig.savefig(file_path, **kwargs)
+        else:
+            fig.save(file_path, **kwargs)
+
     # Create video
     def create_video(self, file_paths, file_path_video, fps=5, **kwargs):
         """Create video from images.
@@ -441,58 +568,64 @@ class rpclass:
 
         # Create video
         rpc.videos.create_video(file_paths, file_path_video, fps=fps, **kwargs)
+    
+    # Plot custom colormaps
+    def plot_colormaps(self):
+        """Plot custom colormaps.
+
+        :return: None.
+        :rtype:  None
+        """
+
+        # Plot custom colormaps
+        rpc.colormaps.plot_colormaps()
 
     # =============================================================================
-    # General plot methods
-    # =============================================================================
-    # Plot data using pcolormesh
-    def pcolormesh(self, data, ax=None, data_type=None, extent_type=None, show_kwargs=False, **kwargs):
+    # Plot methods
+    # =============================================================================    
+    def pcolormesh(self, data, ax=None, m=None, data_type=None, extent_type=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot data using pcolormesh.
 
         :param data:        Data to plot.
         :type data:         xarray.DataArray or xugrid.UgridDataArray, optional
         :param ax:          Axis.
         :type ax:           matplotlib.axes.Axes, optional
+        :param m:           Map.
+        :type m:            folium.Map, optional
         :param data_type:   Data type from guidelines.
         :type data_type:    str, optional
         :param extent_type: Extent type from guidelines.
         :type extent_type:  str, optional
+        :param interactive: Interactive plot.
+        :type interactive:  bool, optional
         :param show_kwargs: Show keyword arguments.
         :type show_kwargs:  bool, optional
         :param kwargs:      Keyword arguments for :func:`resilientplotterclass.data_xarray.pcolormesh` or :func:`resilientplotterclass.data_xugrid.pcolormesh`.
         :type kwargs:       dict, optional
         :return:            Plot.
-        :rtype:             matplotlib.collections.QuadMesh
+        :rtype:             matplotlib.collections.QuadMesh or geoviews.element.chart.Image
         """
+
+        # Determine if plot is interactive
+        if isinstance(ax, plt.Axes):
+            interactive = False
+        elif isinstance(m, folium.Map):
+            interactive = True
+        elif interactive is None:
+            interactive = False
         
-        # Get plot_type (function name)
-        plot_type = inspect.currentframe().f_code.co_name
-
-        # Get default types
-        if data_type is None:
-            data_type = self.guidelines['general']['default_types']['data_type']
-        if extent_type is None:
-            extent_type = self.guidelines['general']['default_types']['extent_type']
-
-        # Combine guidelines and user keyword arguments, prioritising user keyword arguments
-        kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
-        if data_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type].copy(), kwargs)
-        if extent_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
-
-        # Remove conflicting kwargs
-        kwargs = self._remove_dictonary_conflicts(kwargs, plot_type)
-
-        # Show keyword arguments
-        if show_kwargs:
-            print('Keyword arguments for {}: {}'.format(plot_type, kwargs))
+        # Get keyword arguments
+        kwargs = self._get_kwargs(data_type=data_type, extent_type=extent_type, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
 
         # Plot data
-        if isinstance(data, xr.DataArray):
+        if isinstance(data, xr.DataArray) and not interactive:
             p = rpc.data_xarray.pcolormesh(data, ax=ax, **kwargs)
-        elif isinstance(data, xu.UgridDataArray):
+        elif isinstance(data, xu.UgridDataArray) and not interactive:
             p = rpc.data_xugrid.pcolormesh(data, ax=ax, **kwargs)
+        elif isinstance(data, xr.DataArray) and interactive:
+            p = rpc.interactive.pcolormesh(data, m=m, **kwargs)
+        elif isinstance(data, xu.UgridDataArray) and interactive:
+            raise TypeError('Interactive pcolormesh not supported for xugrid.UgridDataArray.')
         else:
             raise TypeError('data type not supported. Please provide a xarray.DataArray or xugrid.UgridDataArray. Received: {}'.format(type(data)))
         
@@ -500,53 +633,49 @@ class rpclass:
         return p
         
     # Plot data using imshow
-    def imshow(self, data, ax=None, data_type=None, extent_type=None, show_kwargs=False, **kwargs):
+    def imshow(self, data, ax=None, m=None, data_type=None, extent_type=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot data using imshow.
 
         :param data:        Data to plot.
         :type data:         xarray.DataArray or xugrid.UgridDataArray, optional
         :param ax:          Axis.
         :type ax:           matplotlib.axes.Axes, optional
+        :param m:           Map.
+        :type m:            folium.Map, optional
         :param data_type:   Data type from guidelines.
         :type data_type:    str, optional
         :param extent_type: Extent type from guidelines.
         :type extent_type:  str, optional
+        :param interactive: Interactive plot.
+        :type interactive:  bool, optional
         :param show_kwargs: Show keyword arguments.
         :type show_kwargs:  bool, optional
         :param kwargs:      Keyword arguments for :func:`resilientplotterclass.data_xarray.imshow` or :func:`resilientplotterclass.data_xugrid.imshow`.
         :type kwargs:       dict, optional
         :return:            Plot.
-        :rtype:             matplotlib.collections.QuadMesh
+        :rtype:             matplotlib.collections.QuadMesh or geoviews.element.chart.Image 
         """
-
-        # Get plot_type (function name)
-        plot_type = inspect.currentframe().f_code.co_name
-
-        # Get default types
-        if data_type is None:
-            data_type = self.guidelines['general']['default_types']['data_type']
-        if extent_type is None:
-            extent_type = self.guidelines['general']['default_types']['extent_type']
-
-        # Combine guidelines and user keyword arguments, prioritising user keyword arguments
-        kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
-        if data_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type].copy(), kwargs)
-        if extent_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
-
-        # Remove conflicting kwargs
-        kwargs = self._remove_dictonary_conflicts(kwargs, plot_type)
         
-        # Show keyword arguments
-        if show_kwargs:
-            print('Keyword arguments for {}: {}'.format(plot_type, kwargs))
+        # Determine if plot is interactive
+        if isinstance(ax, plt.Axes):
+            interactive = False
+        elif isinstance(m, folium.Map):
+            interactive = True
+        elif interactive is None:
+            interactive = False
         
+        # Get keyword arguments
+        kwargs = self._get_kwargs(data_type=data_type, extent_type=extent_type, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
+
         # Plot data
-        if isinstance(data, xr.DataArray):
+        if isinstance(data, xr.DataArray) and not interactive:
             p = rpc.data_xarray.imshow(data, ax=ax, **kwargs)
-        elif isinstance(data, xu.UgridDataArray):
+        elif isinstance(data, xu.UgridDataArray) and not interactive:
             p = rpc.data_xugrid.imshow(data, ax=ax, **kwargs)
+        elif isinstance(data, xr.DataArray) and interactive:
+            p = rpc.interactive.imshow(data, m=m, **kwargs)
+        elif isinstance(data, xu.UgridDataArray) and interactive:
+            raise TypeError('Interactive imshow not supported for xugrid.UgridDataArray.')
         else:
             raise TypeError('data type not supported. Please provide a xarray.DataArray or xugrid.UgridDataArray. Received: {}'.format(type(data)))
         
@@ -554,17 +683,21 @@ class rpclass:
         return p
     
     # Plot data using scatter
-    def scatter(self, data, ax=None, data_type=None, extent_type=None, show_kwargs=False, **kwargs):
+    def scatter(self, data, ax=None, m=None, data_type=None, extent_type=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot data using scatter.
 
         :param data:        Data to plot.
         :type data:         xarray.DataArray or xarray.Dataset or xugrid.UgridDataArray, optional
         :param ax:          Axis.
         :type ax:           matplotlib.axes.Axes, optional
+        :param m:           Map.
+        :type m:            folium.Map, optional
         :param data_type:   Data type from guidelines.
         :type data_type:    str, optional
         :param extent_type: Extent type from guidelines.
         :type extent_type:  str, optional
+        :param interactive: Interactive plot.
+        :type interactive:  bool, optional
         :param show_kwargs: Show keyword arguments.
         :type show_kwargs:  bool, optional
         :param kwargs:      Keyword arguments for :func:`resilientplotterclass.data_xarray.scatter` or :func:`resilientplotterclass.data_xugrid.scatter`.
@@ -573,34 +706,26 @@ class rpclass:
         :rtype:             matplotlib.collections.QuadMesh
         """
 
-        # Get plot_type (function name)
-        plot_type = inspect.currentframe().f_code.co_name
+        # Determine if plot is interactive
+        if isinstance(ax, plt.Axes):
+            interactive = False
+        elif isinstance(m, folium.Map):
+            interactive = True
+        elif interactive is None:
+            interactive = False
 
-        # Get default types
-        if data_type is None:
-            data_type = self.guidelines['general']['default_types']['data_type']
-        if extent_type is None:
-            extent_type = self.guidelines['general']['default_types']['extent_type']
-
-        # Combine guidelines and user keyword arguments, prioritising user keyword arguments
-        kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
-        if data_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type].copy(), kwargs)
-        if extent_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
-
-        # Remove conflicting kwargs
-        kwargs = self._remove_dictonary_conflicts(kwargs, plot_type)
-
-        # Show keyword arguments
-        if show_kwargs:
-            print('Keyword arguments for {}: {}'.format(plot_type, kwargs))
+        # Get keyword arguments
+        kwargs = self._get_kwargs(data_type=data_type, extent_type=extent_type, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
 
         # Plot data
-        if isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset):
+        if (isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset)) and not interactive:
             p = rpc.data_xarray.scatter(data, ax=ax, **kwargs)
-        elif isinstance(data, xu.UgridDataArray):
+        elif isinstance(data, xu.UgridDataArray) and not interactive:
             p = rpc.data_xugrid.scatter(data, ax=ax, **kwargs)
+        elif isinstance(data, xr.DataArray) and interactive:
+            p = rpc.interactive.scatter(data, m=m, **kwargs)
+        elif isinstance(data, xu.UgridDataArray) and interactive:
+            raise TypeError('Interactive scatter not supported for xugrid.UgridDataArray.')
         else: 
             raise TypeError('data type not supported. Please provide a xarray.DataArray, xarray.Dataset or xugrid.UgridDataArray. Received: {}'.format(type(data)))
         
@@ -608,17 +733,21 @@ class rpclass:
         return p
     
     # Plot data using contourf
-    def contourf(self, data, ax=None, data_type=None, extent_type=None, show_kwargs=False, **kwargs):
+    def contourf(self, data, ax=None, m=None, data_type=None, extent_type=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot data using contourf.
 
         :param data:        Data to plot.
         :type data:         xarray.DataArray or xugrid.UgridDataArray, optional
         :param ax:          Axis.
-        :type ax:           matplotlib.axes.Axes, optional
+        :type ax:           matplotlib.axes.Axes,
+        :param m:           Map.
+        :type m:            folium.Map, optional
         :param data_type:   Data type from guidelines.
         :type data_type:    str, optional
         :param extent_type: Extent type from guidelines.
         :type extent_type:  str, optional
+        :param interactive: Interactive plot.
+        :type interactive:  bool, optional
         :param show_kwargs: Show keyword arguments.
         :type show_kwargs:  bool, optional
         :param kwargs:      Keyword arguments for :func:`resilientplotterclass.data_xarray.contourf` or :func:`resilientplotterclass.data_xugrid.contourf`.
@@ -627,34 +756,26 @@ class rpclass:
         :rtype:             matplotlib.collections.QuadMesh
         """
 
-        # Get plot_type (function name)
-        plot_type = inspect.currentframe().f_code.co_name
-
-        # Get default types
-        if data_type is None:
-            data_type = self.guidelines['general']['default_types']['data_type']
-        if extent_type is None:
-            extent_type = self.guidelines['general']['default_types']['extent_type']
-
-        # Combine guidelines and user keyword arguments, prioritising user keyword arguments
-        kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
-        if data_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type].copy(), kwargs)
-        if extent_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
-
-        # Remove conflicting kwargs
-        kwargs = self._remove_dictonary_conflicts(kwargs, plot_type)
-
-        # Show keyword arguments
-        if show_kwargs:
-            print('Keyword arguments for {}: {}'.format(plot_type, kwargs))
+        # Determine if plot is interactive
+        if isinstance(ax, plt.Axes):
+            interactive = False
+        elif isinstance(m, folium.Map):
+            interactive = True
+        elif interactive is None:
+            interactive = False
+        
+        # Get keyword arguments
+        kwargs = self._get_kwargs(data_type=data_type, extent_type=extent_type, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
 
         # Plot data
-        if isinstance(data, xr.DataArray):
+        if isinstance(data, xr.DataArray) and not interactive:
             p = rpc.data_xarray.contourf(data, ax=ax, **kwargs)
-        elif isinstance(data, xu.UgridDataArray):
+        elif isinstance(data, xu.UgridDataArray) and not interactive:
             p = rpc.data_xugrid.contourf(data, ax=ax, **kwargs)
+        elif isinstance(data, xr.DataArray) and interactive:
+            p = rpc.interactive.contourf(data, m=m, **kwargs)
+        elif isinstance(data, xu.UgridDataArray) and interactive:
+            raise TypeError('Interactive contourf not supported for xugrid.UgridDataArray.')
         else:
             raise TypeError('data type not supported. Please provide a xarray.DataArray or xugrid.UgridDataArray. Received: {}'.format(type(data)))
         
@@ -662,17 +783,21 @@ class rpclass:
         return p
     
     # Plot data using contour
-    def contour(self, data, ax=None, data_type=None, extent_type=None, show_kwargs=False, **kwargs):
+    def contour(self, data, ax=None, m=None, data_type=None, extent_type=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot data using contour.
 
         :param data:        Data to plot.
         :type data:         xarray.DataArray or xugrid.UgridDataArray, optional
         :param ax:          Axis.
-        :type ax:           matplotlib.axes.Axes, optional
+        :type ax:           matplotlib.axes.Axes or folium.Map, optional
+        :param m:           Map.
+        :type m:            folium.Map, optional
         :param data_type:   Data type from guidelines.
         :type data_type:    str, optional
         :param extent_type: Extent type from guidelines.
         :type extent_type:  str, optional
+        :param interactive: Interactive plot.
+        :type interactive:  bool, optional
         :param show_kwargs: Show keyword arguments.
         :type show_kwargs:  bool, optional
         :param kwargs:      Keyword arguments for :func:`resilientplotterclass.data_xarray.contour` or :func:`resilientplotterclass.data_xugrid.contour`.
@@ -681,34 +806,26 @@ class rpclass:
         :rtype:             matplotlib.collections.QuadMesh
         """
 
-        # Get plot_type (function name)
-        plot_type = inspect.currentframe().f_code.co_name
+        # Determine if plot is interactive
+        if isinstance(ax, plt.Axes):
+            interactive = False
+        elif isinstance(m, folium.Map):
+            interactive = True
+        elif interactive is None:
+            interactive = False
 
-        # Get default types
-        if data_type is None:
-            data_type = self.guidelines['general']['default_types']['data_type']
-        if extent_type is None:
-            extent_type = self.guidelines['general']['default_types']['extent_type']
-
-        # Combine guidelines and user keyword arguments, prioritising user keyword arguments
-        kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
-        if data_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type].copy(), kwargs)
-        if extent_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
-
-        # Remove conflicting kwargs
-        kwargs = self._remove_dictonary_conflicts(kwargs, plot_type)
-
-        # Show keyword arguments
-        if show_kwargs:
-            print('Keyword arguments for {}: {}'.format(plot_type, kwargs))
+        # Get keyword arguments
+        kwargs = self._get_kwargs(data_type=data_type, extent_type=extent_type, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
 
         # Plot data
-        if isinstance(data, xr.DataArray):
+        if isinstance(data, xr.DataArray) and not interactive:
             p = rpc.data_xarray.contour(data, ax=ax, **kwargs)
-        elif isinstance(data, xu.UgridDataArray) or isinstance(data, xu.UgridDataset):
+        elif (isinstance(data, xu.UgridDataArray) or isinstance(data, xu.UgridDataset)) and not interactive:
             p = rpc.data_xugrid.contour(data, ax=ax, **kwargs)
+        elif isinstance(data, xr.DataArray) and interactive:
+            p = rpc.interactive.contour(data, m=m, **kwargs)
+        elif isinstance(data, xu.UgridDataArray) and interactive:
+            raise TypeError('Interactive contour not supported for xugrid.UgridDataArray.')
         else:
             raise TypeError('data type not supported. Please provide a xarray.DataArray or xugrid.UgridDataArray. Received: {}'.format(type(data)))
         
@@ -716,17 +833,21 @@ class rpclass:
         return p
 
     # Plot data using quiver
-    def quiver(self, data, ax=None, data_type=None, extent_type=None, show_kwargs=False, **kwargs):
+    def quiver(self, data, ax=None, m=None, data_type=None, extent_type=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot data using quiver.
 
         :param data:        Data to plot.
         :type data:         xarray.Dataset or xugrid.UgridDataArray or xugrid.UgridDataset, optional
         :param ax:          Axis.
         :type ax:           matplotlib.axes.Axes, optional
+        :param m:           Map.
+        :type m:            folium.Map, optional
         :param data_type:   Data type from guidelines.
         :type data_type:    str, optional
         :param extent_type: Extent type from guidelines.
         :type extent_type:  str, optional
+        :param interactive: Interactive plot.
+        :type interactive:  bool, optional
         :param show_kwargs: Show keyword arguments.
         :type show_kwargs:  bool, optional
         :param kwargs:      Keyword arguments for :func:`resilientplotterclass.data_xarray.quiver` or :func:`resilientplotterclass.data_xugrid.quiver`.
@@ -735,34 +856,26 @@ class rpclass:
         :rtype:             matplotlib.collections.QuadMesh
         """
 
-        # Get plot_type (function name)
-        plot_type = inspect.currentframe().f_code.co_name
+        # Determine if plot is interactive
+        if isinstance(ax, plt.Axes):
+            interactive = False
+        elif isinstance(m, folium.Map):
+            interactive = True
+        elif interactive is None:
+            interactive = False
 
-        # Get default types
-        if data_type is None:
-            data_type = self.guidelines['general']['default_types']['data_type']
-        if extent_type is None:
-            extent_type = self.guidelines['general']['default_types']['extent_type']
-
-        # Combine guidelines and user keyword arguments, prioritising user keyword arguments
-        kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
-        if data_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type].copy(), kwargs)
-        if extent_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
-        
-        # Remove conflicting kwargs
-        kwargs = self._remove_dictonary_conflicts(kwargs, plot_type)
-
-        # Show keyword arguments
-        if show_kwargs:
-            print('Keyword arguments for {}: {}'.format(plot_type, kwargs))
+        # Get keyword arguments
+        kwargs = self._get_kwargs(data_type=data_type, extent_type=extent_type, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
 
         # Plot data
-        if isinstance(data, xr.Dataset):
+        if isinstance(data, xr.Dataset) and not interactive:
             p = rpc.data_xarray.quiver(data, ax=ax, **kwargs)
-        elif isinstance(data, xu.UgridDataset):
+        elif isinstance(data, xu.UgridDataset) and not interactive:
             p = rpc.data_xugrid.quiver(data, ax=ax, **kwargs)
+        elif isinstance(data, xr.Dataset) and interactive:
+            p = rpc.interactive.quiver(data, m=m, **kwargs)
+        elif isinstance(data, xu.UgridDataset) and interactive:
+            raise TypeError('Interactive quiver not supported for xugrid.UgridDataset.')
         else:
             raise TypeError('data type not supported. Please provide a xarray.Dataset or xugrid.UgridDataset. Received: {}'.format(type(data)))
         
@@ -770,49 +883,45 @@ class rpclass:
         return p
 
     # Plot data using streamplot
-    def streamplot(self, da, ax=None, data_type=None, extent_type=None, show_kwargs=False, **kwargs):
+    def streamplot(self, da, ax=None, m=None, data_type=None, extent_type=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot data using streamplot.
 
         :param da:          Data to plot.
         :type da:           xarray.Dataset, optional
         :param ax:          Axis.
         :type ax:           matplotlib.axes.Axes, optional
+        :param m:           Map.
+        :type m:            folium.Map, optional
         :param data_type:   Data type from guidelines.
         :type data_type:    str, optional
         :param extent_type: Extent type from guidelines.
         :type extent_type:  str, optional
+        :param interactive: Interactive plot.
+        :type interactive:  bool, optional
+        :param show_kwargs: Show keyword arguments.
+        :type show_kwargs:  bool, optional
         :param kwargs:      Keyword arguments for :func:`resilientplotterclass.data_xarray.streamplot`.
         :type kwargs:       dict, optional
         :return:            Plot.
         :rtype:             matplotlib.collections.QuadMesh
         """
-
-        # Get plot_type (function name)
-        plot_type = inspect.currentframe().f_code.co_name
-
-        # Get default types
-        if data_type is None:
-            data_type = self.guidelines['general']['default_types']['data_type']
-        if extent_type is None:
-            extent_type = self.guidelines['general']['default_types']['extent_type']
-
-        # Combine guidelines and user keyword arguments, prioritising user keyword arguments
-        kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
-        if data_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type].copy(), kwargs)
-        if extent_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
-
-        # Remove conflicting kwargs
-        kwargs = self._remove_dictonary_conflicts(kwargs, plot_type)
-
-        # Show keyword arguments
-        if show_kwargs:
-            print('Keyword arguments for {}: {}'.format(plot_type, kwargs))
         
+        # Determine if plot is interactive
+        if isinstance(ax, plt.Axes):
+            interactive = False
+        elif isinstance(m, folium.Map):
+            interactive = True
+        elif interactive is None:
+            interactive = False
+
+        # Get keyword arguments
+        kwargs = self._get_kwargs(data_type=data_type, extent_type=extent_type, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
+
         # Plot data
-        if isinstance(da, xr.Dataset):
+        if isinstance(da, xr.Dataset) and not interactive:
             p = rpc.data_xarray.streamplot(da, ax=ax, **kwargs)
+        elif isinstance(da, xr.Dataset) and interactive:
+            p = rpc.interactive.streamplot(da, m=m, **kwargs)
         else:
             raise TypeError('data type not supported. Please provide a xarray.Dataset. Received: {}'.format(type(da)))
 
@@ -820,97 +929,95 @@ class rpclass:
         return p
 
     # Plot grid using xugrid
-    def grid(self, data, ax=None, geom_type='grid', extent_type=None, show_kwargs=False, **kwargs):
+    def grid(self, data, ax=None, m=None, geom_type='grid', extent_type=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot grid using xugrid.
 
         :param data:          Data to plot.
-        :type data:           xugrid.UgridDataArray
+        :type data:           xarray.DataArray or xugrid.UgridDataArray, optional
         :param ax:            Axis.
         :type ax:             matplotlib.axes.Axes, optional
+        :param m:             Map.
+        :type m:              folium.Map, optional
         :param geom_type:     Geometry type from guidelines.
         :type geom_type:      str, optional
         :param extent_type:   Extent type from guidelines.
         :type extent_type:    str, optional
+        :param interactive:   Interactive plot.
+        :type interactive:    bool, optional
         :param show_kwargs:   Show keyword arguments.
         :type show_kwargs:    bool, optional
-        :param kwargs:        Keyword arguments for :func:`resilientplotterclass.data_xugrid.grid`.
+        :param kwargs:        Keyword arguments for :func:`resilientplotterclass.data_xarray.grid` or :func:`resilientplotterclass.data_xugrid.grid`.
         :type kwargs:         dict, optional
         :return:              Axis.
         :rtype:               matplotlib.axes.Axes
         """
 
-        # Get default types
-        if geom_type is None:
-            geom_type = self.guidelines['general']['default_types']['geom_type']
-        if extent_type is None:
-            extent_type = self.guidelines['general']['default_types']['extent_type']
+        # Determine if plot is interactive
+        if isinstance(ax, plt.Axes):
+            interactive = False
+        elif isinstance(m, folium.Map):
+            interactive = True
+        elif interactive is None:
+            interactive = False
 
-        # Combine guidelines and user keyword arguments, prioritising user keyword arguments
-        kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
-        if geom_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['geom_type'][geom_type].copy(), kwargs)
-        if extent_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
-        
-        # Remove conflicting kwargs
-        kwargs = self._remove_dictonary_conflicts(kwargs)
+        # Get keyword arguments
+        kwargs = self._get_kwargs(geom_type=geom_type, extent_type=extent_type, show_kwargs=show_kwargs, **kwargs)
 
-        # Show keyword arguments
-        if show_kwargs:
-            print('Keyword arguments for grid: {}'.format(kwargs))
-        
         # Plot grid
-        if isinstance(data, xu.UgridDataArray) or isinstance(data, xu.UgridDataset):
+        if (isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset)) and not interactive:
+            ax = rpc.data_xarray.grid(data, ax=ax, **kwargs)
+        elif (isinstance(data, xu.UgridDataArray) or isinstance(data, xu.UgridDataset)) and not interactive:
             ax = rpc.data_xugrid.grid(data, ax=ax, **kwargs)
+        elif (isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset)) and interactive:
+            raise TypeError('Interactive grid not supported for xarray.DataArray or xarray.Dataset.')
+        elif (isinstance(data, xu.UgridDataArray) or isinstance(data, xu.UgridDataset)) and interactive:
+            raise TypeError('Interactive grid not supported for xugrid.UgridDataArray or xugrid.UgridDataset.')
         else:
-            raise TypeError('data type not supported. Please provide a xugrid.UgridDataArray. Received: {}'.format(type(data)))
+            raise TypeError('data type not supported. Please provide a xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray or xugrid.UgridDataset. Received: {}'.format(type(data)))
 
         # Return axis
         return ax
     
     # Plot geometries using geopandas
-    def geometries(self, gdf, ax=None, geom_type=None, extent_type=None, show_kwargs=False, **kwargs):
+    def geometries(self, gdf, ax=None, m=None, geom_type=None, extent_type=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot geometries using geopandas.
 
         :param gdf:           geometries to plot.
         :type gdf:            geopandas.GeoDataFrame
         :param ax:            Axis.
-        :type ax:             matplotlib.axes.Axes, optional
+        :type ax:             matplotlib.axes.Axes or folium.Map, optional
+        :param m:             Map.
+        :type m:              folium.Map, optional
         :param geom_type:     Geometry type from guidelines.
         :type geom_type:      str, optional
         :param extent_type:   Extent type from guidelines.
         :type extent_type:    str, optional
+        :param interactive:   Interactive plot.
+        :type interactive:    bool, optional
         :param show_kwargs:   Show keyword arguments.
         :type show_kwargs:    bool, optional
         :param kwargs:        Keyword arguments for :func:`resilientplotterclass.geometries.plot_geometries`.
         :type kwargs:         dict, optional
         :return:              Axis.
-        :rtype:               matplotlib.axes.Axes
+        :rtype:               matplotlib.axes.Axes or geoviews.element.chart.Polygons
         """
-        
-        # Get default types
-        if geom_type is None:
-            geom_type = self.guidelines['general']['default_types']['geom_type']
-        if extent_type is None:
-            extent_type = self.guidelines['general']['default_types']['extent_type']
 
-        # Combine guidelines and user keyword arguments, prioritising user keyword arguments
-        kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
-        if geom_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['geom_type'][geom_type].copy(), kwargs)
-        if extent_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
-
-        # Remove conflicting kwargs
-        kwargs = self._remove_dictonary_conflicts(kwargs)
-
-        # Show keyword arguments
-        if show_kwargs:
-            print('Keyword arguments for geometries: {}'.format(kwargs))
+        # Determine if plot is interactive
+        if isinstance(ax, plt.Axes):
+            interactive = False
+        elif isinstance(m, folium.Map):
+            interactive = True
+        elif interactive is None:
+            interactive = False
+            
+        # Get keyword arguments
+        kwargs = self._get_kwargs(geom_type=geom_type, extent_type=extent_type, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
         
         # Plot geometries
-        if isinstance(gdf, gpd.GeoDataFrame):
+        if isinstance(gdf, gpd.GeoDataFrame) and not interactive:
             ax = rpc.geometries.plot_geometries(gdf, ax=ax, **kwargs)
+        elif isinstance(gdf, gpd.GeoDataFrame) and interactive:
+            ax = rpc.interactive.plot_geometries(gdf, m=m, **kwargs)
         else:
             raise TypeError('gdf must be a geopandas.GeoDataFrame. Received: {}'.format(type(gdf)))
 
@@ -918,58 +1025,65 @@ class rpclass:
         return ax
     
     # Plot basemap using contextily
-    def basemap(self, crs=None, ax=None, map_type=None, extent_type=None, show_kwargs=False, **kwargs):
+    def basemap(self, crs=None, ax=None, m=None, map_type=None, extent_type=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot basemap using contextily.
 
         :param crs:         Coordinate reference system.
         :type crs:          pyproj.CRS or rasterio.CRS or str, optional
         :param ax:          Axis.
-        :type ax:           matplotlib.axes.Axes, optional
+        :type ax:           matplotlib.axes.Axes or folium.Map, optional
+        :param m:           Map.
+        :type m:            folium.Map, optional
         :param map_type:    Map type from guidelines.
         :type map_type:     str, optional
         :param extent_type: Extent type from guidelines.
         :type extent_type:  str, optional
+        :param interactive: Interactive plot.
+        :type interactive:  bool, optional
         :param show_kwargs: Show keyword arguments.
         :type show_kwargs:  bool, optional
         :param kwargs:      Keyword arguments for :func:`resilientplotterclass.basemaps.plot_basemap`.
         :type kwargs:       dict, optional
-        :return:            None.
-        :rtype:             None
+        :return:            Axis.
+        :rtype:             matplotlib.axes.Axes or holoviews.element.tiles.Tiles
         """
 
-        # Get default types
+        # Determine if plot is interactive
+        if isinstance(ax, plt.Axes):
+            interactive = False
+        elif isinstance(m, folium.Map):
+            interactive = True
+        elif interactive is None:
+            interactive = False
+
+        # Get keyword arguments
         if crs is None:
             crs = self.guidelines['general']['crs']
-        if map_type is None:
-            map_type = self.guidelines['general']['default_types']['map_type']
-        if extent_type is None:
-            extent_type = self.guidelines['general']['default_types']['extent_type']
-        
-        # Combine guidelines and user keyword arguments, prioritising user keyword arguments
-        kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
-        if map_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['map_type'][map_type].copy(), kwargs)
-        if extent_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
-
-        # Remove conflicting kwargs
-        kwargs = self._remove_dictonary_conflicts(kwargs)
-
-        # Show keyword arguments
-        if show_kwargs:
-            print('Keyword arguments for basemap: {}'.format(kwargs))
+        kwargs = self._get_kwargs(map_type=map_type, extent_type=extent_type, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
         
         # Plot basemap
-        rpc.basemaps.plot_basemap(crs=crs, ax=ax, **kwargs)
+        if (isinstance(crs, pyprojCRS) or isinstance(crs, rasterioCRS) or isinstance(crs, str)) and not interactive:
+            ax = rpc.basemaps.plot_basemap(crs=crs, ax=ax, **kwargs)
+        elif interactive:
+            ax = rpc.interactive.plot_basemap(m=m, **kwargs)
+        else:
+            raise TypeError('crs must be a pyproj.CRS or rasterio.CRS or str. Received: {}'.format(type(crs)))
+        
+        # Return axis
+        return ax
     
     # Plot cartopy geometries using geopandas
-    def cartopy(self, ax=None, extent_type=None, show_kwargs=False, **kwargs):
+    def cartopy(self, ax=None, m=None, extent_type=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot cartopy geometries using geopandas.
 
         :param ax:          Axis.
-        :type ax:           matplotlib.axes.Axes, optional
+        :type ax:           matplotlib.axes.Axes or folium.Map, optional
+        :param m:           Map.
+        :type m:            folium.Map, optional
         :param extent_type: Extent type from guidelines.
         :type extent_type:  str, optional
+        :param interactive: Interactive plot.
+        :type interactive:  bool, optional
         :param show_kwargs: Show keyword arguments.
         :type show_kwargs:  bool, optional
         :param kwargs:      Keyword arguments for :func:`resilientplotterclass.geometries.plot_geometries`.
@@ -978,339 +1092,24 @@ class rpclass:
         :rtype:             matplotlib.axes.Axes
         """
 
-        # Get default types
-        if extent_type is None:
-            extent_type = self.guidelines['general']['default_types']['extent_type']
+        # Determine if plot is interactive
+        if isinstance(ax, plt.Axes):
+            interactive = False
+        elif isinstance(m, folium.Map):
+            interactive = True
+        elif interactive is None:
+            interactive = False
+
+        # Get keyword arguments
+        kwargs = self._get_kwargs(extent_type=extent_type, show_kwargs=show_kwargs, **kwargs)
         
-        # Combine guidelines and user keyword arguments, prioritising user keyword arguments
-        kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
-        if extent_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['extent_type'][extent_type].copy(), kwargs)
-        
-        # Show keyword arguments
-        if show_kwargs:
-            print('Keyword arguments for cartopy: {}'.format(kwargs))
-            
         # Plot cartopy geometries
-        ax = rpc.geometries.plot_geometries(self.get_cartopy(), ax=ax, **kwargs)
+        if not interactive:
+            ax = rpc.geometries.plot_geometries(self.get_cartopy(), ax=ax, **kwargs)
+        else:
+            ax = rpc.interactive.plot_cartopy(self.get_cartopy(), m=m, **kwargs)
 
         # Return axis
-        return ax
-    
-    def interactive_data(self, data, data_type=None, show_kwargs=False, **kwargs):
-        """Plot data interactively.
-
-        :param data:        Data to plot.
-        :type data:         xarray.DataArray or xugrid.UgridDataArray, optional
-        :param data_type:   Data type from guidelines.
-        :type data_type:    str, optional
-        :param extent_type: Extent type from guidelines.
-        :type extent_type:  str, optional
-        :param show_kwargs: Show keyword arguments.
-        :type show_kwargs:  bool, optional
-        :param kwargs:      Keyword arguments for :func:`resilientplotterclass.interactive.da_interactive` or :func:`resilientplotterclass.interactive.uda_interactive`.
-        :type kwargs:       dict, optional
-        :return:            Interactive plot.
-        :rtype:             holoviews.core.spaces.DynamicMap
-        """
-
-        # Get plot_type (function name)
-        plot_type = inspect.currentframe().f_code.co_name
-
-        # Combine guidelines and user keyword arguments, prioritising user keyword arguments
-        kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
-        if data_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['data_type'][data_type][plot_type].copy(), kwargs)
-        
-        # Remove conflicting kwargs
-        kwargs = self._remove_dictonary_conflicts(kwargs, plot_type)
-
-        # Show keyword arguments
-        if show_kwargs:
-            print('Keyword arguments for {}: {}'.format(plot_type, kwargs))
-        
-        # Plot data
-        if isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset):
-            p = rpc.interactive.interactive_da(data, **kwargs)
-        elif isinstance(data, xu.UgridDataArray) or isinstance(data, xu.UgridDataset):
-            p = rpc.interactive.interactive_uda(data, **kwargs)
-        else:
-            raise TypeError('data type not supported. Please provide a xarray.DataArray or xugrid.UgridDataArray. Received: {}'.format(type(data)))
-        
-        # Return plot
-        return p
-    
-    def interactive_geometries(self, gdf, geom_type=None, show_kwargs=False, **kwargs):
-        """Plot geometries interactively.
-
-        :param gdf:           Geodataframe to plot.
-        :type gdf:            geopandas.GeoDataFrame
-        :param ax:            Axis.
-        :type ax:             matplotlib.axes.Axes, optional
-        :param geom_type:     Geometry type from guidelines.
-        :type geom_type:      str, optional
-        :param show_kwargs:   Show keyword arguments.
-        :type show_kwargs:    bool, optional
-        :param kwargs:        Keyword arguments for :func:`resilientplotterclass.interactive.geometries_interactive`.
-        :type kwargs:         dict, optional
-        :return:              Interactive plot.
-        :rtype:               holoviews.element.path.Polygons
-        """
-
-        # Get plot_type (function name)
-        plot_type = inspect.currentframe().f_code.co_name
-
-        # Combine guidelines and user keyword arguments, prioritising user keyword arguments
-        kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
-        if geom_type is not None:
-            kwargs = self._combine_dictionaries(self.guidelines['geom_type'][geom_type].copy(), kwargs)
-
-        # Remove conflicting kwargs
-        kwargs = self._remove_dictonary_conflicts(kwargs, plot_type)
-
-        # Show keyword arguments
-        if show_kwargs:
-            print('Keyword arguments for {}: {}'.format(plot_type, kwargs))
-        
-        # Plot geometries interactively
-        p = rpc.interactive.interactive_gdf(gdf, **kwargs)
-
-        # Return plot
-        return p
-    
-    def interactive_cartopy(self, show_kwargs=False, **kwargs):
-        """Plot cartopy geometries interactively.
-
-        :param ax:          Axis.
-        :type ax:           matplotlib.axes.Axes, optional
-        :param show_kwargs: Show keyword arguments.
-        :type show_kwargs:  bool, optional
-        :param kwargs:      Keyword arguments for :func:`resilientplotterclass.interactive.interactive_gdf_cartopy`.
-        :type kwargs:       dict, optional
-        :return:            Interactive plot.
-        :rtype:             holoviews.core.overlay.Overlay
-        """
-
-        # Get plot_type (function name)
-        plot_type = inspect.currentframe().f_code.co_name
-
-        # Combine guidelines and user keyword arguments, prioritising user keyword arguments
-        kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
-
-        # Remove conflicting kwargs
-        kwargs = self._remove_dictonary_conflicts(kwargs, plot_type)
-
-        # Show keyword arguments
-        if show_kwargs:
-            print('Keyword arguments for {}: {}'.format(plot_type, kwargs))
-        
-        # Plot cartopy geometries interactively 
-        p = rpc.interactive.interactive_gdf_cartopy(self.get_cartopy(), **kwargs)
-
-        # Return plot
-        return p
-    
-    def interactive_basemap(self, map_type=None, show_kwargs=False, **kwargs):
-        """Plot basemap interactively.
-
-        :return: 
-        :rtype:  
-        """
-
-        # Get plot_type (function name)
-        plot_type = inspect.currentframe().f_code.co_name
-
-        # Combine guidelines and user keyword arguments, prioritising user keyword arguments
-        if map_type is None:
-            map_type = self.guidelines['general']['map_type']
-
-        # Remove conflicting kwargs
-        kwargs = self._remove_dictonary_conflicts(kwargs, plot_type)
-
-        # Show keyword arguments
-        if show_kwargs:
-            print('Keyword arguments for {}: {}'.format(plot_type, kwargs))
-
-        # Plot basemap interactively
-        p = rpc.interactive.interactive_basemap(map_type=map_type, **kwargs)
-
-        # Return plot
-        return p
-    
-    # =============================================================================
-    # Specialised plot methods
-    # =============================================================================
-    # Plot bathymetry
-    def bathymetry(self, da, gdf=None, ax=None, data_type='bathymetry', geom_type='aoi', map_type='satellite', extent_type=None):
-        """Plot bathymetry.
-
-        :param da:            DataArray or UgridDataArray to plot.
-        :type da:             xarray.DataArray or xugrid.UgridDataArray
-        :param gdf:           Geodataframe to plot.
-        :type gdf:            geopandas.GeoDataFrame, optional
-        :param ax:            Axis.
-        :type ax:             matplotlib.axes.Axes, optional
-        :param data_type:     Data type from guidelines.
-        :type data_type:      str, optional
-        :param geom_type:     Geometry type from guidelines.
-        :type geom_type:      str, optional
-        :param map_type:      Map type from guidelines.
-        :type map_type:       str, optional
-        :param extent_type:   Extent type from guidelines.
-        :type extent_type:    str, optional
-        :return:              Figure and axis.
-        :rtype:               tuple[matplotlib.figure.Figure, matplotlib.axes.Axes]
-        """
-                
-        # Create axis if not provided
-        if ax is None:
-            _, ax = plt.subplots(1, 1, figsize=(10, 10))
-
-        # Remove values above 0 (land)
-        if isinstance(da, xr.DataArray):
-            da = da.where(da < 0)
-        elif isinstance(da, xu.UgridDataArray):
-            da = da.where(da < 0, drop=True)
-        
-        # Plot bathymetry
-        self.imshow(da, ax=ax, data_type=data_type, extent_type=extent_type)
-        self.contour(da, ax=ax, data_type=data_type, extent_type=extent_type)
-        
-        # Plot geometries
-        if gdf is not None:
-            self.geometries(gdf, ax=ax, geom_type=geom_type, extent_type=extent_type)
-            ax.legend(loc='upper right')
-
-        # Get coordinate reference system
-        if isinstance(da, xr.DataArray):
-            crs = da.rio.crs
-        elif isinstance(da, xu.UgridDataArray):
-            crs = da.grid.crs
-
-        # Plot basemap
-        self.basemap(crs=crs, ax=ax, map_type=map_type, extent_type=extent_type)
-
-        # Return figure and axis
-        return ax
-
-    # Plot topography
-    def topography(self, da, gdf=None, ax=None, data_type='topography', geom_type='aoi', map_type='satellite', extent_type=None):
-        pass
-
-    # Plot bedforms
-    def bedforms(self, da, ax=None, data_type='bathymetry', geom_type='aoi', map_type='satellite', extent_type=None):
-        pass
-
-    # Plot morphology
-    def morphology(self, da, gdf=None, ax=None, data_type='bathymetry', geom_type='aoi', map_type='satellite', extent_type=None):
-        pass
-
-    # Plot flow velocity
-    def flow_velocity(self, da, gdf=None, ax=None, data_type='bathymetry', geom_type='aoi', map_type='satellite', extent_type=None):
-        pass
-
-    # Plot flow direction
-    def flow_direction(self,da, gdf=None, ax=None, data_type='bathymetry', geom_type='aoi', map_type='satellite', extent_type=None):
-        pass
-
-    # Plot wave height
-    def wave_height(self, da, gdf=None, ax=None, data_type='bathymetry', geom_type='aoi', map_type='satellite', extent_type=None):
-        pass
-
-    # Plot wave period
-    def wave_period(self, da, gdf=None, ax=None, data_type='bathymetry', geom_type='aoi', map_type='satellite', extent_type=None):
-        pass
-
-    # Plot wave direction
-    def wave_direction(self, da, gdf=None, ax=None, data_type='bathymetry', geom_type='aoi', map_type='satellite', extent_type=None):
-        pass
-    
-    # Plot sediment transport
-    def sediment_transport(self, da, gdf=None, data_type='bathymetry', geom_type='aoi', map_type='satellite', extent_type=None):
-        pass
-    
-    # Plot sediment concentration
-    def sediment_concentration(self, da, gdf=None, ax=None, data_type='bathymetry', geom_type='aoi', map_type='satellite', extent_type=None):
-        pass
-
-    # Plot sediment particle size
-    def sediment_particle_size(self, da, gdf=None, ax=None, data_type='bathymetry', geom_type='aoi', map_type='satellite', extent_type=None):
-        pass
-
-    # Plot pretty geometries
-    def pretty_geometries(self, gdf, ax=None, geom_type='aoi', map_type='satellite', extent_type=None):
-        """Plot pretty geometries.
-
-        :param gdf:           Geodataframe to plot.
-        :type gdf:            geopandas.GeoDataFrame
-        :param ax:            Axis.
-        :type ax:             matplotlib.axes.Axes, optional
-        :param geom_type:     Geometry type from guidelines.
-        :type geom_type:      str, optional
-        :param map_type:      Map type from guidelines.
-        :type map_type:       str, optional
-        :param extent_type:   Extent type from guidelines.
-        :type extent_type:    str, optional
-        :return:              Figure and axis.
-        :rtype:               tuple[matplotlib.figure.Figure, matplotlib.axes.Axes]
-        """
-            
-        # Create axis if not provided
-        if ax is None:
-            _, ax = plt.subplots(1, 1, figsize=(10, 10))
-
-        # Plot geometries
-        self.geometries(gdf, ax=ax, geom_type=geom_type, extent_type=extent_type)
-        ax.legend(loc='upper right')
-
-        # Get coordinate reference system
-        crs = gdf.crs
-
-        # Plot basemap
-        self.basemap(crs=crs, ax=ax, map_type=map_type, extent_type=extent_type)
-
-        # Return figure and axis
-        return ax
-    
-    # Plot pretty grid
-    def pretty_grid(self, da, gdf=None, ax=None, geom_type='aoi', map_type='satellite', extent_type=None):
-        """Plot pretty grid.
-
-        :param da:             DataArray or UgridDataArray to plot.
-        :type da:              xarray.DataArray or xugrid.UgridDataArray
-        :param gdf:            Geodataframe to plot.
-        :type gdf:             geopandas.GeoDataFrame, optional
-        :param ax:             Axis.
-        :type ax:              matplotlib.axes.Axes, optional
-        :param geom_type:      Geometry type from guidelines.
-        :type geom_type:       str, optional
-        :param map_type:       Map type from guidelines.
-        :type map_type:        str, optional
-        :param extent_type:    Extent type from guidelines.
-        :type extent_type:     str, optional
-        :return:               Figure and axis.
-        :rtype:                tuple[matplotlib.figure.Figure, matplotlib.axes.Axes]
-        """
-
-        # Create axis if not provided
-        if ax is None:
-            _, ax = plt.subplots(1, 1, figsize=(10, 10))
-
-        # Plot grid
-        self.grid(da, ax=ax, extent_type=extent_type)
-        
-        # Plot geometries
-        if gdf is not None:
-            self.geometries(gdf, ax=ax, geom_type=geom_type, extent_type=extent_type)
-            ax.legend(loc='upper right')
-
-        # Get coordinate reference system
-        crs = da.grid.crs
-
-        # Plot basemap
-        self.basemap(crs=crs, ax=ax, map_type=map_type, extent_type=extent_type)
-
-        # Return figure and axis
         return ax
     
     # =============================================================================

@@ -1,7 +1,7 @@
 {
     "metadata": {
         "title": "Default guidelines",
-        "date": "2024-10-25",
+        "date": "2025-05-01",
         "author(s)": ["Math van Soest, Ruben White"]
     },
 
@@ -15,36 +15,36 @@
     },
 
     "data_type": {
-        "data":{
+        "default":{
             "pcolormesh": {
                 "cmap": "bathymetry",
                 "center": false,
                 "zorder": 1,
-                "append_axes_kwargs": {"position": "right", "size": 0.4, "pad": 0.2}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.2}
             },
             "imshow": {
                 "cmap": "bathymetry",
                 "center": false,
                 "zorder": 1,
-                "append_axes_kwargs": {"position": "right", "size": 0.4, "pad": 0.2}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.2}
             },
             "scatter": {
                 "edgecolor": "none",
                 "cmap": "bathymetry",
                 "zorder": 1,
-                "append_axes_kwargs": {"position": "right", "size": 0.4, "pad": 0.2}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.2}
             },
             "contourf": {
                 "cmap": "bathymetry",
                 "center": false,
                 "zorder": 1,
-                "append_axes_kwargs": {"position": "right", "size": 0.4, "pad": 0.2}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.2}
             },
             "contour": {
                 "cmap": "bathymetry_contour",
                 "center": false,
                 "zorder": 1,
-                "append_axes_kwargs": {"position": "right", "size": 0.4, "pad": 0.2}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.2}
             },
             "quiver": {
                 "add_guide": false,
@@ -53,13 +53,13 @@
                 "angles": "xy",
                 "pivot": "tail",
                 "zorder": 1.5,
-                "append_axes_kwargs": {"position": "right", "size": 0.4, "pad": 0.2}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.2}
             },
             "streamplot": {
                 "add_guide": false,
                 "color": "black",
                 "zorder": 1.5,
-                "append_axes_kwargs": {"position": "right", "size": 0.4, "pad": 0.2}
+                "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.2}
             }
         },
         "image":{
@@ -73,28 +73,28 @@
                 "cmap": "bathymetry",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {"label": "Bathymetry [m]"},
+                "cbar_kwargs": {"label": "Bathymetry [m@vrl]"},
                 "append_axes_kwargs": {"position": "right", "size": 0.4, "pad": 0.2}
             },
             "imshow": {
                 "cmap": "bathymetry",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {"label": "Bathymetry [m]"},
+                "cbar_kwargs": {"label": "Bathymetry [m@vrl]"},
                 "append_axes_kwargs": {"position": "right", "size": 0.4, "pad": 0.2}
             },
             "scatter": {
                 "edgecolor": "none",
                 "cmap": "bathymetry",
                 "zorder": 1,
-                "cbar_kwargs": {"label": "Bathymetry [m]"},
+                "cbar_kwargs": {"label": "Bathymetry [m@vrl|]"},
                 "append_axes_kwargs": {"position": "right", "size": 0.4, "pad": 0.2}
             },
             "contourf": {
                 "cmap": "bathymetry",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {"label": "Bathymetry [m]"},
+                "cbar_kwargs": {"label": "Bathymetry [m@vrl]"},
                 "append_axes_kwargs": {"position": "right", "size": 0.4, "pad": 0.2}
             },
             "contour": {
@@ -648,7 +648,7 @@
     },
     
     "geom_type": {
-        "geom": {
+        "default": {
             "zorder": 2,
             "append_axes_kwargs": {"position": "right", "size": 0.4, "pad": 0.2}
         },
@@ -670,6 +670,11 @@
     },
 
     "map_type": {
+        "default": {
+            "source": "OpenStreetMap.Mapnik",
+            "attribution": false,
+            "zorder": 0
+        },
         "osm": {
             "source": "OpenStreetMap.Mapnik",
             "attribution": false,
@@ -679,7 +684,12 @@
             "source": "Esri.WorldImagery",
             "attribution": false,
             "zorder": 0
-        }  
+        },
+        "grey": {
+            "source": "CartoDB.Positron",
+            "attribution": false,
+            "zorder": 0
+        }
     },
     
     "extent_type": {
