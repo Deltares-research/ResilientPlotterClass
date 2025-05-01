@@ -1,7 +1,7 @@
 Documentation
 -------------
 
-The `ResilientPlotterClass`_ is a python package to create resilient plots for geospatial data. This package is a wrapper around the plotting functionalities of `xarray`_,
+The `ResilientPlotterClass`_ is a package to create resilient plots for geospatial data. This package is a wrapper around the plotting functionalities of `xarray`_,
 `xugrid`_, `geopandas`_, `matplotlib`_, `contextily`_, `cartopy`_ and `folium`_.
 
 .. _ResilientPlotterClass: https://github.com/Deltares-research/ResilientPlotterClass

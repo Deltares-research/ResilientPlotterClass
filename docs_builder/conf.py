@@ -194,6 +194,13 @@ exclude_patterns = ['_build', 'conf.py', 'make.bat', 'Makefile']
 
 html_theme = 'pydata_sphinx_theme'
 html_logo = '_logo/Resilient_Plotter_Class_Logo.png'
-
+html_sidebars = {
+  "index": [],
+}
+html_theme_options = {
+    "secondary_sidebar_items": {
+        "index": [],
+    },
+}
 
 # %%
