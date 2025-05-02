@@ -29,6 +29,7 @@ Functions
     resilientplotterclass.interactive.contourf
     resilientplotterclass.interactive.imshow
     resilientplotterclass.interactive.pcolormesh
+    resilientplotterclass.interactive.plot_basemap
     resilientplotterclass.interactive.plot_geometries
     resilientplotterclass.interactive.quiver
     resilientplotterclass.interactive.scatter

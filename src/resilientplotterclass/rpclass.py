@@ -1168,7 +1168,7 @@ class rpclass:
         if not interactive:
             ax = rpc.geometries.plot_geometries(self.get_cartopy(), ax=ax, **kwargs)
         else:
-            ax = rpc.interactive.plot_cartopy(self.get_cartopy(), m=m, **kwargs)
+            raise TypeError('Interactive cartopy not supported.')
 
         # Return axis
         return ax
