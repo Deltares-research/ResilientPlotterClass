@@ -116,28 +116,28 @@
                 "cmap": "bedforms",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {"label": "Bedforms [m]"},
+                "cbar_kwargs": {"label": "Bedform elevation [m]"},
                 "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.2}
             },
             "imshow": {
                 "cmap": "bedforms",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {"label": "Bedforms [m]"},
+                "cbar_kwargs": {"label": "Bedform elevation [m]"},
                 "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.2}
             },
             "scatter": {
                 "edgecolor": "none",
                 "cmap": "bedforms",
                 "zorder": 1,
-                "cbar_kwargs": {"label": "Bedforms [m]"},
+                "cbar_kwargs": {"label": "Bedform elevation [m]"},
                 "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.2}
             },
             "contourf": {
                 "cmap": "bedforms",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {"label": "Bedforms [m]"},
+                "cbar_kwargs": {"label": "Bedform elevation [m]"},
                 "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.2}
             },
             "contour": {
@@ -224,28 +224,28 @@
                 "cmap": "cet_CET_C8s",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {"label": "Flow direction [degN]"},
+                "cbar_kwargs": {"label": "Flow direction [Degrees North]"},
                 "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.2}
             },
             "imshow": {
                 "cmap": "cet_CET_C8s",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {"label": "Flow direction [degN]"},
+                "cbar_kwargs": {"label": "Flow direction [Degrees North]"},
                 "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.2}
             },
             "contourf": {
                 "cmap": "cet_CET_C8s",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {"label": "Flow direction [degN]"},
+                "cbar_kwargs": {"label": "Flow direction [Degrees North]"},
                 "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.2}
             },
             "scatter": {
                 "edgecolor": "none",
                 "cmap": "cet_CET_C8s",
                 "zorder": 1,
-                "cbar_kwargs": {"label": "Flow direction [degN]"},
+                "cbar_kwargs": {"label": "Flow direction [Degrees North]"},
                 "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.2}
             },
             "contour": {
@@ -347,28 +347,28 @@
                 "cmap": "cet_CET_C8s",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {"label": "Wave direction [degN]"},
+                "cbar_kwargs": {"label": "Wave direction [Degrees North]"},
                 "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.2}
             },
             "imshow": {
                 "cmap": "cet_CET_C8s",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {"label": "Wave direction [degN]"},
+                "cbar_kwargs": {"label": "Wave direction [Degrees North]"},
                 "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.2}
             },
             "scatter": {
                 "edgecolor": "none",
                 "cmap": "cet_CET_C8s",
                 "zorder": 1,
-                "cbar_kwargs": {"label": "Wave direction [degN]"},
+                "cbar_kwargs": {"label": "Wave direction [Degrees North]"},
                 "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.2}
             },
             "contourf": {
                 "cmap": "cet_CET_C8s",
                 "center": false,
                 "zorder": 1,
-                "cbar_kwargs": {"label": "Wave direction [degN]"},
+                "cbar_kwargs": {"label": "Wave direction [Degrees North]"},
                 "append_axes_kwargs": {"position": "right", "size": 0.2, "pad": 0.2}
             },
             "contour": {
@@ -719,11 +719,11 @@
         "bathymetry": {
             "pcolormesh": {
                 "cmap": "bathymetry",
-                "legend_kwds": {"label": "Bathymetry [m@vrl]"}
+                "legend_kwds": {"caption": "Bathymetry [m@vrl]"}
             },
             "imshow": {
                 "cmap": "bathymetry",
-                "legend_kwds": {"label": "Bathymetry [m@vrl]"}
+                "legend_kwds": {"caption": "Bathymetry [m@vrl]"}
             }
         }
     },
