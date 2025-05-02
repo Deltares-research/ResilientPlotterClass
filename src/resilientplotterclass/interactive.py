@@ -8,24 +8,24 @@ from folium.plugins import Draw
 def _explore_image(da, m, cmap='Spectral_r', vmin=None, vmax=None, legend=None, legend_kwds={}, **kwargs):
     """"Plot data interactively using folium.
 
-    :param da:                 Data to plot.
-    :type da:                  xarray.DataArray
-    :param m:                  Folium map to plot on.
-    :type m:                   folium.Map, optional
-    :param cmap:               Colormap to use.
-    :type cmap:                str, optional
-    :param vmin:               Minimum value for colormap.
-    :type vmin:                float, optional
-    :param vmax:               Maximum value for colormap.
-    :type vmax:                float, optional
-    :param legend:             Whether to show legend.
-    :type legend:              bool, optional
-    :param legend_kwds:        Keyword arguments for legend.
-    :type legend_kwds:         dict, optional
-    :param kwargs:             Keyword arguments for :func:`folium.raster_layers.ImageOverlay`.
-    :type kwargs:              dict, optional
-    :return:                   Plot.
-    :rtype:                    folium.Map
+    :param da:          Data to plot.
+    :type da:           xarray.DataArray
+    :param m:           Folium map to plot on.
+    :type m:            folium.Map, optional
+    :param cmap:        Colormap to use.
+    :type cmap:         str, optional
+    :param vmin:        Minimum value for colormap.
+    :type vmin:         float, optional
+    :param vmax:        Maximum value for colormap.
+    :type vmax:         float, optional
+    :param legend:      Whether to show legend.
+    :type legend:       bool, optional
+    :param legend_kwds: Keyword arguments for legend.
+    :type legend_kwds:  dict, optional
+    :param kwargs:      Keyword arguments for :func:`folium.raster_layers.ImageOverlay`.
+    :type kwargs:       dict, optional
+    :return:            Plot.
+    :rtype:             folium.Map
 
     :See also: `folium.raster_layers.ImageOverlay <https://python-visualization.github.io/folium/latest/reference.html#folium.raster_layers.ImageOverlay>`_
     :See also: `folium.LinearColormap <https://python-visualization.github.io/folium/latest/advanced_guide/colormaps.html>`_
@@ -130,28 +130,28 @@ def pcolormesh(da, m=None, skip=1, smooth=1, **kwargs):
 def imshow(da, m=None, skip=1, smooth=1, **kwargs):
     """Plot data interactively using imshow.
 
-    :param da:                 Data to plot.
-    :type da:                  xarray.DataArray
-    :param m:                  Folium map to plot on.
-    :type m:                   folium.Map, optional
-    :param skip:               Plot every nth value in x and y direction.
-    :type skip:                int, optional
-    :param smooth:             Smooth data array with rolling mean in x and y direction.
-    :type smooth:              int, optional
-    :param xlim:               x limits.
-    :type xlim:                list[float], optional
-    :param ylim:               y limits.
-    :type ylim:                list[float], optional
+    :param da:     Data to plot.
+    :type da:      xarray.DataArray
+    :param m:      Folium map to plot on.
+    :type m:       folium.Map, optional
+    :param skip:   Plot every nth value in x and y direction.
+    :type skip:    int, optional
+    :param smooth: Smooth data array with rolling mean in x and y direction.
+    :type smooth:  int, optional
+    :param xlim:   x limits.
+    :type xlim:    list[float], optional
+    :param ylim:   y limits.
+    :type ylim:    list[float], optional
     
-    :param kwargs:             Keyword arguments for :func:`resilientplotterclass.interactive._explore_image`.
-    :type kwargs:              dict, optional
-    :return:                   Plot.
-    :rtype:                    folium.Map
+    :param kwargs: Keyword arguments for :func:`resilientplotterclass.interactive._explore_image`.
+    :type kwargs:  dict, optional
+    :return:       Plot.
+    :rtype:        folium.Map
     """
 
     # Reproject DataArray
     if da.rio.crs != 'EPSG:4326':
-        print("\033[93m Reprojecting DataArray to EPSG:4326.\033[0m")
+        print("\033[93mReprojecting DataArray to EPSG:4326.\033[0m")
         da = da.rio.reproject('EPSG:4326')
     
     # Get map
@@ -197,21 +197,21 @@ def streamplot(da, m=None, skip=1, smooth=1, **kwargs):
 def plot_geometries(gdf, m=None, **kwargs):
     """Plot geometries interactively using folium.
 
-    :param gdf:                GeoDataFrame to plot.
-    :type gdf:                 geopandas.GeoDataFrame
-    :param m:                  Folium map to plot on.
-    :type m:                   folium.Map, optional
-    :param kwargs:             Keyword arguments for :func:`geopandas.explore`.
-    :type kwargs:              dict, optional
-    :return:                   Plot.
-    :rtype:                    folium.Map
+    :param gdf:    GeoDataFrame to plot.
+    :type gdf:     geopandas.GeoDataFrame
+    :param m:      Folium map to plot on.
+    :type m:       folium.Map, optional
+    :param kwargs: Keyword arguments for :func:`geopandas.explore`.
+    :type kwargs:  dict, optional
+    :return:       Plot.
+    :rtype:        folium.Map
 
     :See also: `geopandas.explore <https://geopandas.org/en/stable/docs/reference/api/geopandas.GeoDataFrame.explore.html>`_
     """
 
     # Reproject GeoDataFrame
     if gdf.crs != 'EPSG:4326':
-        print("\033[93m Reprojecting GeoDataFrame to EPSG:4326.\033[0m")
+        print("\033[93mReprojecting GeoDataFrame to EPSG:4326.\033[0m")
         gdf = gdf.to_crs('EPSG:4326')
     
     # Get map
@@ -223,6 +223,28 @@ def plot_geometries(gdf, m=None, **kwargs):
 
     # Plot GeoDataFrame
     gdf.explore(m=m, **kwargs)
+
+    # Return plot
+    return m
+
+def plot_basemap(m=None, **kwargs):
+    """Plot basemaps interactively using folium.
+
+    :param m:      Folium map to plot on.
+    :type m:       folium.Map, optional
+    :param kwargs: Keyword arguments for :func:`folium.Map`.
+    :type kwargs:  dict, optional
+    :return:       Plot.
+    :rtype:        folium.Map
+
+    :See also: `folium.TileLayer <https://python-visualization.github.io/folium/latest/reference.html#folium.raster_layers.TileLayer>`_
+    """
+
+    # Get map
+    if m is None:
+         m = folium.Map()
+    # Plot basemap
+    folium.TileLayer(**kwargs).add_to(m)
 
     # Return plot
     return m

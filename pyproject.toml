@@ -14,9 +14,11 @@ dependencies = [
     'contextily',
     'cartopy',
     'folium',
+    'mapclassify',
     'colorcet',
     'cmocean',
     'opencv-python',
+    'netcdf4',
 ]
 
 [project.optional-dependencies]

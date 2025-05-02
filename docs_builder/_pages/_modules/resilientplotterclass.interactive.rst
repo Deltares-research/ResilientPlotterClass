@@ -12,6 +12,7 @@
       contourf
       imshow
       pcolormesh
+      plot_basemap
       plot_geometries
       quiver
       scatter

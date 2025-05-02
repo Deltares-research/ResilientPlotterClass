@@ -703,12 +703,60 @@
     },
 
     "interactive_data_style": {
+        "default": {
+            "pcolormesh": {
+                "cmap": "bathymetry"
+            },
+            "imshow": {
+                "cmap": "bathymetry"
+            }
+        },
+        "image": {
+            "imshow": {
+                "cmap": "bathymetry"
+            }
+        },
+        "bathymetry": {
+            "pcolormesh": {
+                "cmap": "bathymetry",
+                "legend_kwds": {"label": "Bathymetry [m@vrl]"}
+            },
+            "imshow": {
+                "cmap": "bathymetry",
+                "legend_kwds": {"label": "Bathymetry [m@vrl]"}
+            }
+        }
     },
 
     "interactive_geom_style": {
+        "default": {
+            "tooltip": false
+        },
+        "aoi": {
+            "style_kwds": {"color": "blue", "fill": false},
+            "name": "Area of interest",
+            "tooltip": false
+        },
+        "grid": {
+            "style_kwds": {"color": "cyan", "fill": false},
+            "name": "Grid",
+            "tooltip": false
+        }
     },
 
     "interactive_map_style": {
+        "default": {
+            "tiles": "OpenStreetMap"
+        },
+        "osm": {
+            "tiles": "OpenStreetMap"
+        },
+        "satellite": {
+            "tiles": "Esri.WorldImagery"
+        },
+        "grey": {
+            "tiles": "CartoDB.Positron"
+        }
     },
 
     "interactive_extent_style": {
