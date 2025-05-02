@@ -19,7 +19,7 @@
     "geom":{
     },
 
-    "data_type": {
+    "data_style": {
         "bathymetry": {
             "pcolormesh": {"cbar_kwargs": null},
             "imshow": {"cbar_kwargs": null},
@@ -43,13 +43,13 @@
         }
     },
 
-    "geom_type": {
+    "geom_style": {
     },
 
-    "map_type": {
+    "map_style": {
     },
 
-    "extent_type": {
+    "extent_style": {
     },
     
     "interactive_data_style": {
