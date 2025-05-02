@@ -1,5 +1,6 @@
 # Packages
 import folium
+import gc
 import geopandas as gpd
 import html
 import inspect
@@ -576,18 +577,16 @@ class rpclass:
     def save(self, fig=None, m=None, file_path=None, **kwargs):
         """Save figure.
 
-        :param file_path:   File path to save figure.
-        :type file_path:    str
-        :param fig:         Figure to save.
-        :type fig:          matplotlib.figure.Figure or folium.Map
-        :param dpi:         Dots per inch.
-        :type dpi:          int, optional
-        :param bbox_inches: Bounding box in inches.
-        :type bbox_inches:  str, optional
-        :param kwargs:      Keyword arguments for :func:`matplotlib.figure.Figure.savefig`.
-        :type kwargs:       dict, optional
-        :return:            None.
-        :rtype:             None
+        :param fig:       Figure to save.
+        :type fig:        matplotlib.figure.Figure
+        :param m:         Map to save.
+        :type m:          folium.Map
+        :param file_path: File path to save the figure.
+        :type file_path:  str
+        :param kwargs:    Keyword arguments for :func:`matplotlib.figure.Figure.savefig` or :func:`folium.Map.save`.
+        :type kwargs:     dict, optional
+        :return:          None.
+        :rtype:           None
 
         See also: `matplotlib.figure.Figure.savefig() <https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure.savefig>`_
         """
@@ -611,6 +610,34 @@ class rpclass:
             fig.savefig(file_path, **kwargs)
         else:
             fig.save(file_path, **kwargs)
+
+    # Close figure
+    def close(self, fig=None, m=None):
+        """Close figure.
+
+        :param fig: Figure to close.
+        :type fig:  matplotlib.figure.Figure
+        :param m:   Map to close.
+        :type m:    folium.Map
+        :return:    None.
+        :rtype:     None   
+        """
+
+        # Determine if plot is interactive
+        fig = m if fig is None else fig
+        if isinstance(fig, plt.Figure):
+            interactive = False
+        elif isinstance(fig, folium.Map):
+            interactive = True
+        else:
+            raise TypeError('fig must be a matplotlib.figure.Figure or folium.Map. Received: {}'.format(type(fig)))
+
+        # Close figure
+        if not interactive:
+            plt.close(fig)
+            gc.collect()
+        else:
+            raise TypeError('fig must be a matplotlib.figure.Figure. Received: {}'.format(type(fig)))
 
     # Create video
     def create_video(self, file_paths, file_path_video, fps=5, **kwargs):
