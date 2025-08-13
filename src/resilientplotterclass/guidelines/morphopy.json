@@ -4,63 +4,75 @@
         "date": "2025-05-01",
         "author(s)": "Ruben White"
     },
-    
     "general": {
         "crs": null,
         "vrl": null,
         "xy_unit": null,
         "cartopy_bounds": null,
-        "cartopy_features": ["land", "ocean", "lakes", "rivers", "coastline", "borders", "states"],
+        "cartopy_features": [
+            "land",
+            "ocean",
+            "lakes",
+            "rivers",
+            "coastline",
+            "borders",
+            "states"
+        ]
     },
-    
-    "data": {
-    },
-
-    "geom":{
-    },
-
+    "data": {},
+    "geom": {},
     "data_style": {
         "bathymetry": {
-            "pcolormesh": {"cbar_kwargs": null},
-            "imshow": {"cbar_kwargs": null},
-            "scatter": {"cbar_kwargs": null},
-            "contourf": {"cbar_kwargs": null},
+            "pcolormesh": {
+                "cbar_kwargs": null
+            },
+            "imshow": {
+                "cbar_kwargs": null
+            },
+            "scatter": {
+                "cbar_kwargs": null
+            },
+            "contourf": {
+                "cbar_kwargs": null
+            },
             "contour": {}
         },
         "bedforms": {
-            "pcolormesh": {"cbar_kwargs": null},
-            "imshow": {"cbar_kwargs": null},
-            "scatter": {"cbar_kwargs": null},
-            "contourf": {"cbar_kwargs": null},
+            "pcolormesh": {
+                "cbar_kwargs": null
+            },
+            "imshow": {
+                "cbar_kwargs": null
+            },
+            "scatter": {
+                "cbar_kwargs": null
+            },
+            "contourf": {
+                "cbar_kwargs": null
+            },
             "contour": {}
         },
         "morphology": {
-            "pcolormesh": {"cbar_kwargs": null},
-            "imshow": {"cbar_kwargs": null},
-            "scatter": {"cbar_kwargs": null},
-            "contourf": {"cbar_kwargs": null},
+            "pcolormesh": {
+                "cbar_kwargs": null
+            },
+            "imshow": {
+                "cbar_kwargs": null
+            },
+            "scatter": {
+                "cbar_kwargs": null
+            },
+            "contourf": {
+                "cbar_kwargs": null
+            },
             "contour": {}
         }
     },
-
-    "geom_style": {
-    },
-
-    "map_style": {
-    },
-
-    "extent_style": {
-    },
-    
-    "interactive_data_style": {
-    },
-
-    "interactive_geom_style": {
-    },
-
-    "interactive_map_style": {
-    },
-
-    "interactive_extent_style": {
-    }
+    "geom_style": {},
+    "map_style": {},
+    "extent_style": {},
+    "interactive_data_style": {},
+    "interactive_geom_style": {},
+    "interactive_map_style": {},
+    "interactive_extent_style": {}
 }
