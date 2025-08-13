@@ -1,5 +1,5 @@
 # All files in notebooks/tests
-notebooks/tests
+notebooks/tests/**
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
