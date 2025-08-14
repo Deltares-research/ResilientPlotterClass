@@ -5,7 +5,7 @@ A Python package to create resilient plots for geospatial data. This package is 
 
 - [Documentation](https://deltares-research.github.io/ResilientPlotterClass/build/index.html)
 - [Installation](https://deltares-research.github.io/ResilientPlotterClass/build/installation.html)
-- [Getting Started](https://deltares-research.github.io/ResilientPlotterClass/build/usage_examples/00_getting_started.html)
+- [Getting Started](https://deltares-research.github.io/ResilientPlotterClass/build/usage_examples/01_getting_started.html)
 - [Usage Examples](https://deltares-research.github.io/ResilientPlotterClass/build/usage_examples.html)
 - [API Reference](https://deltares-research.github.io/ResilientPlotterClass/build/api_reference.html)
 
