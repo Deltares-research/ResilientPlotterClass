@@ -1,9 +1,10 @@
-import numpy as np
 import geopandas as gpd
-from pyproj import CRS as pyprojCRS
+import numpy as np
 import xarray as xr
 import xugrid as xu
+from pyproj import CRS as pyprojCRS
 from rasterio.crs import CRS as rasterioCRS
+
 
 def _get_xy_attrs_from_crs(crs=None):
     """Get the x and y attributes for a coordinate reference system.
@@ -14,22 +15,41 @@ def _get_xy_attrs_from_crs(crs=None):
     :rtype:     dict, dict
     """
     # Define abbreviations for x and y long names and unit
-    XY_NAME_ABRIVIATIONS = {'Geodetic latitude':'Latitude', 'Geodetic longitude':'Longitude'}
-    XY_UNIT_ABRIVIATIONS = {'millimeter':'mm', 'decimeter':'dm', 'centimeter':'cm', 'meter':'m',
-                            'decameter':'dam', 'hectometer':'hm', 'kilometer':'km',
-                            'millimetre':'mm', 'decimetre':'dm', 'centimetre':'cm', 'metre':'m',
-                            'decametre':'dam', 'hectometre':'hm', 'kilometre':'km',
-                            'degree':'deg', 'arcsecond':'arcsec', 'arcminute':'arcmin','radian':'rad',
-                            'foot':'ft', 'inch':'in', 'yard':'yd', 'mile':'mi', 'nautical mile':'nmi'}
-    
+    XY_NAME_ABRIVIATIONS = {"Geodetic latitude": "Latitude", "Geodetic longitude": "Longitude"}
+    XY_UNIT_ABRIVIATIONS = {
+        "millimeter": "mm",
+        "decimeter": "dm",
+        "centimeter": "cm",
+        "meter": "m",
+        "decameter": "dam",
+        "hectometer": "hm",
+        "kilometer": "km",
+        "millimetre": "mm",
+        "decimetre": "dm",
+        "centimetre": "cm",
+        "metre": "m",
+        "decametre": "dam",
+        "hectometre": "hm",
+        "kilometre": "km",
+        "degree": "deg",
+        "arcsecond": "arcsec",
+        "arcminute": "arcmin",
+        "radian": "rad",
+        "foot": "ft",
+        "inch": "in",
+        "yard": "yd",
+        "mile": "mi",
+        "nautical mile": "nmi",
+    }
+
     # Convert the crs to a pyproj.CRS object
     if crs is None:
-        x_attrs = {'long_name':'x', 'unit':'-'}
-        y_attrs = {'long_name':'y', 'unit':'-'}
+        x_attrs = {"long_name": "x", "unit": "-"}
+        y_attrs = {"long_name": "y", "unit": "-"}
         return x_attrs, y_attrs
-    
+
     # Get the x and y axis names
-    if crs.axis_info[0].direction == 'north' or crs.axis_info[0].direction == 'south':
+    if crs.axis_info[0].direction == "north" or crs.axis_info[0].direction == "south":
         x_axis_name = crs.axis_info[1].name
         y_axis_name = crs.axis_info[0].name
     else:
@@ -41,21 +61,22 @@ def _get_xy_attrs_from_crs(crs=None):
     y_axis_name = XY_NAME_ABRIVIATIONS[y_axis_name] if y_axis_name in XY_NAME_ABRIVIATIONS.keys() else y_axis_name
 
     # Set the x and y long names
-    x_long_name = '{} {}'.format(x_axis_name, crs.name)
-    y_long_name = '{} {}'.format(y_axis_name, crs.name)
+    x_long_name = "{} {}".format(x_axis_name, crs.name)
+    y_long_name = "{} {}".format(y_axis_name, crs.name)
 
     # Get the x and y unit
-    xy_unit = crs.axis_info[0].unit_name    
+    xy_unit = crs.axis_info[0].unit_name
 
     # Abbreviate the x and y unit
     xy_unit = XY_UNIT_ABRIVIATIONS[xy_unit] if xy_unit in XY_UNIT_ABRIVIATIONS.keys() else xy_unit
 
     # Set the x and y attributes
-    x_attrs = {'long_name':x_long_name, 'unit':xy_unit}
-    y_attrs = {'long_name':y_long_name, 'unit':xy_unit}
+    x_attrs = {"long_name": x_long_name, "unit": xy_unit}
+    y_attrs = {"long_name": y_long_name, "unit": xy_unit}
 
     # Return the x and y attributes
     return x_attrs, y_attrs
+
 
 def _get_scale_factor(xy_unit_in, xy_unit_out=None):
     """Get the scale factor and corresponding x and y unit.
@@ -69,30 +90,43 @@ def _get_scale_factor(xy_unit_in, xy_unit_out=None):
     """
 
     # Define the scale factors
-    SCALE_METRES = {'mm':1000, 'cm':100, 'dm':10, 'm':1, 'dam':0.1, 'hm':0.01, 'km':0.001,
-                    'ft':3.28084, 'in':39.3701, 'yd':1.09361, 'mi':0.000621371, 'nmi':0.000539957}
-    SCALE_DEGREES = {'deg':1, 'arcsec':3600, 'arcmin':60, 'rad':np.pi/180}
+    SCALE_METRES = {
+        "mm": 1000,
+        "cm": 100,
+        "dm": 10,
+        "m": 1,
+        "dam": 0.1,
+        "hm": 0.01,
+        "km": 0.001,
+        "ft": 3.28084,
+        "in": 39.3701,
+        "yd": 1.09361,
+        "mi": 0.000621371,
+        "nmi": 0.000539957,
+    }
+    SCALE_DEGREES = {"deg": 1, "arcsec": 3600, "arcmin": 60, "rad": np.pi / 180}
 
     # Get the x and y unit
     if xy_unit_out is None and xy_unit_in in SCALE_METRES:
-        xy_unit_out = 'km'
+        xy_unit_out = "km"
     elif xy_unit_out is None and xy_unit_in in SCALE_DEGREES:
-        xy_unit_out = 'deg'
+        xy_unit_out = "deg"
     elif xy_unit_out is None:
         xy_unit_out = xy_unit_in
     else:
         xy_unit_out = xy_unit_out
-    
+
     # Get the scale factor
     if xy_unit_in in SCALE_METRES.keys() and xy_unit_out in SCALE_METRES.keys():
-        scale_factor = SCALE_METRES[xy_unit_out]/SCALE_METRES[xy_unit_in]
+        scale_factor = SCALE_METRES[xy_unit_out] / SCALE_METRES[xy_unit_in]
     elif xy_unit_in in SCALE_DEGREES.keys() and xy_unit_out in SCALE_DEGREES.keys():
-        scale_factor = SCALE_DEGREES[xy_unit_out]/SCALE_DEGREES[xy_unit_in]
+        scale_factor = SCALE_DEGREES[xy_unit_out] / SCALE_DEGREES[xy_unit_in]
     else:
         scale_factor = 1
 
     # Return the scale factor and corresponding x and y unit
     return scale_factor, xy_unit_out
+
 
 def _rescale_xarray(da, scale_factor):
     """Rescale the x and y dimensions of a DataArray or Dataset.
@@ -104,20 +138,21 @@ def _rescale_xarray(da, scale_factor):
     :return:             Rescaled data
     :rtype:              xarray.DataArray or xarray.Dataset
     """
-    
+
     # If scale factor is 1, return the original data
     if scale_factor == 1:
         return da
-    
+
     # Rescale the x and y dimensions
-    x_coord = xr.DataArray(da['x'].values*scale_factor, dims=['x'], attrs=da['x'].attrs)
-    y_coord = xr.DataArray(da['y'].values*scale_factor, dims=['y'], attrs=da['y'].attrs)
+    x_coord = xr.DataArray(da["x"].values * scale_factor, dims=["x"], attrs=da["x"].attrs)
+    y_coord = xr.DataArray(da["y"].values * scale_factor, dims=["y"], attrs=da["y"].attrs)
 
     # Assign the coordinate arrays to the data
     da = da.assign_coords(x=x_coord, y=y_coord)
 
     # Return the rescaled data
     return da
+
 
 def _rescale_xugrid(uda, scale_factor):
     """Rescale the x and y dimensions of a UgridDataArray or UgridDataset.
@@ -129,15 +164,27 @@ def _rescale_xugrid(uda, scale_factor):
     :return:             Rescaled data
     :rtype:              xugrid.UgridDataArray
     """
-    
+
     # Function to rename the dimensions of the data
     def _rename_dims(da):
         # Define the new dimension names
-        NEW_DIMS_1D = {'node':'network1d_nNodes', 'edge':'network1d_nEdges', 'face':'network1d_nFaces',
-                       'Node':'network1d_nNodes', 'Edge':'network1d_nEdges', 'Face':'network1d_nFaces'}
-        NEW_DIMS_2D = {'node':'mesh2d_nNodes', 'edge':'mesh2d_nEdges', 'face':'mesh2d_nFaces',
-                       'Node':'mesh2d_nNodes', 'Edge':'mesh2d_nEdges', 'Face':'mesh2d_nFaces'}
-        
+        NEW_DIMS_1D = {
+            "node": "network1d_nNodes",
+            "edge": "network1d_nEdges",
+            "face": "network1d_nFaces",
+            "Node": "network1d_nNodes",
+            "Edge": "network1d_nEdges",
+            "Face": "network1d_nFaces",
+        }
+        NEW_DIMS_2D = {
+            "node": "mesh2d_nNodes",
+            "edge": "mesh2d_nEdges",
+            "face": "mesh2d_nFaces",
+            "Node": "mesh2d_nNodes",
+            "Edge": "mesh2d_nEdges",
+            "Face": "mesh2d_nFaces",
+        }
+
         # Get the new dimension names
         if isinstance(da.grid, xu.Ugrid1d):
             NEW_DIMS = NEW_DIMS_1D
@@ -149,16 +196,32 @@ def _rescale_xugrid(uda, scale_factor):
             for new_dim in NEW_DIMS.keys():
                 if new_dim in dim:
                     da = da.rename({dim: NEW_DIMS[new_dim]})
-        
+
         # Return the renamed data
         return da
-    
+
     # Rescale the coordinates of the data
     def _rescale_coords(da, scale_factor):
         # Define the coordinates to rescale
-        COORD_NAMES = ['x', 'y', 'node_x', 'node_y', 'edge_x', 'edge_y', 'face_x', 'face_y',
-                       'X', 'Y', 'Node_x', 'Node_y', 'Edge_x', 'Edge_y', 'Face_x', 'Face_y']
-        
+        COORD_NAMES = [
+            "x",
+            "y",
+            "node_x",
+            "node_y",
+            "edge_x",
+            "edge_y",
+            "face_x",
+            "face_y",
+            "X",
+            "Y",
+            "Node_x",
+            "Node_y",
+            "Edge_x",
+            "Edge_y",
+            "Face_x",
+            "Face_y",
+        ]
+
         # Rescale the coordinates
         coord_names = [coord_name for coord_name in list(da.coords) if coord_name not in list(da.dims)]
 
@@ -166,40 +229,44 @@ def _rescale_xugrid(uda, scale_factor):
         coords = {}
         for coord_name in coord_names:
             if np.any([COORD_NAME in coord_name for COORD_NAME in COORD_NAMES]):
-                coords[coord_name] = xr.DataArray(da[coord_name].values*scale_factor, dims=da[coord_name].dims, attrs=da[coord_name].attrs)
-        
+                coords[coord_name] = xr.DataArray(da[coord_name].values * scale_factor, dims=da[coord_name].dims, attrs=da[coord_name].attrs)
+
         # Assign the rescaled coordinates to the data
         da = da.assign_coords(coords)
 
         # Return the rescaled data
         return da
-    
+
     # Function to rescale the grid
     def _rescale_grid(grid, scale_factor):
         # Rescale the x and y dimensions of 1D grid
         if isinstance(grid, xu.Ugrid1d):
-            grid = xu.Ugrid1d(node_x=grid.node_x*scale_factor,
-                              node_y=grid.node_y*scale_factor,
-                              fill_value=grid.fill_value,
-                              edge_node_connectivity=grid.edge_node_connectivity)
+            grid = xu.Ugrid1d(
+                node_x=grid.node_x * scale_factor,
+                node_y=grid.node_y * scale_factor,
+                fill_value=grid.fill_value,
+                edge_node_connectivity=grid.edge_node_connectivity,
+            )
 
-        # Rescale x and y dimensions of 2D grid  
+        # Rescale x and y dimensions of 2D grid
         elif isinstance(grid, xu.Ugrid2d):
-            grid = xu.Ugrid2d(node_x=grid.node_x*scale_factor,
-                              node_y=grid.node_y*scale_factor,
-                              fill_value=grid.fill_value,
-                              face_node_connectivity=grid.face_node_connectivity,
-                              edge_node_connectivity=grid.edge_node_connectivity)
-        
+            grid = xu.Ugrid2d(
+                node_x=grid.node_x * scale_factor,
+                node_y=grid.node_y * scale_factor,
+                fill_value=grid.fill_value,
+                face_node_connectivity=grid.face_node_connectivity,
+                edge_node_connectivity=grid.edge_node_connectivity,
+            )
+
         # Return rescaled grid
         return grid
-    
+
     # Rename the dimensions of the data
     da = _rename_dims(uda)
 
     # Rescale the coordinates of the data
     da = _rescale_coords(da, scale_factor)
-    
+
     # Assign the coordinate arrays to the data
     if isinstance(uda, xu.UgridDataArray):
         grid = _rescale_grid(uda.grid, scale_factor)
@@ -213,6 +280,7 @@ def _rescale_xugrid(uda, scale_factor):
 
     # Return the rescaled data
     return uda_rescaled
+
 
 def _rescale_GeoDataFrame(gdf, scale_factor):
     """Rescale the x and y dimensions of a GeoDataFrame.
@@ -228,13 +296,14 @@ def _rescale_GeoDataFrame(gdf, scale_factor):
     # If scale factor is 1, return the original geometries
     if scale_factor == 1:
         return gdf
-    
-    # Rescale the x and y dimensions 
+
+    # Rescale the x and y dimensions
     gdf_rescaled = gdf.copy()
-    gdf_rescaled['geometry'] = gdf_rescaled['geometry'].scale(xfact=scale_factor, yfact=scale_factor, zfact=1, origin=(0, 0))
+    gdf_rescaled["geometry"] = gdf_rescaled["geometry"].scale(xfact=scale_factor, yfact=scale_factor, zfact=1, origin=(0, 0))
 
     # Return the rescaled geometries
     return gdf_rescaled
+
 
 def get_rescale_parameters(data=None, crs=None, xy_unit=None):
     """Get the scale factor, xlabel and ylabel for data, geometries or a coordinate reference system and unit.
@@ -248,7 +317,7 @@ def get_rescale_parameters(data=None, crs=None, xy_unit=None):
     :return:        Scale factor, xlabel, ylabel.
     :rtype:         tuple[float, str, str]
     """
-    
+
     # Get the coordiante reference system of the data
     if isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset):
         crs = data.rio.crs
@@ -259,8 +328,10 @@ def get_rescale_parameters(data=None, crs=None, xy_unit=None):
     elif data is None:
         crs = crs
     else:
-        raise TypeError('data type not supported. Please provide a xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray, xugrid.UgridDataset or geopandas.GeoDataFrame.')
-        
+        raise TypeError(
+            "data type not supported. Please provide a xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray, xugrid.UgridDataset or geopandas.GeoDataFrame."
+        )
+
     # Convert the crs to a pyproj.CRS
     if isinstance(crs, pyprojCRS):
         crs = crs
@@ -271,20 +342,21 @@ def get_rescale_parameters(data=None, crs=None, xy_unit=None):
     elif crs is None:
         crs = crs
     else:
-        raise TypeError('crs type not supported. Please provide a pyproj.CRS, rasterio.CRS or str object.')
+        raise TypeError("crs type not supported. Please provide a pyproj.CRS, rasterio.CRS or str object.")
 
     # Get x and y attributes and unit
     x_attrs, y_attrs = _get_xy_attrs_from_crs(crs)
 
     # Get the scale factor and corresponding x and y unit
-    scale_factor, xy_unit_out = _get_scale_factor(xy_unit_in=x_attrs['unit'], xy_unit_out=xy_unit)
+    scale_factor, xy_unit_out = _get_scale_factor(xy_unit_in=x_attrs["unit"], xy_unit_out=xy_unit)
 
     # Get labels for the x and y dimensions
-    xlabel = '{} [{}]'.format(x_attrs['long_name'], xy_unit_out)
-    ylabel = '{} [{}]'.format(y_attrs['long_name'], xy_unit_out)
+    xlabel = "{} [{}]".format(x_attrs["long_name"], xy_unit_out)
+    ylabel = "{} [{}]".format(y_attrs["long_name"], xy_unit_out)
 
     # Return the scale factor, xlabel, ylabel
     return scale_factor, xlabel, ylabel
+
 
 def rescale(data, scale_factor=1):
     """Rescale the x and y dimensions of data or geometries.
@@ -305,7 +377,9 @@ def rescale(data, scale_factor=1):
     elif isinstance(data, gpd.GeoDataFrame):
         data = _rescale_GeoDataFrame(data, scale_factor)
     else:
-        raise TypeError('data type not supported. Please provide a xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray, xugrid.UgridDataset or geopandas.GeoDataFrame.')
-    
+        raise TypeError(
+            "data type not supported. Please provide a xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray, xugrid.UgridDataset or geopandas.GeoDataFrame."
+        )
+
     # Return the rescaled data
     return data

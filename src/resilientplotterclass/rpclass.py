@@ -763,9 +763,9 @@ class rpclass:
 
         # Plot data
         if isinstance(data, xr.DataArray) and not interactive:
-            p = rpc.data_xarray.pcolormesh(data, ax=ax, **kwargs)
+            p = rpc.structured_data.pcolormesh(data, ax=ax, **kwargs)
         elif isinstance(data, xu.UgridDataArray) and not interactive:
-            p = rpc.data_xugrid.pcolormesh(data, ax=ax, **kwargs)
+            p = rpc.unstructured_data.pcolormesh(data, ax=ax, **kwargs)
         elif isinstance(data, xr.DataArray) and interactive:
             p = rpc.interactive.pcolormesh(data, m=m, **kwargs)
         elif isinstance(data, xu.UgridDataArray) and interactive:
@@ -813,9 +813,9 @@ class rpclass:
 
         # Plot data
         if isinstance(data, xr.DataArray) and not interactive:
-            p = rpc.data_xarray.imshow(data, ax=ax, **kwargs)
+            p = rpc.structured_data.imshow(data, ax=ax, **kwargs)
         elif isinstance(data, xu.UgridDataArray) and not interactive:
-            p = rpc.data_xugrid.imshow(data, ax=ax, **kwargs)
+            p = rpc.unstructured_data.imshow(data, ax=ax, **kwargs)
         elif isinstance(data, xr.DataArray) and interactive:
             p = rpc.interactive.imshow(data, m=m, **kwargs)
         elif isinstance(data, xu.UgridDataArray) and interactive:
@@ -863,9 +863,9 @@ class rpclass:
 
         # Plot data
         if (isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset)) and not interactive:
-            p = rpc.data_xarray.scatter(data, ax=ax, **kwargs)
+            p = rpc.structured_data.scatter(data, ax=ax, **kwargs)
         elif isinstance(data, xu.UgridDataArray) and not interactive:
-            p = rpc.data_xugrid.scatter(data, ax=ax, **kwargs)
+            p = rpc.unstructured_data.scatter(data, ax=ax, **kwargs)
         elif isinstance(data, xr.DataArray) and interactive:
             p = rpc.interactive.scatter(data, m=m, **kwargs)
         elif isinstance(data, xu.UgridDataArray) and interactive:
@@ -915,9 +915,9 @@ class rpclass:
 
         # Plot data
         if isinstance(data, xr.DataArray) and not interactive:
-            p = rpc.data_xarray.contourf(data, ax=ax, **kwargs)
+            p = rpc.structured_data.contourf(data, ax=ax, **kwargs)
         elif isinstance(data, xu.UgridDataArray) and not interactive:
-            p = rpc.data_xugrid.contourf(data, ax=ax, **kwargs)
+            p = rpc.unstructured_data.contourf(data, ax=ax, **kwargs)
         elif isinstance(data, xr.DataArray) and interactive:
             p = rpc.interactive.contourf(data, m=m, **kwargs)
         elif isinstance(data, xu.UgridDataArray) and interactive:
@@ -965,9 +965,9 @@ class rpclass:
 
         # Plot data
         if isinstance(data, xr.DataArray) and not interactive:
-            p = rpc.data_xarray.contour(data, ax=ax, **kwargs)
+            p = rpc.structured_data.contour(data, ax=ax, **kwargs)
         elif (isinstance(data, xu.UgridDataArray) or isinstance(data, xu.UgridDataset)) and not interactive:
-            p = rpc.data_xugrid.contour(data, ax=ax, **kwargs)
+            p = rpc.unstructured_data.contour(data, ax=ax, **kwargs)
         elif isinstance(data, xr.DataArray) and interactive:
             p = rpc.interactive.contour(data, m=m, **kwargs)
         elif isinstance(data, xu.UgridDataArray) and interactive:
@@ -1015,9 +1015,9 @@ class rpclass:
 
         # Plot data
         if isinstance(data, xr.Dataset) and not interactive:
-            p = rpc.data_xarray.quiver(data, ax=ax, **kwargs)
+            p = rpc.structured_data.quiver(data, ax=ax, **kwargs)
         elif isinstance(data, xu.UgridDataset) and not interactive:
-            p = rpc.data_xugrid.quiver(data, ax=ax, **kwargs)
+            p = rpc.unstructured_data.quiver(data, ax=ax, **kwargs)
         elif isinstance(data, xr.Dataset) and interactive:
             p = rpc.interactive.quiver(data, m=m, **kwargs)
         elif isinstance(data, xu.UgridDataset) and interactive:
@@ -1065,7 +1065,7 @@ class rpclass:
 
         # Plot data
         if isinstance(da, xr.Dataset) and not interactive:
-            p = rpc.data_xarray.streamplot(da, ax=ax, **kwargs)
+            p = rpc.structured_data.streamplot(da, ax=ax, **kwargs)
         elif isinstance(da, xr.Dataset) and interactive:
             p = rpc.interactive.streamplot(da, m=m, **kwargs)
         else:
@@ -1111,9 +1111,9 @@ class rpclass:
 
         # Plot grid
         if (isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset)) and not interactive:
-            ax = rpc.data_xarray.grid(data, ax=ax, **kwargs)
+            ax = rpc.structured_data.grid(data, ax=ax, **kwargs)
         elif (isinstance(data, xu.UgridDataArray) or isinstance(data, xu.UgridDataset)) and not interactive:
-            ax = rpc.data_xugrid.grid(data, ax=ax, **kwargs)
+            ax = rpc.unstructured_data.grid(data, ax=ax, **kwargs)
         elif (isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset)) and interactive:
             raise TypeError("Interactive grid not supported for xarray.DataArray or xarray.Dataset.")
         elif (isinstance(data, xu.UgridDataArray) or isinstance(data, xu.UgridDataset)) and interactive:

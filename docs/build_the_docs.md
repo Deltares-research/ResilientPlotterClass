@@ -1,6 +1,6 @@
 # Building the documentation
 ## Prerequisites
-The following prerequisites are required to install and use MorphoPy:
+The following prerequisites are required to install and use the ResilientPlotterClass:
 1. Install [Python](https://www.python.org/downloads)
 
 2. Install a python package manager (e.g. [uv](https://docs.astral.sh/uv/getting-started/installation/),  [Mamba](https://mamba.readthedocs.io/en/latest/installation/mamba-installation.html))
@@ -34,7 +34,7 @@ To build the documentation, follow these steps:
 
 1. Navigate to the `docs` directory of the cloned repository:
     ```bash
-    cd c:\...\morphopy\docs
+    cd c:\...\ResilientPlotterClass\docs
     ```
     
 2. Build the documentation using [sphinx](https://www.sphinx-doc.org/en/master/):

@@ -77,12 +77,13 @@
            <div itemprop="articleBody">
              
   <h1>Source code for resilientplotterclass.rescale</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyproj</span><span class="w"> </span><span class="kn">import</span> <span class="n">CRS</span> <span class="k">as</span> <span class="n">pyprojCRS</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xugrid</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xu</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyproj</span><span class="w"> </span><span class="kn">import</span> <span class="n">CRS</span> <span class="k">as</span> <span class="n">pyprojCRS</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">rasterio.crs</span><span class="w"> </span><span class="kn">import</span> <span class="n">CRS</span> <span class="k">as</span> <span class="n">rasterioCRS</span>
+
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_get_xy_attrs_from_crs</span><span class="p">(</span><span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the x and y attributes for a coordinate reference system.</span>
@@ -93,22 +94,41 @@
 <span class="sd">    :rtype:     dict, dict</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Define abbreviations for x and y long names and unit</span>
-    <span class="n">XY_NAME_ABRIVIATIONS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Geodetic latitude&#39;</span><span class="p">:</span><span class="s1">&#39;Latitude&#39;</span><span class="p">,</span> <span class="s1">&#39;Geodetic longitude&#39;</span><span class="p">:</span><span class="s1">&#39;Longitude&#39;</span><span class="p">}</span>
-    <span class="n">XY_UNIT_ABRIVIATIONS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;millimeter&#39;</span><span class="p">:</span><span class="s1">&#39;mm&#39;</span><span class="p">,</span> <span class="s1">&#39;decimeter&#39;</span><span class="p">:</span><span class="s1">&#39;dm&#39;</span><span class="p">,</span> <span class="s1">&#39;centimeter&#39;</span><span class="p">:</span><span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="s1">&#39;meter&#39;</span><span class="p">:</span><span class="s1">&#39;m&#39;</span><span class="p">,</span>
-                            <span class="s1">&#39;decameter&#39;</span><span class="p">:</span><span class="s1">&#39;dam&#39;</span><span class="p">,</span> <span class="s1">&#39;hectometer&#39;</span><span class="p">:</span><span class="s1">&#39;hm&#39;</span><span class="p">,</span> <span class="s1">&#39;kilometer&#39;</span><span class="p">:</span><span class="s1">&#39;km&#39;</span><span class="p">,</span>
-                            <span class="s1">&#39;millimetre&#39;</span><span class="p">:</span><span class="s1">&#39;mm&#39;</span><span class="p">,</span> <span class="s1">&#39;decimetre&#39;</span><span class="p">:</span><span class="s1">&#39;dm&#39;</span><span class="p">,</span> <span class="s1">&#39;centimetre&#39;</span><span class="p">:</span><span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="s1">&#39;metre&#39;</span><span class="p">:</span><span class="s1">&#39;m&#39;</span><span class="p">,</span>
-                            <span class="s1">&#39;decametre&#39;</span><span class="p">:</span><span class="s1">&#39;dam&#39;</span><span class="p">,</span> <span class="s1">&#39;hectometre&#39;</span><span class="p">:</span><span class="s1">&#39;hm&#39;</span><span class="p">,</span> <span class="s1">&#39;kilometre&#39;</span><span class="p">:</span><span class="s1">&#39;km&#39;</span><span class="p">,</span>
-                            <span class="s1">&#39;degree&#39;</span><span class="p">:</span><span class="s1">&#39;deg&#39;</span><span class="p">,</span> <span class="s1">&#39;arcsecond&#39;</span><span class="p">:</span><span class="s1">&#39;arcsec&#39;</span><span class="p">,</span> <span class="s1">&#39;arcminute&#39;</span><span class="p">:</span><span class="s1">&#39;arcmin&#39;</span><span class="p">,</span><span class="s1">&#39;radian&#39;</span><span class="p">:</span><span class="s1">&#39;rad&#39;</span><span class="p">,</span>
-                            <span class="s1">&#39;foot&#39;</span><span class="p">:</span><span class="s1">&#39;ft&#39;</span><span class="p">,</span> <span class="s1">&#39;inch&#39;</span><span class="p">:</span><span class="s1">&#39;in&#39;</span><span class="p">,</span> <span class="s1">&#39;yard&#39;</span><span class="p">:</span><span class="s1">&#39;yd&#39;</span><span class="p">,</span> <span class="s1">&#39;mile&#39;</span><span class="p">:</span><span class="s1">&#39;mi&#39;</span><span class="p">,</span> <span class="s1">&#39;nautical mile&#39;</span><span class="p">:</span><span class="s1">&#39;nmi&#39;</span><span class="p">}</span>
-    
+    <span class="n">XY_NAME_ABRIVIATIONS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Geodetic latitude&quot;</span><span class="p">:</span> <span class="s2">&quot;Latitude&quot;</span><span class="p">,</span> <span class="s2">&quot;Geodetic longitude&quot;</span><span class="p">:</span> <span class="s2">&quot;Longitude&quot;</span><span class="p">}</span>
+    <span class="n">XY_UNIT_ABRIVIATIONS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;millimeter&quot;</span><span class="p">:</span> <span class="s2">&quot;mm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;decimeter&quot;</span><span class="p">:</span> <span class="s2">&quot;dm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;centimeter&quot;</span><span class="p">:</span> <span class="s2">&quot;cm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;meter&quot;</span><span class="p">:</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;decameter&quot;</span><span class="p">:</span> <span class="s2">&quot;dam&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;hectometer&quot;</span><span class="p">:</span> <span class="s2">&quot;hm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;kilometer&quot;</span><span class="p">:</span> <span class="s2">&quot;km&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;millimetre&quot;</span><span class="p">:</span> <span class="s2">&quot;mm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;decimetre&quot;</span><span class="p">:</span> <span class="s2">&quot;dm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;centimetre&quot;</span><span class="p">:</span> <span class="s2">&quot;cm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;metre&quot;</span><span class="p">:</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;decametre&quot;</span><span class="p">:</span> <span class="s2">&quot;dam&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;hectometre&quot;</span><span class="p">:</span> <span class="s2">&quot;hm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;kilometre&quot;</span><span class="p">:</span> <span class="s2">&quot;km&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;degree&quot;</span><span class="p">:</span> <span class="s2">&quot;deg&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;arcsecond&quot;</span><span class="p">:</span> <span class="s2">&quot;arcsec&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;arcminute&quot;</span><span class="p">:</span> <span class="s2">&quot;arcmin&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;radian&quot;</span><span class="p">:</span> <span class="s2">&quot;rad&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;foot&quot;</span><span class="p">:</span> <span class="s2">&quot;ft&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;inch&quot;</span><span class="p">:</span> <span class="s2">&quot;in&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;yard&quot;</span><span class="p">:</span> <span class="s2">&quot;yd&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;mile&quot;</span><span class="p">:</span> <span class="s2">&quot;mi&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;nautical mile&quot;</span><span class="p">:</span> <span class="s2">&quot;nmi&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
     <span class="c1"># Convert the crs to a pyproj.CRS object</span>
     <span class="k">if</span> <span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">x_attrs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;long_name&#39;</span><span class="p">:</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;unit&#39;</span><span class="p">:</span><span class="s1">&#39;-&#39;</span><span class="p">}</span>
-        <span class="n">y_attrs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;long_name&#39;</span><span class="p">:</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;unit&#39;</span><span class="p">:</span><span class="s1">&#39;-&#39;</span><span class="p">}</span>
+        <span class="n">x_attrs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;long_name&quot;</span><span class="p">:</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;unit&quot;</span><span class="p">:</span> <span class="s2">&quot;-&quot;</span><span class="p">}</span>
+        <span class="n">y_attrs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;long_name&quot;</span><span class="p">:</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;unit&quot;</span><span class="p">:</span> <span class="s2">&quot;-&quot;</span><span class="p">}</span>
         <span class="k">return</span> <span class="n">x_attrs</span><span class="p">,</span> <span class="n">y_attrs</span>
-    
+
     <span class="c1"># Get the x and y axis names</span>
-    <span class="k">if</span> <span class="n">crs</span><span class="o">.</span><span class="n">axis_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;north&#39;</span> <span class="ow">or</span> <span class="n">crs</span><span class="o">.</span><span class="n">axis_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;south&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">crs</span><span class="o">.</span><span class="n">axis_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s2">&quot;north&quot;</span> <span class="ow">or</span> <span class="n">crs</span><span class="o">.</span><span class="n">axis_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s2">&quot;south&quot;</span><span class="p">:</span>
         <span class="n">x_axis_name</span> <span class="o">=</span> <span class="n">crs</span><span class="o">.</span><span class="n">axis_info</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
         <span class="n">y_axis_name</span> <span class="o">=</span> <span class="n">crs</span><span class="o">.</span><span class="n">axis_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
     <span class="k">else</span><span class="p">:</span>
@@ -120,21 +140,22 @@
     <span class="n">y_axis_name</span> <span class="o">=</span> <span class="n">XY_NAME_ABRIVIATIONS</span><span class="p">[</span><span class="n">y_axis_name</span><span class="p">]</span> <span class="k">if</span> <span class="n">y_axis_name</span> <span class="ow">in</span> <span class="n">XY_NAME_ABRIVIATIONS</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">else</span> <span class="n">y_axis_name</span>
 
     <span class="c1"># Set the x and y long names</span>
-    <span class="n">x_long_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x_axis_name</span><span class="p">,</span> <span class="n">crs</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-    <span class="n">y_long_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">y_axis_name</span><span class="p">,</span> <span class="n">crs</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">x_long_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x_axis_name</span><span class="p">,</span> <span class="n">crs</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">y_long_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">y_axis_name</span><span class="p">,</span> <span class="n">crs</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
     <span class="c1"># Get the x and y unit</span>
-    <span class="n">xy_unit</span> <span class="o">=</span> <span class="n">crs</span><span class="o">.</span><span class="n">axis_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unit_name</span>    
+    <span class="n">xy_unit</span> <span class="o">=</span> <span class="n">crs</span><span class="o">.</span><span class="n">axis_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unit_name</span>
 
     <span class="c1"># Abbreviate the x and y unit</span>
     <span class="n">xy_unit</span> <span class="o">=</span> <span class="n">XY_UNIT_ABRIVIATIONS</span><span class="p">[</span><span class="n">xy_unit</span><span class="p">]</span> <span class="k">if</span> <span class="n">xy_unit</span> <span class="ow">in</span> <span class="n">XY_UNIT_ABRIVIATIONS</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">else</span> <span class="n">xy_unit</span>
 
     <span class="c1"># Set the x and y attributes</span>
-    <span class="n">x_attrs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;long_name&#39;</span><span class="p">:</span><span class="n">x_long_name</span><span class="p">,</span> <span class="s1">&#39;unit&#39;</span><span class="p">:</span><span class="n">xy_unit</span><span class="p">}</span>
-    <span class="n">y_attrs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;long_name&#39;</span><span class="p">:</span><span class="n">y_long_name</span><span class="p">,</span> <span class="s1">&#39;unit&#39;</span><span class="p">:</span><span class="n">xy_unit</span><span class="p">}</span>
+    <span class="n">x_attrs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;long_name&quot;</span><span class="p">:</span> <span class="n">x_long_name</span><span class="p">,</span> <span class="s2">&quot;unit&quot;</span><span class="p">:</span> <span class="n">xy_unit</span><span class="p">}</span>
+    <span class="n">y_attrs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;long_name&quot;</span><span class="p">:</span> <span class="n">y_long_name</span><span class="p">,</span> <span class="s2">&quot;unit&quot;</span><span class="p">:</span> <span class="n">xy_unit</span><span class="p">}</span>
 
     <span class="c1"># Return the x and y attributes</span>
     <span class="k">return</span> <span class="n">x_attrs</span><span class="p">,</span> <span class="n">y_attrs</span>
+
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_get_scale_factor</span><span class="p">(</span><span class="n">xy_unit_in</span><span class="p">,</span> <span class="n">xy_unit_out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the scale factor and corresponding x and y unit.</span>
@@ -148,30 +169,43 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># Define the scale factors</span>
-    <span class="n">SCALE_METRES</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;mm&#39;</span><span class="p">:</span><span class="mi">1000</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">:</span><span class="mi">100</span><span class="p">,</span> <span class="s1">&#39;dm&#39;</span><span class="p">:</span><span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;dam&#39;</span><span class="p">:</span><span class="mf">0.1</span><span class="p">,</span> <span class="s1">&#39;hm&#39;</span><span class="p">:</span><span class="mf">0.01</span><span class="p">,</span> <span class="s1">&#39;km&#39;</span><span class="p">:</span><span class="mf">0.001</span><span class="p">,</span>
-                    <span class="s1">&#39;ft&#39;</span><span class="p">:</span><span class="mf">3.28084</span><span class="p">,</span> <span class="s1">&#39;in&#39;</span><span class="p">:</span><span class="mf">39.3701</span><span class="p">,</span> <span class="s1">&#39;yd&#39;</span><span class="p">:</span><span class="mf">1.09361</span><span class="p">,</span> <span class="s1">&#39;mi&#39;</span><span class="p">:</span><span class="mf">0.000621371</span><span class="p">,</span> <span class="s1">&#39;nmi&#39;</span><span class="p">:</span><span class="mf">0.000539957</span><span class="p">}</span>
-    <span class="n">SCALE_DEGREES</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;deg&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;arcsec&#39;</span><span class="p">:</span><span class="mi">3600</span><span class="p">,</span> <span class="s1">&#39;arcmin&#39;</span><span class="p">:</span><span class="mi">60</span><span class="p">,</span> <span class="s1">&#39;rad&#39;</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">}</span>
+    <span class="n">SCALE_METRES</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;mm&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
+        <span class="s2">&quot;cm&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="s2">&quot;dm&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="s2">&quot;m&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">&quot;dam&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="s2">&quot;hm&quot;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
+        <span class="s2">&quot;km&quot;</span><span class="p">:</span> <span class="mf">0.001</span><span class="p">,</span>
+        <span class="s2">&quot;ft&quot;</span><span class="p">:</span> <span class="mf">3.28084</span><span class="p">,</span>
+        <span class="s2">&quot;in&quot;</span><span class="p">:</span> <span class="mf">39.3701</span><span class="p">,</span>
+        <span class="s2">&quot;yd&quot;</span><span class="p">:</span> <span class="mf">1.09361</span><span class="p">,</span>
+        <span class="s2">&quot;mi&quot;</span><span class="p">:</span> <span class="mf">0.000621371</span><span class="p">,</span>
+        <span class="s2">&quot;nmi&quot;</span><span class="p">:</span> <span class="mf">0.000539957</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">SCALE_DEGREES</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;deg&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;arcsec&quot;</span><span class="p">:</span> <span class="mi">3600</span><span class="p">,</span> <span class="s2">&quot;arcmin&quot;</span><span class="p">:</span> <span class="mi">60</span><span class="p">,</span> <span class="s2">&quot;rad&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">}</span>
 
     <span class="c1"># Get the x and y unit</span>
     <span class="k">if</span> <span class="n">xy_unit_out</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">xy_unit_in</span> <span class="ow">in</span> <span class="n">SCALE_METRES</span><span class="p">:</span>
-        <span class="n">xy_unit_out</span> <span class="o">=</span> <span class="s1">&#39;km&#39;</span>
+        <span class="n">xy_unit_out</span> <span class="o">=</span> <span class="s2">&quot;km&quot;</span>
     <span class="k">elif</span> <span class="n">xy_unit_out</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">xy_unit_in</span> <span class="ow">in</span> <span class="n">SCALE_DEGREES</span><span class="p">:</span>
-        <span class="n">xy_unit_out</span> <span class="o">=</span> <span class="s1">&#39;deg&#39;</span>
+        <span class="n">xy_unit_out</span> <span class="o">=</span> <span class="s2">&quot;deg&quot;</span>
     <span class="k">elif</span> <span class="n">xy_unit_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">xy_unit_out</span> <span class="o">=</span> <span class="n">xy_unit_in</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">xy_unit_out</span> <span class="o">=</span> <span class="n">xy_unit_out</span>
-    
+
     <span class="c1"># Get the scale factor</span>
     <span class="k">if</span> <span class="n">xy_unit_in</span> <span class="ow">in</span> <span class="n">SCALE_METRES</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="n">xy_unit_out</span> <span class="ow">in</span> <span class="n">SCALE_METRES</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-        <span class="n">scale_factor</span> <span class="o">=</span> <span class="n">SCALE_METRES</span><span class="p">[</span><span class="n">xy_unit_out</span><span class="p">]</span><span class="o">/</span><span class="n">SCALE_METRES</span><span class="p">[</span><span class="n">xy_unit_in</span><span class="p">]</span>
+        <span class="n">scale_factor</span> <span class="o">=</span> <span class="n">SCALE_METRES</span><span class="p">[</span><span class="n">xy_unit_out</span><span class="p">]</span> <span class="o">/</span> <span class="n">SCALE_METRES</span><span class="p">[</span><span class="n">xy_unit_in</span><span class="p">]</span>
     <span class="k">elif</span> <span class="n">xy_unit_in</span> <span class="ow">in</span> <span class="n">SCALE_DEGREES</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="n">xy_unit_out</span> <span class="ow">in</span> <span class="n">SCALE_DEGREES</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-        <span class="n">scale_factor</span> <span class="o">=</span> <span class="n">SCALE_DEGREES</span><span class="p">[</span><span class="n">xy_unit_out</span><span class="p">]</span><span class="o">/</span><span class="n">SCALE_DEGREES</span><span class="p">[</span><span class="n">xy_unit_in</span><span class="p">]</span>
+        <span class="n">scale_factor</span> <span class="o">=</span> <span class="n">SCALE_DEGREES</span><span class="p">[</span><span class="n">xy_unit_out</span><span class="p">]</span> <span class="o">/</span> <span class="n">SCALE_DEGREES</span><span class="p">[</span><span class="n">xy_unit_in</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">scale_factor</span> <span class="o">=</span> <span class="mi">1</span>
 
     <span class="c1"># Return the scale factor and corresponding x and y unit</span>
     <span class="k">return</span> <span class="n">scale_factor</span><span class="p">,</span> <span class="n">xy_unit_out</span>
+
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_rescale_xarray</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Rescale the x and y dimensions of a DataArray or Dataset.</span>
@@ -183,20 +217,21 @@
 <span class="sd">    :return:             Rescaled data</span>
 <span class="sd">    :rtype:              xarray.DataArray or xarray.Dataset</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    
+
     <span class="c1"># If scale factor is 1, return the original data</span>
     <span class="k">if</span> <span class="n">scale_factor</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">da</span>
-    
+
     <span class="c1"># Rescale the x and y dimensions</span>
-    <span class="n">x_coord</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">*</span><span class="n">scale_factor</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">attrs</span><span class="o">=</span><span class="n">da</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span>
-    <span class="n">y_coord</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">*</span><span class="n">scale_factor</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span> <span class="n">attrs</span><span class="o">=</span><span class="n">da</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span>
+    <span class="n">x_coord</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">*</span> <span class="n">scale_factor</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">attrs</span><span class="o">=</span><span class="n">da</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span>
+    <span class="n">y_coord</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">*</span> <span class="n">scale_factor</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="n">attrs</span><span class="o">=</span><span class="n">da</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span>
 
     <span class="c1"># Assign the coordinate arrays to the data</span>
     <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x_coord</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_coord</span><span class="p">)</span>
 
     <span class="c1"># Return the rescaled data</span>
     <span class="k">return</span> <span class="n">da</span>
+
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_rescale_xugrid</span><span class="p">(</span><span class="n">uda</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Rescale the x and y dimensions of a UgridDataArray or UgridDataset.</span>
@@ -208,15 +243,27 @@
 <span class="sd">    :return:             Rescaled data</span>
 <span class="sd">    :rtype:              xugrid.UgridDataArray</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    
+
     <span class="c1"># Function to rename the dimensions of the data</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_rename_dims</span><span class="p">(</span><span class="n">da</span><span class="p">):</span>
         <span class="c1"># Define the new dimension names</span>
-        <span class="n">NEW_DIMS_1D</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;node&#39;</span><span class="p">:</span><span class="s1">&#39;network1d_nNodes&#39;</span><span class="p">,</span> <span class="s1">&#39;edge&#39;</span><span class="p">:</span><span class="s1">&#39;network1d_nEdges&#39;</span><span class="p">,</span> <span class="s1">&#39;face&#39;</span><span class="p">:</span><span class="s1">&#39;network1d_nFaces&#39;</span><span class="p">,</span>
-                       <span class="s1">&#39;Node&#39;</span><span class="p">:</span><span class="s1">&#39;network1d_nNodes&#39;</span><span class="p">,</span> <span class="s1">&#39;Edge&#39;</span><span class="p">:</span><span class="s1">&#39;network1d_nEdges&#39;</span><span class="p">,</span> <span class="s1">&#39;Face&#39;</span><span class="p">:</span><span class="s1">&#39;network1d_nFaces&#39;</span><span class="p">}</span>
-        <span class="n">NEW_DIMS_2D</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;node&#39;</span><span class="p">:</span><span class="s1">&#39;mesh2d_nNodes&#39;</span><span class="p">,</span> <span class="s1">&#39;edge&#39;</span><span class="p">:</span><span class="s1">&#39;mesh2d_nEdges&#39;</span><span class="p">,</span> <span class="s1">&#39;face&#39;</span><span class="p">:</span><span class="s1">&#39;mesh2d_nFaces&#39;</span><span class="p">,</span>
-                       <span class="s1">&#39;Node&#39;</span><span class="p">:</span><span class="s1">&#39;mesh2d_nNodes&#39;</span><span class="p">,</span> <span class="s1">&#39;Edge&#39;</span><span class="p">:</span><span class="s1">&#39;mesh2d_nEdges&#39;</span><span class="p">,</span> <span class="s1">&#39;Face&#39;</span><span class="p">:</span><span class="s1">&#39;mesh2d_nFaces&#39;</span><span class="p">}</span>
-        
+        <span class="n">NEW_DIMS_1D</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;node&quot;</span><span class="p">:</span> <span class="s2">&quot;network1d_nNodes&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;edge&quot;</span><span class="p">:</span> <span class="s2">&quot;network1d_nEdges&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;face&quot;</span><span class="p">:</span> <span class="s2">&quot;network1d_nFaces&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Node&quot;</span><span class="p">:</span> <span class="s2">&quot;network1d_nNodes&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Edge&quot;</span><span class="p">:</span> <span class="s2">&quot;network1d_nEdges&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Face&quot;</span><span class="p">:</span> <span class="s2">&quot;network1d_nFaces&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">NEW_DIMS_2D</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;node&quot;</span><span class="p">:</span> <span class="s2">&quot;mesh2d_nNodes&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;edge&quot;</span><span class="p">:</span> <span class="s2">&quot;mesh2d_nEdges&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;face&quot;</span><span class="p">:</span> <span class="s2">&quot;mesh2d_nFaces&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Node&quot;</span><span class="p">:</span> <span class="s2">&quot;mesh2d_nNodes&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Edge&quot;</span><span class="p">:</span> <span class="s2">&quot;mesh2d_nEdges&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Face&quot;</span><span class="p">:</span> <span class="s2">&quot;mesh2d_nFaces&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+
         <span class="c1"># Get the new dimension names</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">Ugrid1d</span><span class="p">):</span>
             <span class="n">NEW_DIMS</span> <span class="o">=</span> <span class="n">NEW_DIMS_1D</span>
@@ -228,16 +275,32 @@
             <span class="k">for</span> <span class="n">new_dim</span> <span class="ow">in</span> <span class="n">NEW_DIMS</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">new_dim</span> <span class="ow">in</span> <span class="n">dim</span><span class="p">:</span>
                     <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="n">dim</span><span class="p">:</span> <span class="n">NEW_DIMS</span><span class="p">[</span><span class="n">new_dim</span><span class="p">]})</span>
-        
+
         <span class="c1"># Return the renamed data</span>
         <span class="k">return</span> <span class="n">da</span>
-    
+
     <span class="c1"># Rescale the coordinates of the data</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_rescale_coords</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">):</span>
         <span class="c1"># Define the coordinates to rescale</span>
-        <span class="n">COORD_NAMES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;node_x&#39;</span><span class="p">,</span> <span class="s1">&#39;node_y&#39;</span><span class="p">,</span> <span class="s1">&#39;edge_x&#39;</span><span class="p">,</span> <span class="s1">&#39;edge_y&#39;</span><span class="p">,</span> <span class="s1">&#39;face_x&#39;</span><span class="p">,</span> <span class="s1">&#39;face_y&#39;</span><span class="p">,</span>
-                       <span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="s1">&#39;Y&#39;</span><span class="p">,</span> <span class="s1">&#39;Node_x&#39;</span><span class="p">,</span> <span class="s1">&#39;Node_y&#39;</span><span class="p">,</span> <span class="s1">&#39;Edge_x&#39;</span><span class="p">,</span> <span class="s1">&#39;Edge_y&#39;</span><span class="p">,</span> <span class="s1">&#39;Face_x&#39;</span><span class="p">,</span> <span class="s1">&#39;Face_y&#39;</span><span class="p">]</span>
-        
+        <span class="n">COORD_NAMES</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;x&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;y&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;node_x&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;node_y&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;edge_x&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;edge_y&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;face_x&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;face_y&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;X&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Y&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Node_x&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Node_y&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Edge_x&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Edge_y&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Face_x&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Face_y&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+
         <span class="c1"># Rescale the coordinates</span>
         <span class="n">coord_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">coord_name</span> <span class="k">for</span> <span class="n">coord_name</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span> <span class="k">if</span> <span class="n">coord_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">)]</span>
 
@@ -245,40 +308,44 @@
         <span class="n">coords</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">coord_name</span> <span class="ow">in</span> <span class="n">coord_names</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">([</span><span class="n">COORD_NAME</span> <span class="ow">in</span> <span class="n">coord_name</span> <span class="k">for</span> <span class="n">COORD_NAME</span> <span class="ow">in</span> <span class="n">COORD_NAMES</span><span class="p">]):</span>
-                <span class="n">coords</span><span class="p">[</span><span class="n">coord_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="n">coord_name</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">*</span><span class="n">scale_factor</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">da</span><span class="p">[</span><span class="n">coord_name</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">da</span><span class="p">[</span><span class="n">coord_name</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span>
-        
+                <span class="n">coords</span><span class="p">[</span><span class="n">coord_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="n">coord_name</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">*</span> <span class="n">scale_factor</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">da</span><span class="p">[</span><span class="n">coord_name</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">da</span><span class="p">[</span><span class="n">coord_name</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span>
+
         <span class="c1"># Assign the rescaled coordinates to the data</span>
         <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
 
         <span class="c1"># Return the rescaled data</span>
         <span class="k">return</span> <span class="n">da</span>
-    
+
     <span class="c1"># Function to rescale the grid</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_rescale_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">):</span>
         <span class="c1"># Rescale the x and y dimensions of 1D grid</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">Ugrid1d</span><span class="p">):</span>
-            <span class="n">grid</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">Ugrid1d</span><span class="p">(</span><span class="n">node_x</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">node_x</span><span class="o">*</span><span class="n">scale_factor</span><span class="p">,</span>
-                              <span class="n">node_y</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">node_y</span><span class="o">*</span><span class="n">scale_factor</span><span class="p">,</span>
-                              <span class="n">fill_value</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
-                              <span class="n">edge_node_connectivity</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">)</span>
+            <span class="n">grid</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">Ugrid1d</span><span class="p">(</span>
+                <span class="n">node_x</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">node_x</span> <span class="o">*</span> <span class="n">scale_factor</span><span class="p">,</span>
+                <span class="n">node_y</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">node_y</span> <span class="o">*</span> <span class="n">scale_factor</span><span class="p">,</span>
+                <span class="n">fill_value</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
+                <span class="n">edge_node_connectivity</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">,</span>
+            <span class="p">)</span>
 
-        <span class="c1"># Rescale x and y dimensions of 2D grid  </span>
+        <span class="c1"># Rescale x and y dimensions of 2D grid</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">Ugrid2d</span><span class="p">):</span>
-            <span class="n">grid</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">Ugrid2d</span><span class="p">(</span><span class="n">node_x</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">node_x</span><span class="o">*</span><span class="n">scale_factor</span><span class="p">,</span>
-                              <span class="n">node_y</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">node_y</span><span class="o">*</span><span class="n">scale_factor</span><span class="p">,</span>
-                              <span class="n">fill_value</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
-                              <span class="n">face_node_connectivity</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span>
-                              <span class="n">edge_node_connectivity</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">)</span>
-        
+            <span class="n">grid</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">Ugrid2d</span><span class="p">(</span>
+                <span class="n">node_x</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">node_x</span> <span class="o">*</span> <span class="n">scale_factor</span><span class="p">,</span>
+                <span class="n">node_y</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">node_y</span> <span class="o">*</span> <span class="n">scale_factor</span><span class="p">,</span>
+                <span class="n">fill_value</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
+                <span class="n">face_node_connectivity</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span>
+                <span class="n">edge_node_connectivity</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">,</span>
+            <span class="p">)</span>
+
         <span class="c1"># Return rescaled grid</span>
         <span class="k">return</span> <span class="n">grid</span>
-    
+
     <span class="c1"># Rename the dimensions of the data</span>
     <span class="n">da</span> <span class="o">=</span> <span class="n">_rename_dims</span><span class="p">(</span><span class="n">uda</span><span class="p">)</span>
 
     <span class="c1"># Rescale the coordinates of the data</span>
     <span class="n">da</span> <span class="o">=</span> <span class="n">_rescale_coords</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">)</span>
-    
+
     <span class="c1"># Assign the coordinate arrays to the data</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">uda</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">):</span>
         <span class="n">grid</span> <span class="o">=</span> <span class="n">_rescale_grid</span><span class="p">(</span><span class="n">uda</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">)</span>
@@ -292,6 +359,7 @@
 
     <span class="c1"># Return the rescaled data</span>
     <span class="k">return</span> <span class="n">uda_rescaled</span>
+
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_rescale_GeoDataFrame</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Rescale the x and y dimensions of a GeoDataFrame.</span>
@@ -307,13 +375,14 @@
     <span class="c1"># If scale factor is 1, return the original geometries</span>
     <span class="k">if</span> <span class="n">scale_factor</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">gdf</span>
-    
-    <span class="c1"># Rescale the x and y dimensions </span>
+
+    <span class="c1"># Rescale the x and y dimensions</span>
     <span class="n">gdf_rescaled</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">gdf_rescaled</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gdf_rescaled</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">xfact</span><span class="o">=</span><span class="n">scale_factor</span><span class="p">,</span> <span class="n">yfact</span><span class="o">=</span><span class="n">scale_factor</span><span class="p">,</span> <span class="n">zfact</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">gdf_rescaled</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gdf_rescaled</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">xfact</span><span class="o">=</span><span class="n">scale_factor</span><span class="p">,</span> <span class="n">yfact</span><span class="o">=</span><span class="n">scale_factor</span><span class="p">,</span> <span class="n">zfact</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
 
     <span class="c1"># Return the rescaled geometries</span>
     <span class="k">return</span> <span class="n">gdf_rescaled</span>
+
 
 <div class="viewcode-block" id="get_rescale_parameters">
 <a class="viewcode-back" href="../../resilientplotterclass.html#resilientplotterclass.rescale.get_rescale_parameters">[docs]</a>
@@ -329,7 +398,7 @@
 <span class="sd">    :return:        Scale factor, xlabel, ylabel.</span>
 <span class="sd">    :rtype:         tuple[float, str, str]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    
+
     <span class="c1"># Get the coordiante reference system of the data</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
         <span class="n">crs</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">crs</span>
@@ -340,8 +409,10 @@
     <span class="k">elif</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">crs</span> <span class="o">=</span> <span class="n">crs</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;data type not supported. Please provide a xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray, xugrid.UgridDataset or geopandas.GeoDataFrame.&#39;</span><span class="p">)</span>
-        
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;data type not supported. Please provide a xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray, xugrid.UgridDataset or geopandas.GeoDataFrame.&quot;</span>
+        <span class="p">)</span>
+
     <span class="c1"># Convert the crs to a pyproj.CRS</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">crs</span><span class="p">,</span> <span class="n">pyprojCRS</span><span class="p">):</span>
         <span class="n">crs</span> <span class="o">=</span> <span class="n">crs</span>
@@ -352,20 +423,21 @@
     <span class="k">elif</span> <span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">crs</span> <span class="o">=</span> <span class="n">crs</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;crs type not supported. Please provide a pyproj.CRS, rasterio.CRS or str object.&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;crs type not supported. Please provide a pyproj.CRS, rasterio.CRS or str object.&quot;</span><span class="p">)</span>
 
     <span class="c1"># Get x and y attributes and unit</span>
     <span class="n">x_attrs</span><span class="p">,</span> <span class="n">y_attrs</span> <span class="o">=</span> <span class="n">_get_xy_attrs_from_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">)</span>
 
     <span class="c1"># Get the scale factor and corresponding x and y unit</span>
-    <span class="n">scale_factor</span><span class="p">,</span> <span class="n">xy_unit_out</span> <span class="o">=</span> <span class="n">_get_scale_factor</span><span class="p">(</span><span class="n">xy_unit_in</span><span class="o">=</span><span class="n">x_attrs</span><span class="p">[</span><span class="s1">&#39;unit&#39;</span><span class="p">],</span> <span class="n">xy_unit_out</span><span class="o">=</span><span class="n">xy_unit</span><span class="p">)</span>
+    <span class="n">scale_factor</span><span class="p">,</span> <span class="n">xy_unit_out</span> <span class="o">=</span> <span class="n">_get_scale_factor</span><span class="p">(</span><span class="n">xy_unit_in</span><span class="o">=</span><span class="n">x_attrs</span><span class="p">[</span><span class="s2">&quot;unit&quot;</span><span class="p">],</span> <span class="n">xy_unit_out</span><span class="o">=</span><span class="n">xy_unit</span><span class="p">)</span>
 
     <span class="c1"># Get labels for the x and y dimensions</span>
-    <span class="n">xlabel</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> [</span><span class="si">{}</span><span class="s1">]&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x_attrs</span><span class="p">[</span><span class="s1">&#39;long_name&#39;</span><span class="p">],</span> <span class="n">xy_unit_out</span><span class="p">)</span>
-    <span class="n">ylabel</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> [</span><span class="si">{}</span><span class="s1">]&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">y_attrs</span><span class="p">[</span><span class="s1">&#39;long_name&#39;</span><span class="p">],</span> <span class="n">xy_unit_out</span><span class="p">)</span>
+    <span class="n">xlabel</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> [</span><span class="si">{}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x_attrs</span><span class="p">[</span><span class="s2">&quot;long_name&quot;</span><span class="p">],</span> <span class="n">xy_unit_out</span><span class="p">)</span>
+    <span class="n">ylabel</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> [</span><span class="si">{}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">y_attrs</span><span class="p">[</span><span class="s2">&quot;long_name&quot;</span><span class="p">],</span> <span class="n">xy_unit_out</span><span class="p">)</span>
 
     <span class="c1"># Return the scale factor, xlabel, ylabel</span>
     <span class="k">return</span> <span class="n">scale_factor</span><span class="p">,</span> <span class="n">xlabel</span><span class="p">,</span> <span class="n">ylabel</span></div>
+
 
 
 <div class="viewcode-block" id="rescale">
@@ -389,8 +461,10 @@
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">_rescale_GeoDataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;data type not supported. Please provide a xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray, xugrid.UgridDataset or geopandas.GeoDataFrame.&#39;</span><span class="p">)</span>
-    
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;data type not supported. Please provide a xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray, xugrid.UgridDataset or geopandas.GeoDataFrame.&quot;</span>
+        <span class="p">)</span>
+
     <span class="c1"># Return the rescaled data</span>
     <span class="k">return</span> <span class="n">data</span></div>
 

@@ -79,13 +79,14 @@
   <h1>Source code for resilientplotterclass.interactive</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">folium</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.colors</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_hex</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">branca.element</span><span class="w"> </span><span class="kn">import</span> <span class="n">Element</span><span class="p">,</span> <span class="n">Figure</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">folium.plugins</span><span class="w"> </span><span class="kn">import</span> <span class="n">Draw</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.colors</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_hex</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_explore_image</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Spectral_r&#39;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">legend_kwds</span><span class="o">=</span><span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;&quot;Plot data interactively using folium.</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_explore_image</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Spectral_r&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">legend_kwds</span><span class="o">=</span><span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; &quot;Plot data interactively using folium.</span>
 
 <span class="sd">    :param da:          Data to plot.</span>
 <span class="sd">    :type da:           xarray.DataArray</span>
@@ -109,7 +110,7 @@
 <span class="sd">    :See also: `folium.raster_layers.ImageOverlay &lt;https://python-visualization.github.io/folium/latest/reference.html#folium.raster_layers.ImageOverlay&gt;`_</span>
 <span class="sd">    :See also: `folium.LinearColormap &lt;https://python-visualization.github.io/folium/latest/advanced_guide/colormaps.html&gt;`_</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-        
+
     <span class="c1"># Convert da to number</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">number</span><span class="p">):</span>
         <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
@@ -128,8 +129,8 @@
         <span class="n">legend</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">da</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="kc">False</span>
 
     <span class="c1"># Default kwargs</span>
-    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;mercator_project&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-    
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;mercator_project&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
     <span class="c1"># Normalise values</span>
     <span class="n">da</span> <span class="o">=</span> <span class="p">((</span><span class="n">da</span> <span class="o">-</span> <span class="n">vmin</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">vmax</span> <span class="o">-</span> <span class="n">vmin</span><span class="p">))</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
@@ -140,10 +141,10 @@
         <span class="n">rgb</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">rgba</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">rgb</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="o">*</span><span class="n">rgb</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="mi">1</span><span class="p">))],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;DataArray must be 2D or 3D with shape (3, y, x)&#39;</span><span class="p">)</span>
-    
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;DataArray must be 2D or 3D with shape (3, y, x)&quot;</span><span class="p">)</span>
+
     <span class="c1"># Fix color range for mercator projection</span>
-    <span class="k">if</span> <span class="s1">&#39;mercator_project&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;mercator_project&#39;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="s2">&quot;mercator_project&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;mercator_project&quot;</span><span class="p">]:</span>
         <span class="c1"># Find first two non-nan values</span>
         <span class="n">nan_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
 
@@ -164,7 +165,7 @@
 
     <span class="c1"># Create image</span>
     <span class="n">img</span> <span class="o">=</span> <span class="n">folium</span><span class="o">.</span><span class="n">raster_layers</span><span class="o">.</span><span class="n">ImageOverlay</span><span class="p">(</span><span class="n">image</span><span class="o">=</span><span class="n">rgba</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">bounds</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    
+
     <span class="c1"># Add to map</span>
     <span class="n">m</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
 
@@ -181,9 +182,10 @@
 
         <span class="c1"># Add to map</span>
         <span class="n">m</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">cmap</span><span class="p">)</span>
-    
+
     <span class="c1"># Return map</span>
     <span class="k">return</span> <span class="n">m</span>
+
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_set_map_bounds</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">bounds</span><span class="p">):</span>
     <span class="c1"># Convert bounds to list</span>
@@ -194,8 +196,10 @@
 
     <span class="c1"># Combine bounds</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">map_bounds</span><span class="p">)</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="n">bounds</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">min</span><span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">map_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">min</span><span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">map_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])],</span>
-                  <span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">map_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">max</span><span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">map_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])]]</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">map_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">min</span><span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">map_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])],</span>
+            <span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">map_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">max</span><span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">map_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])],</span>
+        <span class="p">]</span>
 
     <span class="c1"># Set bounds</span>
     <span class="n">m</span><span class="o">.</span><span class="n">fit_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span>
@@ -203,10 +207,12 @@
     <span class="c1"># Return map</span>
     <span class="k">return</span> <span class="n">m</span>
 
+
 <div class="viewcode-block" id="pcolormesh">
 <a class="viewcode-back" href="../../resilientplotterclass.html#resilientplotterclass.interactive.pcolormesh">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">pcolormesh</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">smooth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">imshow</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="n">m</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="n">skip</span><span class="p">,</span> <span class="n">smooth</span><span class="o">=</span><span class="n">smooth</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
 
 
 <div class="viewcode-block" id="imshow">
@@ -226,7 +232,7 @@
 <span class="sd">    :type xlim:    list[float], optional</span>
 <span class="sd">    :param ylim:   y limits.</span>
 <span class="sd">    :type ylim:    list[float], optional</span>
-<span class="sd">    </span>
+
 <span class="sd">    :param kwargs: Keyword arguments for :func:`resilientplotterclass.interactive._explore_image`.</span>
 <span class="sd">    :type kwargs:  dict, optional</span>
 <span class="sd">    :return:       Plot.</span>
@@ -234,20 +240,20 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># Reproject DataArray</span>
-    <span class="k">if</span> <span class="n">da</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">crs</span> <span class="o">!=</span> <span class="s1">&#39;EPSG:4326&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">da</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">crs</span> <span class="o">!=</span> <span class="s2">&quot;EPSG:4326&quot;</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[93mReprojecting DataArray to EPSG:4326.</span><span class="se">\033</span><span class="s2">[0m&quot;</span><span class="p">)</span>
-        <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">reproject</span><span class="p">(</span><span class="s1">&#39;EPSG:4326&#39;</span><span class="p">)</span>
-    
+        <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">reproject</span><span class="p">(</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">)</span>
+
     <span class="c1"># Get map</span>
     <span class="k">if</span> <span class="n">m</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-         <span class="n">m</span> <span class="o">=</span> <span class="n">folium</span><span class="o">.</span><span class="n">Map</span><span class="p">()</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">folium</span><span class="o">.</span><span class="n">Map</span><span class="p">()</span>
 
     <span class="c1"># Set map bounds</span>
     <span class="n">m</span> <span class="o">=</span> <span class="n">_set_map_bounds</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">da</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">bounds</span><span class="p">())</span>
 
     <span class="c1"># Reproject DataArray</span>
-    <span class="k">if</span> <span class="n">da</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">crs</span> <span class="o">!=</span> <span class="s1">&#39;EPSG:4326&#39;</span><span class="p">:</span>
-        <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">reproject</span><span class="p">(</span><span class="s1">&#39;EPSG:4326&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">da</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">crs</span> <span class="o">!=</span> <span class="s2">&quot;EPSG:4326&quot;</span><span class="p">:</span>
+        <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">reproject</span><span class="p">(</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">)</span>
 
     <span class="c1"># Skip DataArray values</span>
     <span class="k">if</span> <span class="n">skip</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
@@ -256,42 +262,48 @@
     <span class="c1"># Smooth DataArray</span>
     <span class="k">if</span> <span class="n">smooth</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">smooth</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">smooth</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-    
+
     <span class="c1"># Plot DataArray</span>
     <span class="n">m</span> <span class="o">=</span> <span class="n">_explore_image</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="n">m</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    
+
     <span class="c1"># Return plot</span>
     <span class="k">return</span> <span class="n">m</span></div>
+
 
 
 <div class="viewcode-block" id="scatter">
 <a class="viewcode-back" href="../../resilientplotterclass.html#resilientplotterclass.interactive.scatter">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">scatter</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">smooth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;scatter plot not implemented yet&#39;</span><span class="p">)</span></div>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;scatter plot not implemented yet&quot;</span><span class="p">)</span></div>
+
 
 
 <div class="viewcode-block" id="contourf">
 <a class="viewcode-back" href="../../resilientplotterclass.html#resilientplotterclass.interactive.contourf">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">contourf</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">smooth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;contourf plot not implemented yet&#39;</span><span class="p">)</span></div>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;contourf plot not implemented yet&quot;</span><span class="p">)</span></div>
+
 
 
 <div class="viewcode-block" id="contour">
 <a class="viewcode-back" href="../../resilientplotterclass.html#resilientplotterclass.interactive.contour">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">contour</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">smooth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;contour plot not implemented yet&#39;</span><span class="p">)</span></div>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;contour plot not implemented yet&quot;</span><span class="p">)</span></div>
+
 
 
 <div class="viewcode-block" id="quiver">
 <a class="viewcode-back" href="../../resilientplotterclass.html#resilientplotterclass.interactive.quiver">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">quiver</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">smooth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;quiver plot not implemented yet&#39;</span><span class="p">)</span></div>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;quiver plot not implemented yet&quot;</span><span class="p">)</span></div>
+
 
 
 <div class="viewcode-block" id="streamplot">
 <a class="viewcode-back" href="../../resilientplotterclass.html#resilientplotterclass.interactive.streamplot">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">streamplot</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">smooth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;streamplot plot not implemented yet&#39;</span><span class="p">)</span></div>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;streamplot plot not implemented yet&quot;</span><span class="p">)</span></div>
+
 
 
 <div class="viewcode-block" id="plot_geometries">
@@ -312,13 +324,13 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># Reproject GeoDataFrame</span>
-    <span class="k">if</span> <span class="n">gdf</span><span class="o">.</span><span class="n">crs</span> <span class="o">!=</span> <span class="s1">&#39;EPSG:4326&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">gdf</span><span class="o">.</span><span class="n">crs</span> <span class="o">!=</span> <span class="s2">&quot;EPSG:4326&quot;</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[93mReprojecting GeoDataFrame to EPSG:4326.</span><span class="se">\033</span><span class="s2">[0m&quot;</span><span class="p">)</span>
-        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="s1">&#39;EPSG:4326&#39;</span><span class="p">)</span>
-    
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">)</span>
+
     <span class="c1"># Get map</span>
     <span class="k">if</span> <span class="n">m</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-         <span class="n">m</span> <span class="o">=</span> <span class="n">folium</span><span class="o">.</span><span class="n">Map</span><span class="p">()</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">folium</span><span class="o">.</span><span class="n">Map</span><span class="p">()</span>
 
     <span class="c1"># Set map bounds</span>
     <span class="n">m</span> <span class="o">=</span> <span class="n">_set_map_bounds</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">gdf</span><span class="o">.</span><span class="n">total_bounds</span><span class="p">)</span>
@@ -328,6 +340,7 @@
 
     <span class="c1"># Return plot</span>
     <span class="k">return</span> <span class="n">m</span></div>
+
 
 
 <div class="viewcode-block" id="plot_basemap">
@@ -347,12 +360,13 @@
 
     <span class="c1"># Get map</span>
     <span class="k">if</span> <span class="n">m</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-         <span class="n">m</span> <span class="o">=</span> <span class="n">folium</span><span class="o">.</span><span class="n">Map</span><span class="p">()</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">folium</span><span class="o">.</span><span class="n">Map</span><span class="p">()</span>
     <span class="c1"># Plot basemap</span>
     <span class="n">folium</span><span class="o">.</span><span class="n">TileLayer</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">add_to</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
 
     <span class="c1"># Return plot</span>
     <span class="k">return</span> <span class="n">m</span></div>
+
 
 
 <div class="viewcode-block" id="Draw">
@@ -370,9 +384,7 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="n">figure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_root</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span>
-            <span class="n">figure</span><span class="p">,</span> <span class="n">Figure</span>
-        <span class="p">),</span> <span class="s2">&quot;You cannot render this Element if it is not in a Figure.&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">Figure</span><span class="p">),</span> <span class="s2">&quot;You cannot render this Element if it is not in a Figure.&quot;</span>
 
         <span class="n">export_style</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">            &lt;style&gt;</span>

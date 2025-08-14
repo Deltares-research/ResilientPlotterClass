@@ -1,10 +1,24 @@
 import matplotlib.pyplot as plt
+
 import resilientplotterclass as rpc
 
+
 # Wrapper for contextily.add_basemap() to allow for scaling
-def plot_basemap(crs=None, ax=None, xy_unit=None, xlim=None, ylim=None, xlabel_kwargs=None, ylabel_kwargs=None, title_kwargs=None, aspect_kwargs=None, grid_kwargs=None, **kwargs):
+def plot_basemap(
+    crs=None,
+    ax=None,
+    xy_unit=None,
+    xlim=None,
+    ylim=None,
+    xlabel_kwargs=None,
+    ylabel_kwargs=None,
+    title_kwargs=None,
+    aspect_kwargs=None,
+    grid_kwargs=None,
+    **kwargs,
+):
     """Plot a basemap using contextily.
-    
+
     :param crs:           Coordinate reference system of the basemap.
     :type crs:            pyproj.CRS or rasterio.crs.CRS or str, optional
     :param ax:            Axis.
@@ -41,38 +55,46 @@ def plot_basemap(crs=None, ax=None, xy_unit=None, xlim=None, ylim=None, xlabel_k
     # Initialise axis
     if ax is None:
         _, ax = plt.subplots()
-    
+
     # Get the rescale parameters
     scale_factor, _, _ = rpc.rescale.get_rescale_parameters(crs=crs, xy_unit=xy_unit)
-    
+
     # Format axis
-    ax = rpc.axes.format(ax, crs=crs, xy_unit=xy_unit, xlim=xlim, ylim=ylim, xlabel_kwargs=xlabel_kwargs, ylabel_kwargs=ylabel_kwargs,
-                         title_kwargs=title_kwargs, aspect_kwargs=aspect_kwargs, grid_kwargs=grid_kwargs)
-    
+    ax = rpc.axes.format(
+        ax,
+        crs=crs,
+        xy_unit=xy_unit,
+        xlim=xlim,
+        ylim=ylim,
+        xlabel_kwargs=xlabel_kwargs,
+        ylabel_kwargs=ylabel_kwargs,
+        title_kwargs=title_kwargs,
+        aspect_kwargs=aspect_kwargs,
+        grid_kwargs=grid_kwargs,
+    )
+
     # Add basemap
     _add_basemap(ax=ax, scale=scale_factor, crs=crs, **kwargs)
-    
+
     # Return axis
     return ax
+
 
 # Code below was adapted from the contextily package to allow for scaling using the scale parameter
 """Tools to plot basemaps"""
 
-import warnings
 import numpy as np
 from contextily import providers
-from xyzservices import TileProvider
-from contextily.tile import bounds2img, warp_tiles, _warper
-from rasterio.enums import Resampling
-from rasterio.warp import transform_bounds
-from matplotlib import patheffects
-from matplotlib.pyplot import draw
-from contextily.plotting import _reproj_bb, _is_overlay
+from contextily.plotting import _is_overlay, _reproj_bb
 from contextily.plotting import add_attribution as add_attribution_
+from contextily.tile import _warper, bounds2img, warp_tiles
+from rasterio.enums import Resampling
+from xyzservices import TileProvider
 
 INTERPOLATION = "bilinear"
 ZOOM = "auto"
 ATTRIBUTION_SIZE = 8
+
 
 def _add_basemap(
     ax,
@@ -85,10 +107,9 @@ def _add_basemap(
     attribution=None,
     attribution_size=ATTRIBUTION_SIZE,
     reset_extent=True,
-    
     resampling=Resampling.bilinear,
     zoom_adjust=None,
-    **extra_imshow_args
+    **extra_imshow_args,
 ):
     """
     Add a (web/local) basemap to `ax`.
@@ -140,7 +161,7 @@ def _add_basemap(
         `rasterio.enums.Resampling` method
     zoom_adjust : int or None
         [Optional. Default: None]
-        The amount to adjust a chosen zoom level if it is chosen automatically. 
+        The amount to adjust a chosen zoom level if it is chosen automatically.
         Values outside of -1 to 1 are not recommended as they can lead to slow execution.
     **extra_imshow_args :
         Other parameters to be passed to `imshow`.
@@ -173,9 +194,9 @@ def _add_basemap(
     """
 
     xmin, xmax, ymin, ymax = ax.axis()
-    
+
     # Rescale bounds
-    xmin, xmax, ymin, ymax = xmin/scale, xmax/scale, ymin/scale, ymax/scale
+    xmin, xmax, ymin, ymax = xmin / scale, xmax / scale, ymin / scale, ymax / scale
 
     if isinstance(source, str):
         try:
@@ -184,22 +205,14 @@ def _add_basemap(
             pass
 
     # If web source
-    if (
-        source is None
-        or isinstance(source, (dict, TileProvider))
-        or (isinstance(source, str) and source[:4] == "http")
-    ):
+    if source is None or isinstance(source, (dict, TileProvider)) or (isinstance(source, str) and source[:4] == "http"):
         # Extent
         left, right, bottom, top = xmin, xmax, ymin, ymax
         # Convert extent from `crs` into WM for tile query
         if crs is not None:
-            left, right, bottom, top = _reproj_bb(
-                left, right, bottom, top, crs, "epsg:3857"
-            )
+            left, right, bottom, top = _reproj_bb(left, right, bottom, top, crs, "epsg:3857")
         # Download image
-        image, extent = bounds2img(
-            left, bottom, right, top, zoom=zoom, source=source, ll=False, zoom_adjust=zoom_adjust
-        )
+        image, extent = bounds2img(left, bottom, right, top, zoom=zoom, source=source, ll=False, zoom_adjust=zoom_adjust)
         # Warping
         if crs is not None:
             image, extent = warp_tiles(image, extent, t_crs=crs, resampling=resampling)
@@ -218,9 +231,7 @@ def _add_basemap(
 
                 # Read window
                 if crs:
-                    left, bottom, right, top = rio.warp.transform_bounds(
-                        crs, raster.crs, xmin, ymin, xmax, ymax
-                    )
+                    left, bottom, right, top = rio.warp.transform_bounds(crs, raster.crs, xmin, ymin, xmax, ymax)
                 else:
                     left, bottom, right, top = xmin, ymin, xmax, ymax
                 window = [
@@ -247,22 +258,18 @@ def _add_basemap(
                 extent = bb.left, bb.right, bb.bottom, bb.top
             # Warp
             if (crs is not None) and (raster.crs != crs):
-                image, bounds, _ = _warper(
-                    image, img_transform, raster.crs, crs, resampling
-                )
+                image, bounds, _ = _warper(image, img_transform, raster.crs, crs, resampling)
                 extent = bounds.left, bounds.right, bounds.bottom, bounds.top
             image = image.transpose(1, 2, 0)
-    
+
     # Rescale bounds and extent
-    xmin, xmax, ymin, ymax = [e*scale for e in (xmin, xmax, ymin, ymax)]
-    extent = [e*scale for e in extent]
-    
+    xmin, xmax, ymin, ymax = [e * scale for e in (xmin, xmax, ymin, ymax)]
+    extent = [e * scale for e in extent]
+
     # Plotting
     if image.shape[2] == 1:
         image = image[:, :, 0]
-    img = ax.imshow(
-        image, extent=extent, interpolation=interpolation, **extra_imshow_args
-    )
+    img = ax.imshow(image, extent=extent, interpolation=interpolation, **extra_imshow_args)
 
     if reset_extent:
         ax.axis((xmin, xmax, ymin, ymax))

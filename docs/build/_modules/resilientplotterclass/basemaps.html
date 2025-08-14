@@ -78,14 +78,28 @@
              
   <h1>Source code for resilientplotterclass.basemaps</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">resilientplotterclass</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">rpc</span>
+
 
 <span class="c1"># Wrapper for contextily.add_basemap() to allow for scaling</span>
 <div class="viewcode-block" id="plot_basemap">
 <a class="viewcode-back" href="../../resilientplotterclass.html#resilientplotterclass.basemaps.plot_basemap">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">plot_basemap</span><span class="p">(</span><span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xy_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xlabel_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylabel_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">aspect_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">grid_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_basemap</span><span class="p">(</span>
+    <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xy_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xlim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ylim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xlabel_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ylabel_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">title_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">aspect_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">grid_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot a basemap using contextily.</span>
-<span class="sd">    </span>
+
 <span class="sd">    :param crs:           Coordinate reference system of the basemap.</span>
 <span class="sd">    :type crs:            pyproj.CRS or rasterio.crs.CRS or str, optional</span>
 <span class="sd">    :param ax:            Axis.</span>
@@ -122,39 +136,47 @@
     <span class="c1"># Initialise axis</span>
     <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-    
+
     <span class="c1"># Get the rescale parameters</span>
     <span class="n">scale_factor</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">rescale</span><span class="o">.</span><span class="n">get_rescale_parameters</span><span class="p">(</span><span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">,</span> <span class="n">xy_unit</span><span class="o">=</span><span class="n">xy_unit</span><span class="p">)</span>
-    
+
     <span class="c1"># Format axis</span>
-    <span class="n">ax</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">,</span> <span class="n">xy_unit</span><span class="o">=</span><span class="n">xy_unit</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="n">xlim</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="n">ylim</span><span class="p">,</span> <span class="n">xlabel_kwargs</span><span class="o">=</span><span class="n">xlabel_kwargs</span><span class="p">,</span> <span class="n">ylabel_kwargs</span><span class="o">=</span><span class="n">ylabel_kwargs</span><span class="p">,</span>
-                         <span class="n">title_kwargs</span><span class="o">=</span><span class="n">title_kwargs</span><span class="p">,</span> <span class="n">aspect_kwargs</span><span class="o">=</span><span class="n">aspect_kwargs</span><span class="p">,</span> <span class="n">grid_kwargs</span><span class="o">=</span><span class="n">grid_kwargs</span><span class="p">)</span>
-    
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">ax</span><span class="p">,</span>
+        <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">,</span>
+        <span class="n">xy_unit</span><span class="o">=</span><span class="n">xy_unit</span><span class="p">,</span>
+        <span class="n">xlim</span><span class="o">=</span><span class="n">xlim</span><span class="p">,</span>
+        <span class="n">ylim</span><span class="o">=</span><span class="n">ylim</span><span class="p">,</span>
+        <span class="n">xlabel_kwargs</span><span class="o">=</span><span class="n">xlabel_kwargs</span><span class="p">,</span>
+        <span class="n">ylabel_kwargs</span><span class="o">=</span><span class="n">ylabel_kwargs</span><span class="p">,</span>
+        <span class="n">title_kwargs</span><span class="o">=</span><span class="n">title_kwargs</span><span class="p">,</span>
+        <span class="n">aspect_kwargs</span><span class="o">=</span><span class="n">aspect_kwargs</span><span class="p">,</span>
+        <span class="n">grid_kwargs</span><span class="o">=</span><span class="n">grid_kwargs</span><span class="p">,</span>
+    <span class="p">)</span>
+
     <span class="c1"># Add basemap</span>
     <span class="n">_add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale_factor</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    
+
     <span class="c1"># Return axis</span>
     <span class="k">return</span> <span class="n">ax</span></div>
+
 
 
 <span class="c1"># Code below was adapted from the contextily package to allow for scaling using the scale parameter</span>
 <span class="sd">&quot;&quot;&quot;Tools to plot basemaps&quot;&quot;&quot;</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">contextily</span><span class="w"> </span><span class="kn">import</span> <span class="n">providers</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">xyzservices</span><span class="w"> </span><span class="kn">import</span> <span class="n">TileProvider</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">contextily.tile</span><span class="w"> </span><span class="kn">import</span> <span class="n">bounds2img</span><span class="p">,</span> <span class="n">warp_tiles</span><span class="p">,</span> <span class="n">_warper</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">rasterio.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">Resampling</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">rasterio.warp</span><span class="w"> </span><span class="kn">import</span> <span class="n">transform_bounds</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">patheffects</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="kn">import</span> <span class="n">draw</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">contextily.plotting</span><span class="w"> </span><span class="kn">import</span> <span class="n">_reproj_bb</span><span class="p">,</span> <span class="n">_is_overlay</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextily.plotting</span><span class="w"> </span><span class="kn">import</span> <span class="n">_is_overlay</span><span class="p">,</span> <span class="n">_reproj_bb</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">contextily.plotting</span><span class="w"> </span><span class="kn">import</span> <span class="n">add_attribution</span> <span class="k">as</span> <span class="n">add_attribution_</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextily.tile</span><span class="w"> </span><span class="kn">import</span> <span class="n">_warper</span><span class="p">,</span> <span class="n">bounds2img</span><span class="p">,</span> <span class="n">warp_tiles</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rasterio.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">Resampling</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xyzservices</span><span class="w"> </span><span class="kn">import</span> <span class="n">TileProvider</span>
 
 <span class="n">INTERPOLATION</span> <span class="o">=</span> <span class="s2">&quot;bilinear&quot;</span>
 <span class="n">ZOOM</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span>
 <span class="n">ATTRIBUTION_SIZE</span> <span class="o">=</span> <span class="mi">8</span>
+
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_add_basemap</span><span class="p">(</span>
     <span class="n">ax</span><span class="p">,</span>
@@ -167,10 +189,9 @@
     <span class="n">attribution</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">attribution_size</span><span class="o">=</span><span class="n">ATTRIBUTION_SIZE</span><span class="p">,</span>
     <span class="n">reset_extent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    
     <span class="n">resampling</span><span class="o">=</span><span class="n">Resampling</span><span class="o">.</span><span class="n">bilinear</span><span class="p">,</span>
     <span class="n">zoom_adjust</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">extra_imshow_args</span>
+    <span class="o">**</span><span class="n">extra_imshow_args</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Add a (web/local) basemap to `ax`.</span>
@@ -222,7 +243,7 @@
 <span class="sd">        `rasterio.enums.Resampling` method</span>
 <span class="sd">    zoom_adjust : int or None</span>
 <span class="sd">        [Optional. Default: None]</span>
-<span class="sd">        The amount to adjust a chosen zoom level if it is chosen automatically. </span>
+<span class="sd">        The amount to adjust a chosen zoom level if it is chosen automatically.</span>
 <span class="sd">        Values outside of -1 to 1 are not recommended as they can lead to slow execution.</span>
 <span class="sd">    **extra_imshow_args :</span>
 <span class="sd">        Other parameters to be passed to `imshow`.</span>
@@ -255,9 +276,9 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">()</span>
-    
+
     <span class="c1"># Rescale bounds</span>
-    <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">xmin</span><span class="o">/</span><span class="n">scale</span><span class="p">,</span> <span class="n">xmax</span><span class="o">/</span><span class="n">scale</span><span class="p">,</span> <span class="n">ymin</span><span class="o">/</span><span class="n">scale</span><span class="p">,</span> <span class="n">ymax</span><span class="o">/</span><span class="n">scale</span>
+    <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">xmin</span> <span class="o">/</span> <span class="n">scale</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">/</span> <span class="n">scale</span><span class="p">,</span> <span class="n">ymin</span> <span class="o">/</span> <span class="n">scale</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">/</span> <span class="n">scale</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
@@ -266,22 +287,14 @@
             <span class="k">pass</span>
 
     <span class="c1"># If web source</span>
-    <span class="k">if</span> <span class="p">(</span>
-        <span class="n">source</span> <span class="ow">is</span> <span class="kc">None</span>
-        <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">TileProvider</span><span class="p">))</span>
-        <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">source</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;http&quot;</span><span class="p">)</span>
-    <span class="p">):</span>
+    <span class="k">if</span> <span class="n">source</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">TileProvider</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">source</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;http&quot;</span><span class="p">):</span>
         <span class="c1"># Extent</span>
         <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">top</span> <span class="o">=</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span>
         <span class="c1"># Convert extent from `crs` into WM for tile query</span>
         <span class="k">if</span> <span class="n">crs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">top</span> <span class="o">=</span> <span class="n">_reproj_bb</span><span class="p">(</span>
-                <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">crs</span><span class="p">,</span> <span class="s2">&quot;epsg:3857&quot;</span>
-            <span class="p">)</span>
+            <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">top</span> <span class="o">=</span> <span class="n">_reproj_bb</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">crs</span><span class="p">,</span> <span class="s2">&quot;epsg:3857&quot;</span><span class="p">)</span>
         <span class="c1"># Download image</span>
-        <span class="n">image</span><span class="p">,</span> <span class="n">extent</span> <span class="o">=</span> <span class="n">bounds2img</span><span class="p">(</span>
-            <span class="n">left</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">zoom</span><span class="o">=</span><span class="n">zoom</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">ll</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">zoom_adjust</span><span class="o">=</span><span class="n">zoom_adjust</span>
-        <span class="p">)</span>
+        <span class="n">image</span><span class="p">,</span> <span class="n">extent</span> <span class="o">=</span> <span class="n">bounds2img</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">zoom</span><span class="o">=</span><span class="n">zoom</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">ll</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">zoom_adjust</span><span class="o">=</span><span class="n">zoom_adjust</span><span class="p">)</span>
         <span class="c1"># Warping</span>
         <span class="k">if</span> <span class="n">crs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">image</span><span class="p">,</span> <span class="n">extent</span> <span class="o">=</span> <span class="n">warp_tiles</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">extent</span><span class="p">,</span> <span class="n">t_crs</span><span class="o">=</span><span class="n">crs</span><span class="p">,</span> <span class="n">resampling</span><span class="o">=</span><span class="n">resampling</span><span class="p">)</span>
@@ -300,9 +313,7 @@
 
                 <span class="c1"># Read window</span>
                 <span class="k">if</span> <span class="n">crs</span><span class="p">:</span>
-                    <span class="n">left</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">top</span> <span class="o">=</span> <span class="n">rio</span><span class="o">.</span><span class="n">warp</span><span class="o">.</span><span class="n">transform_bounds</span><span class="p">(</span>
-                        <span class="n">crs</span><span class="p">,</span> <span class="n">raster</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymax</span>
-                    <span class="p">)</span>
+                    <span class="n">left</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">top</span> <span class="o">=</span> <span class="n">rio</span><span class="o">.</span><span class="n">warp</span><span class="o">.</span><span class="n">transform_bounds</span><span class="p">(</span><span class="n">crs</span><span class="p">,</span> <span class="n">raster</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">left</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">top</span> <span class="o">=</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymax</span>
                 <span class="n">window</span> <span class="o">=</span> <span class="p">[</span>
@@ -329,22 +340,18 @@
                 <span class="n">extent</span> <span class="o">=</span> <span class="n">bb</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">bb</span><span class="o">.</span><span class="n">right</span><span class="p">,</span> <span class="n">bb</span><span class="o">.</span><span class="n">bottom</span><span class="p">,</span> <span class="n">bb</span><span class="o">.</span><span class="n">top</span>
             <span class="c1"># Warp</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">crs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">raster</span><span class="o">.</span><span class="n">crs</span> <span class="o">!=</span> <span class="n">crs</span><span class="p">):</span>
-                <span class="n">image</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_warper</span><span class="p">(</span>
-                    <span class="n">image</span><span class="p">,</span> <span class="n">img_transform</span><span class="p">,</span> <span class="n">raster</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">crs</span><span class="p">,</span> <span class="n">resampling</span>
-                <span class="p">)</span>
+                <span class="n">image</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_warper</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">img_transform</span><span class="p">,</span> <span class="n">raster</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">crs</span><span class="p">,</span> <span class="n">resampling</span><span class="p">)</span>
                 <span class="n">extent</span> <span class="o">=</span> <span class="n">bounds</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">bounds</span><span class="o">.</span><span class="n">right</span><span class="p">,</span> <span class="n">bounds</span><span class="o">.</span><span class="n">bottom</span><span class="p">,</span> <span class="n">bounds</span><span class="o">.</span><span class="n">top</span>
             <span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-    
+
     <span class="c1"># Rescale bounds and extent</span>
-    <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">*</span><span class="n">scale</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)]</span>
-    <span class="n">extent</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">*</span><span class="n">scale</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">extent</span><span class="p">]</span>
-    
+    <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="o">*</span> <span class="n">scale</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)]</span>
+    <span class="n">extent</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="o">*</span> <span class="n">scale</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">extent</span><span class="p">]</span>
+
     <span class="c1"># Plotting</span>
     <span class="k">if</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span>
-    <span class="n">img</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
-        <span class="n">image</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">extent</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">interpolation</span><span class="p">,</span> <span class="o">**</span><span class="n">extra_imshow_args</span>
-    <span class="p">)</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">extent</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">interpolation</span><span class="p">,</span> <span class="o">**</span><span class="n">extra_imshow_args</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">reset_extent</span><span class="p">:</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">((</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">))</span>
