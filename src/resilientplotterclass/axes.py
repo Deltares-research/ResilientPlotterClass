@@ -1,6 +1,7 @@
-import matplotlib.pyplot as plt
-import resilientplotterclass as rpc
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+import resilientplotterclass as rpc
+
 
 def append_cbar_axis(ax, append_axes_kwargs=None):
     """Append a colorbar axis.
@@ -17,21 +18,34 @@ def append_cbar_axis(ax, append_axes_kwargs=None):
     """
 
     # Create keyword arguments if not provided
-    if append_axes_kwargs is None: append_axes_kwargs = {}
+    if append_axes_kwargs is None:
+        append_axes_kwargs = {}
 
     # Divide axis
     divider = make_axes_locatable(ax)
 
     # Create colorbar axis
     cax = divider.append_axes(**append_axes_kwargs)
-    
+
     # Return colorbar axis
     return cax
 
 
-def format(ax, data=None, crs=None, xy_unit=None, xlim=None, ylim=None, xlabel_kwargs=None, ylabel_kwargs=None, title_kwargs=None, aspect_kwargs=None, grid_kwargs=None):
+def format(
+    ax,
+    data=None,
+    crs=None,
+    xy_unit=None,
+    xlim=None,
+    ylim=None,
+    xlabel_kwargs=None,
+    ylabel_kwargs=None,
+    title_kwargs=None,
+    aspect_kwargs=None,
+    grid_kwargs=None,
+):
     """Format axis for a DataArray, UgridDataArray or GeoDataFrame.
-    
+
     :param ax:            Axis.
     :type ax:             matplotlib.axes.Axes
     :param data:          DataArray, UgridDataArray or GeoDataFrame to rescale. If ``None``, the coordinate reference system is used to create the axis.
@@ -65,27 +79,32 @@ def format(ax, data=None, crs=None, xy_unit=None, xlim=None, ylim=None, xlabel_k
     """
 
     # Create keyword arguments if not provided
-    if xlabel_kwargs is None: xlabel_kwargs = {}
-    if ylabel_kwargs is None: ylabel_kwargs = {}
-    if title_kwargs is None: title_kwargs = {}
-    if aspect_kwargs is None: aspect_kwargs = {}
-    if grid_kwargs is None: grid_kwargs = {}
+    if xlabel_kwargs is None:
+        xlabel_kwargs = {}
+    if ylabel_kwargs is None:
+        ylabel_kwargs = {}
+    if title_kwargs is None:
+        title_kwargs = {}
+    if aspect_kwargs is None:
+        aspect_kwargs = {}
+    if grid_kwargs is None:
+        grid_kwargs = {}
 
     # Get the rescale parameters
     scale_factor, xlabel, ylabel = rpc.rescale.get_rescale_parameters(data=data, crs=crs, xy_unit=xy_unit)
-    
+
     # Rescale x and y limits
     if xlim is not None:
-        xlim = [x*scale_factor for x in xlim]
+        xlim = [x * scale_factor for x in xlim]
     if ylim is not None:
-        ylim = [y*scale_factor for y in ylim]
-    
+        ylim = [y * scale_factor for y in ylim]
+
     # Set default keyword arguments
-    xlabel_kwargs.setdefault('xlabel', xlabel)
-    ylabel_kwargs.setdefault('ylabel', ylabel)
-    title_kwargs.setdefault('label', '')
-    aspect_kwargs.setdefault('aspect', 'equal')
-    grid_kwargs.setdefault('visible', True)
+    xlabel_kwargs.setdefault("xlabel", xlabel)
+    ylabel_kwargs.setdefault("ylabel", ylabel)
+    title_kwargs.setdefault("label", "")
+    aspect_kwargs.setdefault("aspect", "equal")
+    grid_kwargs.setdefault("visible", True)
 
     # Set limits
     ax.set_xlim(xlim)
@@ -101,6 +120,9 @@ def format(ax, data=None, crs=None, xy_unit=None, xlim=None, ylim=None, xlabel_k
 
     # Set grid
     ax.grid(**grid_kwargs)
+
+    # Set tick label format
+    ax.ticklabel_format(useOffset=False, style="plain")
 
     # Return axis
     return ax

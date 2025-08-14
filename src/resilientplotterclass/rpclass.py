@@ -1,19 +1,22 @@
 # Packages
-import folium
 import gc
-import geopandas as gpd
 import html
 import inspect
-from IPython.display import display, HTML
 import json
-import matplotlib.pyplot as plt
 import os
+
+import folium
+import geopandas as gpd
+import matplotlib.pyplot as plt
 import pandas as pd
-from pyproj import CRS as pyprojCRS
-from rasterio.crs import CRS as rasterioCRS
 import xarray as xr
 import xugrid as xu
+from IPython.display import HTML, display
+from pyproj import CRS as pyprojCRS
+from rasterio.crs import CRS as rasterioCRS
+
 import resilientplotterclass as rpc
+
 
 # Resilient Plotter Class
 class rpclass:
@@ -39,11 +42,9 @@ class rpclass:
             self.set_cartopy()
         else:
             self.gdf_cartopy = None
-        
+
         # Register colormaps
         rpc.colormaps.register_colormaps()
-        import colorcet as cc    # See also: https://colorcet.holoviz.org/
-        import cmocean.cm as cmo # See also: https://matplotlib.org/cmocean/
 
     # =============================================================================
     # Guideline support methods
@@ -69,34 +70,34 @@ class rpclass:
         # Both dictionaries are not dictionaries --> return dictionary 2
         if not isinstance(dict1, dict) and not isinstance(dict2, dict):
             return dict2
-        
+
         # Dictionary 1 is not a dictionary --> return dictionary 2
         elif not isinstance(dict1, dict):
             return dict2
-        
+
         # Dictionary 2 is not a dictionary --> return dictionary 1
         elif not isinstance(dict2, dict):
             return dict1
-        
+
         # Both dictionaries are dictionaries --> combine dictionaries
         keys = list(dict1.keys()) + list(dict2.keys())
         dict3 = {}
         for key in keys:
             # Key not in dictionary 1 --> use dictionary 2
-            if not key in dict1.keys():
+            if key not in dict1.keys():
                 dict3[key] = dict2[key]
 
             # Key not in dictionary 2 --> use dictionary 1
-            elif not key in dict2.keys():
+            elif key not in dict2.keys():
                 dict3[key] = dict1[key]
-            
+
             # Key in both dictionaries --> combine dictionaries
             else:
-                dict3[key] = self._combine_dictionaries(dict1[key], dict2[key], max_depth=max_depth-1)
-        
+                dict3[key] = self._combine_dictionaries(dict1[key], dict2[key], max_depth=max_depth - 1)
+
         # Return combined dictionary
         return dict3
-    
+
     # Substitute string in dictionary
     def _substitute_str_in_dict(self, dict1, org_str=None, new_str=None):
         """Recursively substitute string in dictionary.
@@ -124,10 +125,10 @@ class rpclass:
 
         # Return dictionary with substituted strings
         return dict1
-    
+
     # Remove conflicting kwargs
     def _remove_conflicting_kwargs(self, dict1, plot_style=None, warn=True, reverse=True):
-        """ Remove conflicting kwargs from dictionary, prioritising the last kwargs.
+        """Remove conflicting kwargs from dictionary, prioritising the last kwargs.
 
         :param dict1:     Dictionary.
         :type dict1:      dict
@@ -143,9 +144,7 @@ class rpclass:
         i = -1 if reverse else 1
 
         # Define conflicting kwargs
-        CONFLICT_DICT = {'color': ['cmap'],
-                         'colors': ['cmap'],
-                         'cmap': ['color', 'colors']}
+        CONFLICT_DICT = {"color": ["cmap"], "colors": ["cmap"], "cmap": ["color", "colors"]}
 
         # Remove conflicting kwargs
         dict2 = {}
@@ -157,11 +156,13 @@ class rpclass:
             elif warn:
                 key2 = [key2 for key2 in CONFLICT_DICT[key] if key2 in dict2.keys()][0]
                 print("\033[93m Warning: Conflicting kwargs ('{}' and '{}') using '{}'. \033[0m".format(key2, key, key2))
-        
+
         # Remove conflicting kwargs for colorbar
-        if ('add_colorbar' in dict2.keys() and not dict2['add_colorbar']) or (plot_style in ['contour', 'quiver', 'streamplot'] and 'add_colorbar' not in dict2.keys()):
-            if 'cbar_kwargs' in dict2.keys():
-                dict2.pop('cbar_kwargs')
+        if ("add_colorbar" in dict2.keys() and not dict2["add_colorbar"]) or (
+            plot_style in ["contour", "quiver", "streamplot"] and "add_colorbar" not in dict2.keys()
+        ):
+            if "cbar_kwargs" in dict2.keys():
+                dict2.pop("cbar_kwargs")
                 print("\033[93m Warning: 'cbar_kwargs' removed because 'add_colorbar' is False. \033[0m")
 
         # Return dictionary without conflicting kwargs
@@ -191,18 +192,18 @@ class rpclass:
         # Get parameters and arguments
         parameters, arguments = [], []
         if data_style is not None:
-            parameters.append('data_style' if not interactive else 'interactive_data_style')
+            parameters.append("data_style" if not interactive else "interactive_data_style")
             arguments.append(data_style)
         if geom_style is not None:
-            parameters.append('geom_style' if not interactive else 'interactive_geom_style')
+            parameters.append("geom_style" if not interactive else "interactive_geom_style")
             arguments.append(geom_style)
         if map_style is not None:
-            parameters.append('map_style' if not interactive else 'interactive_map_style')
+            parameters.append("map_style" if not interactive else "interactive_map_style")
             arguments.append(map_style)
         if extent_style is not None:
-            parameters.append('extent_style' if not interactive else 'interactive_extent_style')
+            parameters.append("extent_style" if not interactive else "interactive_extent_style")
             arguments.append(extent_style)
-        
+
         # Get plot type (name of the function calling this method)
         plot_style = inspect.stack()[1].function
 
@@ -214,28 +215,30 @@ class rpclass:
                 raise ValueError("{} not in guidelines. Available: {}".format(parameter, list(self.guidelines.keys())))
             if argument not in self.guidelines[parameter].keys():
                 raise ValueError("{} '{}' not in guidelines. Available: {}".format(parameter, argument, list(self.guidelines[parameter].keys())))
-            
-            if parameter in ['data_style', 'interactive_data_style']:
+
+            if parameter in ["data_style", "interactive_data_style"]:
                 # Check if plot_style is in guidelines
                 if plot_style not in self.guidelines[parameter][argument].keys():
-                    raise ValueError('plot_style {} not in guidelines. Available: {}'.format(plot_style, list(self.guidelines[parameter][argument].keys())))
+                    raise ValueError(
+                        "plot_style {} not in guidelines. Available: {}".format(plot_style, list(self.guidelines[parameter][argument].keys()))
+                    )
                 guideline_kwargs_ls.append(self.guidelines[parameter][argument][plot_style].copy())
             else:
                 guideline_kwargs_ls.append(self.guidelines[parameter][argument].copy())
 
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
         if not interactive:
-            kwargs.setdefault('xy_unit', self.guidelines['general']['xy_unit'])
+            kwargs.setdefault("xy_unit", self.guidelines["general"]["xy_unit"])
         for guideline_kwargs in guideline_kwargs_ls:
             kwargs = self._combine_dictionaries(guideline_kwargs, kwargs)
-        
+
         # Remove conflicting kwargs
         kwargs = self._remove_conflicting_kwargs(kwargs, plot_style)
 
         # Show keyword arguments
         if show_kwargs:
-            print('Keyword arguments for {}: {}'.format(plot_style, kwargs))
-        
+            print("Keyword arguments for {}: {}".format(plot_style, kwargs))
+
         # Return keyword arguments
         return kwargs
 
@@ -290,21 +293,31 @@ class rpclass:
         :return:                   Guideline origins dataframe.
         :rtype:                    pandas.DataFrame
         """
-        
+
         # Get guidelines
         def _get_guideline(guidelines, parameter, argument, method):
-            if parameter in guidelines.keys() and parameter == 'data_style' and argument in guidelines[parameter].keys() and method in guidelines[parameter][argument].keys():
-                guideline = guidelines[parameter][argument][method] # Data type
-            elif parameter in guidelines.keys() and parameter == 'geom_style' and argument in guidelines[parameter].keys() and method in ['grid', 'geometries']:
-                guideline = guidelines[parameter][argument] # Geom type
-            elif parameter in guidelines.keys() and parameter == 'map_style' and argument in guidelines[parameter].keys() and method in ['basemap']:
-                guideline = guidelines[parameter][argument] # Map type
-            elif parameter in guidelines.keys() and parameter == 'extent_style' and argument in guidelines[parameter].keys():
-                guideline = guidelines[parameter][argument] # Extent type
+            if (
+                parameter in guidelines.keys()
+                and parameter == "data_style"
+                and argument in guidelines[parameter].keys()
+                and method in guidelines[parameter][argument].keys()
+            ):
+                guideline = guidelines[parameter][argument][method]  # Data type
+            elif (
+                parameter in guidelines.keys()
+                and parameter == "geom_style"
+                and argument in guidelines[parameter].keys()
+                and method in ["grid", "geometries"]
+            ):
+                guideline = guidelines[parameter][argument]  # Geom type
+            elif parameter in guidelines.keys() and parameter == "map_style" and argument in guidelines[parameter].keys() and method in ["basemap"]:
+                guideline = guidelines[parameter][argument]  # Map type
+            elif parameter in guidelines.keys() and parameter == "extent_style" and argument in guidelines[parameter].keys():
+                guideline = guidelines[parameter][argument]  # Extent type
             else:
                 guideline = None
             return guideline
-        
+
         # Compare guidelines
         def _compare_guidelines(guidelines, default_guidelines, project_guidelines, parameter, argument, method):
             # Get guidelines
@@ -314,24 +327,44 @@ class rpclass:
 
             # Compare guidelines
             if guideline is None:
-                return '' # No guidelines
+                return ""  # No guidelines
             elif guideline == default_guideline and guideline == project_guideline:
-                return 'D=P' # Default guideline equal to project guideline
+                return "D=P"  # Default guideline equal to project guideline
             elif guideline == default_guideline:
-                return 'D' # Default guideline
+                return "D"  # Default guideline
             elif guideline == project_guideline:
-                return 'P' # Project guideline
+                return "P"  # Project guideline
             else:
-                return 'D+P' # Default guideline merged with project guideline
+                return "D+P"  # Default guideline merged with project guideline
 
         # Initialise lists
         parameters = []
         arguments = []
-        methods = {'pcolormesh': [], 'imshow': [], 'scatter': [], 'contourf': [], 'contour': [],
-                    'quiver': [], 'streamplot': [], 'grid': [], 'geometries': [], 'basemap': [], 'cartopy': []}
+        methods = {
+            "pcolormesh": [],
+            "imshow": [],
+            "scatter": [],
+            "contourf": [],
+            "contour": [],
+            "quiver": [],
+            "streamplot": [],
+            "grid": [],
+            "geometries": [],
+            "basemap": [],
+            "cartopy": [],
+        }
 
         # Add parameters, arguments and methods
-        styles = ['data_style', 'geom_style', 'map_style', 'extent_style', 'interactive_data_style', 'interactive_geom_style', 'interactive_map_style', 'interactive_extent_style']
+        styles = [
+            "data_style",
+            "geom_style",
+            "map_style",
+            "extent_style",
+            "interactive_data_style",
+            "interactive_geom_style",
+            "interactive_map_style",
+            "interactive_extent_style",
+        ]
         for parameter in styles:
             if parameter not in guidelines.keys():
                 continue
@@ -342,10 +375,10 @@ class rpclass:
                     methods[method].append(_compare_guidelines(guidelines, default_guidelines, project_guidelines, parameter, argument, method))
 
         # Create dataframe
-        df_guideline_origins = pd.DataFrame({'parameter': parameters, 'argument': arguments, **methods})
+        df_guideline_origins = pd.DataFrame({"parameter": parameters, "argument": arguments, **methods})
 
         # Set multi-index
-        df_guideline_origins = df_guideline_origins.set_index(['parameter', 'argument'])
+        df_guideline_origins = df_guideline_origins.set_index(["parameter", "argument"])
 
         # Reindex dataframe
         df_guideline_origins = df_guideline_origins.reindex(styles, level=0)
@@ -367,10 +400,10 @@ class rpclass:
         """
 
         # Read default guidelines
-        dir_path_guidelines = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'guidelines')
-        with open(os.path.join(dir_path_guidelines, 'default.json')) as f:
+        dir_path_guidelines = os.path.join(os.path.dirname(os.path.abspath(__file__)), "guidelines")
+        with open(os.path.join(dir_path_guidelines, "default.json")) as f:
             default_guidelines = json.load(f)
-        
+
         # Read project guidelines
         if project_guidelines is None:
             project_guidelines = {}
@@ -378,22 +411,22 @@ class rpclass:
             project_guidelines = project_guidelines
         elif isinstance(project_guidelines, str):
             __, ext = os.path.splitext(project_guidelines)
-            if ext == '':
-                project_guidelines = project_guidelines + '.json'
-            elif ext != '.json':
-                raise ValueError('Project guidelines must be a json file. Received: {}'.format(ext))
+            if ext == "":
+                project_guidelines = project_guidelines + ".json"
+            elif ext != ".json":
+                raise ValueError("Project guidelines must be a json file. Received: {}".format(ext))
             if os.path.exists(os.path.join(dir_path_guidelines, project_guidelines)) and not os.path.exists(project_guidelines):
                 project_guidelines = os.path.join(dir_path_guidelines, project_guidelines)
             with open(project_guidelines) as f:
                 project_guidelines = json.load(f)
         else:
-            raise ValueError('Project guidelines must be a file path (str) or a dictionary (dict). Received: {}'.format(type(project_guidelines)))
+            raise ValueError("Project guidelines must be a file path (str) or a dictionary (dict). Received: {}".format(type(project_guidelines)))
 
         # Combine guidelines, prioritising project guidelines
         guidelines = self._combine_dictionaries(default_guidelines, project_guidelines)
 
         # Substitute strings in guidelines
-        guidelines = self._substitute_str_in_dict(guidelines, '@vrl', guidelines['general']['vrl'])
+        guidelines = self._substitute_str_in_dict(guidelines, "@vrl", guidelines["general"]["vrl"])
 
         # Remove conflicting kwargs from guidelines
         guidelines = self._remove_conflicting_kwargs(guidelines, warn=False, reverse=False)
@@ -403,7 +436,7 @@ class rpclass:
 
         # Set guideline origins dataframe
         self._df_guideline_origins = self._get_df_guideline_origins(guidelines, default_guidelines, project_guidelines)
-    
+
     # Get guidelines
     def get_guidelines(self):
         """Get guidelines.
@@ -414,7 +447,7 @@ class rpclass:
 
         # Return guidelines
         return self.guidelines
-    
+
     # Show guidelines
     def show_guidelines(self, indent=20, open=True):
         """Show guidelines.
@@ -424,7 +457,7 @@ class rpclass:
         """
 
         # Set open
-        open = 'open' if open else 'closed'
+        open = "open" if open else "closed"
 
         # Show guidelines
         html_str = f"""
@@ -436,7 +469,7 @@ class rpclass:
         </details>
         """
         display(HTML(html_str))
-    
+
     # Show guideline origins
     def show_guideline_origins(self):
         """Show guideline origins.
@@ -451,13 +484,15 @@ class rpclass:
         # Show guideline origins dataframe
         style = self._df_guideline_origins.style
         for _, df_group in self._df_guideline_origins.groupby(level=0):
-            style = style.set_properties(**{'text-align': 'center'})
-            style = style.set_table_styles({df_group.index[0]: [{'selector': '', 'props': 'border-top: 2px solid black'}]}, overwrite=False, axis=1)
-        style = style.set_caption('Guideline Origins (D: Default, P: Project, D=P: Default equal to Project, D+P: Default merged with Project)')
-        style = style.set_table_styles([{'selector': 'thread', 'props': [('border-top', '2px solid black')]},
-                                {'selector': 'caption', 'props': [('font-weight', 'bold')]}], overwrite=False)
+            style = style.set_properties(**{"text-align": "center"})
+            style = style.set_table_styles({df_group.index[0]: [{"selector": "", "props": "border-top: 2px solid black"}]}, overwrite=False, axis=1)
+        style = style.set_caption("Guideline Origins (D: Default, P: Project, D=P: Default equal to Project, D+P: Default merged with Project)")
+        style = style.set_table_styles(
+            [{"selector": "thread", "props": [("border-top", "2px solid black")]}, {"selector": "caption", "props": [("font-weight", "bold")]}],
+            overwrite=False,
+        )
         display(style)
-        
+
     # =============================================================================
     # Cartopy methods
     # =============================================================================
@@ -475,11 +510,11 @@ class rpclass:
         :return:         None.
         :rtype:          None
         """
-        
+
         # Combine guidelines and user keyword arguments, prioritising user keyword arguments
-        features = self.guidelines['general']['cartopy_features'] if features is None else features
-        bounds = self.guidelines['general']['cartopy_bounds'] if bounds is None else bounds
-        crs = self.guidelines['general']['crs'] if crs is None else crs
+        features = self.guidelines["general"]["cartopy_features"] if features is None else features
+        bounds = self.guidelines["general"]["cartopy_bounds"] if bounds is None else bounds
+        crs = self.guidelines["general"]["crs"] if crs is None else crs
 
         # Set cartopy geometries
         self.gdf_cartopy = rpc.geometries.get_gdf_cartopy(features=features, bounds=bounds, crs=crs, buffer=buffer)
@@ -498,7 +533,7 @@ class rpclass:
 
         # Return cartopy geometries
         return self.gdf_cartopy
-    
+
     # =============================================================================
     # Plot support methods
     # =============================================================================
@@ -518,10 +553,10 @@ class rpclass:
 
         # Create subplots
         fig, axs = plt.subplots(*args, **kwargs)
-        
+
         # Return figure and axes
         return fig, axs
-    
+
     def map(self, **kwargs):
         """Create map.
 
@@ -538,7 +573,26 @@ class rpclass:
 
         # Create map
         return m
-        
+
+    def draw_map(self, m=None, **kwargs):
+        """Draw map.
+
+        :param m:      Folium map to draw on.
+        :type m:       folium.Map, optional
+        :param kwargs: Keyword arguments for :func:`folium.Map`.
+        :type kwargs:  dict, optional
+        :return:       Map.
+        :rtype:        folium.Map
+
+        See also: `folium.Map() <https://python-visualization.github.io/folium/modules.html#folium.folium.Map>`_
+        """
+
+        # Create map
+        m = folium.Map(**kwargs)
+
+        # Create map
+        return m
+
     # Show figure
     def show(self, fig=None, m=None, **kwargs):
         """Show figure.
@@ -561,14 +615,14 @@ class rpclass:
         elif isinstance(fig, folium.Map):
             interactive = True
         else:
-            raise TypeError('fig must be a matplotlib.figure.Figure or folium.Map. Received: {}'.format(type(fig)))
+            raise TypeError("fig must be a matplotlib.figure.Figure or folium.Map. Received: {}".format(type(fig)))
 
         # Show figure
         if not interactive:
             fig.tight_layout()
             plt.show(**kwargs)
         else:
-            if 'draw' in kwargs.keys() and kwargs['draw']:
+            if "draw" in kwargs.keys() and kwargs["draw"]:
                 rpc.interactive.Draw(export=True, filename="draw.geojson").add_to(m)
             folium.LayerControl().add_to(m)
             display(m)
@@ -597,16 +651,16 @@ class rpclass:
         elif isinstance(fig, folium.Map):
             interactive = True
         else:
-            raise TypeError('fig must be a matplotlib.figure.Figure or folium.Map. Received: {}'.format(type(fig)))
-        
+            raise TypeError("fig must be a matplotlib.figure.Figure or folium.Map. Received: {}".format(type(fig)))
+
         # Determine if file path is set
         if file_path is None:
-            raise ValueError('file_path must be set. Received: {}'.format(file_path))
-        
+            raise ValueError("file_path must be set. Received: {}".format(file_path))
+
         # Save figure
         if not interactive:
-            kwargs.setdefault('dpi', 300)
-            kwargs.setdefault('bbox_inches', 'tight')
+            kwargs.setdefault("dpi", 300)
+            kwargs.setdefault("bbox_inches", "tight")
             fig.savefig(file_path, **kwargs)
         else:
             fig.save(file_path, **kwargs)
@@ -620,7 +674,7 @@ class rpclass:
         :param m:   Map to close.
         :type m:    folium.Map
         :return:    None.
-        :rtype:     None   
+        :rtype:     None
         """
 
         # Determine if plot is interactive
@@ -630,14 +684,16 @@ class rpclass:
         elif isinstance(fig, folium.Map):
             interactive = True
         else:
-            raise TypeError('fig must be a matplotlib.figure.Figure or folium.Map. Received: {}'.format(type(fig)))
+            raise TypeError("fig must be a matplotlib.figure.Figure or folium.Map. Received: {}".format(type(fig)))
 
         # Close figure
         if not interactive:
+            fig.clear()
             plt.close(fig)
+            del fig
             gc.collect()
         else:
-            raise TypeError('fig must be a matplotlib.figure.Figure. Received: {}'.format(type(fig)))
+            raise TypeError("fig must be a matplotlib.figure.Figure. Received: {}".format(type(fig)))
 
     # Create video
     def create_video(self, file_paths, file_path_video, fps=5, **kwargs):
@@ -656,7 +712,7 @@ class rpclass:
 
         # Create video
         rpc.videos.create_video(file_paths, file_path_video, fps=fps, **kwargs)
-    
+
     # Plot custom colormaps
     def plot_colormaps(self):
         """Plot custom colormaps.
@@ -670,7 +726,7 @@ class rpclass:
 
     # =============================================================================
     # Plot methods
-    # =============================================================================    
+    # =============================================================================
     def pcolormesh(self, data, ax=None, m=None, data_style=None, extent_style=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot data using pcolormesh.
 
@@ -701,25 +757,25 @@ class rpclass:
             interactive = True
         elif interactive is None:
             interactive = False
-        
+
         # Get keyword arguments
         kwargs = self._get_kwargs(data_style=data_style, extent_style=extent_style, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
 
         # Plot data
         if isinstance(data, xr.DataArray) and not interactive:
-            p = rpc.data_xarray.pcolormesh(data, ax=ax, **kwargs)
+            p = rpc.structured_data.pcolormesh(data, ax=ax, **kwargs)
         elif isinstance(data, xu.UgridDataArray) and not interactive:
-            p = rpc.data_xugrid.pcolormesh(data, ax=ax, **kwargs)
+            p = rpc.unstructured_data.pcolormesh(data, ax=ax, **kwargs)
         elif isinstance(data, xr.DataArray) and interactive:
             p = rpc.interactive.pcolormesh(data, m=m, **kwargs)
         elif isinstance(data, xu.UgridDataArray) and interactive:
-            raise TypeError('Interactive pcolormesh not supported for xugrid.UgridDataArray.')
+            raise TypeError("Interactive pcolormesh not supported for xugrid.UgridDataArray.")
         else:
-            raise TypeError('data type not supported. Please provide a xarray.DataArray or xugrid.UgridDataArray. Received: {}'.format(type(data)))
-        
+            raise TypeError("data type not supported. Please provide a xarray.DataArray or xugrid.UgridDataArray. Received: {}".format(type(data)))
+
         # Return plot
         return p
-        
+
     # Plot data using imshow
     def imshow(self, data, ax=None, m=None, data_style=None, extent_style=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot data using imshow.
@@ -741,9 +797,9 @@ class rpclass:
         :param kwargs:       Keyword arguments for :func:`resilientplotterclass.data_xarray.imshow` or :func:`resilientplotterclass.data_xugrid.imshow`.
         :type kwargs:        dict, optional
         :return:             Plot.
-        :rtype:              matplotlib.collections.QuadMesh or geoviews.element.chart.Image 
+        :rtype:              matplotlib.collections.QuadMesh or geoviews.element.chart.Image
         """
-        
+
         # Determine if plot is interactive
         if isinstance(ax, plt.Axes):
             interactive = False
@@ -751,25 +807,25 @@ class rpclass:
             interactive = True
         elif interactive is None:
             interactive = False
-        
+
         # Get keyword arguments
         kwargs = self._get_kwargs(data_style=data_style, extent_style=extent_style, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
 
         # Plot data
         if isinstance(data, xr.DataArray) and not interactive:
-            p = rpc.data_xarray.imshow(data, ax=ax, **kwargs)
+            p = rpc.structured_data.imshow(data, ax=ax, **kwargs)
         elif isinstance(data, xu.UgridDataArray) and not interactive:
-            p = rpc.data_xugrid.imshow(data, ax=ax, **kwargs)
+            p = rpc.unstructured_data.imshow(data, ax=ax, **kwargs)
         elif isinstance(data, xr.DataArray) and interactive:
             p = rpc.interactive.imshow(data, m=m, **kwargs)
         elif isinstance(data, xu.UgridDataArray) and interactive:
-            raise TypeError('Interactive imshow not supported for xugrid.UgridDataArray.')
+            raise TypeError("Interactive imshow not supported for xugrid.UgridDataArray.")
         else:
-            raise TypeError('data type not supported. Please provide a xarray.DataArray or xugrid.UgridDataArray. Received: {}'.format(type(data)))
-        
+            raise TypeError("data type not supported. Please provide a xarray.DataArray or xugrid.UgridDataArray. Received: {}".format(type(data)))
+
         # Return plot
         return p
-    
+
     # Plot data using scatter
     def scatter(self, data, ax=None, m=None, data_style=None, extent_style=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot data using scatter.
@@ -807,19 +863,21 @@ class rpclass:
 
         # Plot data
         if (isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset)) and not interactive:
-            p = rpc.data_xarray.scatter(data, ax=ax, **kwargs)
+            p = rpc.structured_data.scatter(data, ax=ax, **kwargs)
         elif isinstance(data, xu.UgridDataArray) and not interactive:
-            p = rpc.data_xugrid.scatter(data, ax=ax, **kwargs)
+            p = rpc.unstructured_data.scatter(data, ax=ax, **kwargs)
         elif isinstance(data, xr.DataArray) and interactive:
             p = rpc.interactive.scatter(data, m=m, **kwargs)
         elif isinstance(data, xu.UgridDataArray) and interactive:
-            raise TypeError('Interactive scatter not supported for xugrid.UgridDataArray.')
-        else: 
-            raise TypeError('data type not supported. Please provide a xarray.DataArray, xarray.Dataset or xugrid.UgridDataArray. Received: {}'.format(type(data)))
-        
+            raise TypeError("Interactive scatter not supported for xugrid.UgridDataArray.")
+        else:
+            raise TypeError(
+                "data type not supported. Please provide a xarray.DataArray, xarray.Dataset or xugrid.UgridDataArray. Received: {}".format(type(data))
+            )
+
         # Return plot
         return p
-    
+
     # Plot data using contourf
     def contourf(self, data, ax=None, m=None, data_style=None, extent_style=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot data using contourf.
@@ -851,25 +909,25 @@ class rpclass:
             interactive = True
         elif interactive is None:
             interactive = False
-        
+
         # Get keyword arguments
         kwargs = self._get_kwargs(data_style=data_style, extent_style=extent_style, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
 
         # Plot data
         if isinstance(data, xr.DataArray) and not interactive:
-            p = rpc.data_xarray.contourf(data, ax=ax, **kwargs)
+            p = rpc.structured_data.contourf(data, ax=ax, **kwargs)
         elif isinstance(data, xu.UgridDataArray) and not interactive:
-            p = rpc.data_xugrid.contourf(data, ax=ax, **kwargs)
+            p = rpc.unstructured_data.contourf(data, ax=ax, **kwargs)
         elif isinstance(data, xr.DataArray) and interactive:
             p = rpc.interactive.contourf(data, m=m, **kwargs)
         elif isinstance(data, xu.UgridDataArray) and interactive:
-            raise TypeError('Interactive contourf not supported for xugrid.UgridDataArray.')
+            raise TypeError("Interactive contourf not supported for xugrid.UgridDataArray.")
         else:
-            raise TypeError('data type not supported. Please provide a xarray.DataArray or xugrid.UgridDataArray. Received: {}'.format(type(data)))
-        
+            raise TypeError("data type not supported. Please provide a xarray.DataArray or xugrid.UgridDataArray. Received: {}".format(type(data)))
+
         # Return plot
         return p
-    
+
     # Plot data using contour
     def contour(self, data, ax=None, m=None, data_style=None, extent_style=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot data using contour.
@@ -907,16 +965,16 @@ class rpclass:
 
         # Plot data
         if isinstance(data, xr.DataArray) and not interactive:
-            p = rpc.data_xarray.contour(data, ax=ax, **kwargs)
+            p = rpc.structured_data.contour(data, ax=ax, **kwargs)
         elif (isinstance(data, xu.UgridDataArray) or isinstance(data, xu.UgridDataset)) and not interactive:
-            p = rpc.data_xugrid.contour(data, ax=ax, **kwargs)
+            p = rpc.unstructured_data.contour(data, ax=ax, **kwargs)
         elif isinstance(data, xr.DataArray) and interactive:
             p = rpc.interactive.contour(data, m=m, **kwargs)
         elif isinstance(data, xu.UgridDataArray) and interactive:
-            raise TypeError('Interactive contour not supported for xugrid.UgridDataArray.')
+            raise TypeError("Interactive contour not supported for xugrid.UgridDataArray.")
         else:
-            raise TypeError('data type not supported. Please provide a xarray.DataArray or xugrid.UgridDataArray. Received: {}'.format(type(data)))
-        
+            raise TypeError("data type not supported. Please provide a xarray.DataArray or xugrid.UgridDataArray. Received: {}".format(type(data)))
+
         # Return plot
         return p
 
@@ -957,16 +1015,16 @@ class rpclass:
 
         # Plot data
         if isinstance(data, xr.Dataset) and not interactive:
-            p = rpc.data_xarray.quiver(data, ax=ax, **kwargs)
+            p = rpc.structured_data.quiver(data, ax=ax, **kwargs)
         elif isinstance(data, xu.UgridDataset) and not interactive:
-            p = rpc.data_xugrid.quiver(data, ax=ax, **kwargs)
+            p = rpc.unstructured_data.quiver(data, ax=ax, **kwargs)
         elif isinstance(data, xr.Dataset) and interactive:
             p = rpc.interactive.quiver(data, m=m, **kwargs)
         elif isinstance(data, xu.UgridDataset) and interactive:
-            raise TypeError('Interactive quiver not supported for xugrid.UgridDataset.')
+            raise TypeError("Interactive quiver not supported for xugrid.UgridDataset.")
         else:
-            raise TypeError('data type not supported. Please provide a xarray.Dataset or xugrid.UgridDataset. Received: {}'.format(type(data)))
-        
+            raise TypeError("data type not supported. Please provide a xarray.Dataset or xugrid.UgridDataset. Received: {}".format(type(data)))
+
         # Return plot
         return p
 
@@ -993,7 +1051,7 @@ class rpclass:
         :return:             Plot.
         :rtype:              matplotlib.collections.QuadMesh
         """
-        
+
         # Determine if plot is interactive
         if isinstance(ax, plt.Axes):
             interactive = False
@@ -1007,17 +1065,17 @@ class rpclass:
 
         # Plot data
         if isinstance(da, xr.Dataset) and not interactive:
-            p = rpc.data_xarray.streamplot(da, ax=ax, **kwargs)
+            p = rpc.structured_data.streamplot(da, ax=ax, **kwargs)
         elif isinstance(da, xr.Dataset) and interactive:
             p = rpc.interactive.streamplot(da, m=m, **kwargs)
         else:
-            raise TypeError('data type not supported. Please provide a xarray.Dataset. Received: {}'.format(type(da)))
+            raise TypeError("data type not supported. Please provide a xarray.Dataset. Received: {}".format(type(da)))
 
         # Return plot
         return p
 
     # Plot grid using xugrid
-    def grid(self, data, ax=None, m=None, geom_style='grid', extent_style=None, interactive=None, show_kwargs=False, **kwargs):
+    def grid(self, data, ax=None, m=None, geom_style="grid", extent_style=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot grid using xugrid.
 
         :param data:           Data to plot.
@@ -1053,19 +1111,23 @@ class rpclass:
 
         # Plot grid
         if (isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset)) and not interactive:
-            ax = rpc.data_xarray.grid(data, ax=ax, **kwargs)
+            ax = rpc.structured_data.grid(data, ax=ax, **kwargs)
         elif (isinstance(data, xu.UgridDataArray) or isinstance(data, xu.UgridDataset)) and not interactive:
-            ax = rpc.data_xugrid.grid(data, ax=ax, **kwargs)
+            ax = rpc.unstructured_data.grid(data, ax=ax, **kwargs)
         elif (isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset)) and interactive:
-            raise TypeError('Interactive grid not supported for xarray.DataArray or xarray.Dataset.')
+            raise TypeError("Interactive grid not supported for xarray.DataArray or xarray.Dataset.")
         elif (isinstance(data, xu.UgridDataArray) or isinstance(data, xu.UgridDataset)) and interactive:
-            raise TypeError('Interactive grid not supported for xugrid.UgridDataArray or xugrid.UgridDataset.')
+            raise TypeError("Interactive grid not supported for xugrid.UgridDataArray or xugrid.UgridDataset.")
         else:
-            raise TypeError('data type not supported. Please provide a xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray or xugrid.UgridDataset. Received: {}'.format(type(data)))
+            raise TypeError(
+                "data type not supported. Please provide a xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray or xugrid.UgridDataset. Received: {}".format(
+                    type(data)
+                )
+            )
 
         # Return axis
         return ax
-    
+
     # Plot geometries using geopandas
     def geometries(self, gdf, ax=None, m=None, geom_style=None, extent_style=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot geometries using geopandas.
@@ -1097,21 +1159,21 @@ class rpclass:
             interactive = True
         elif interactive is None:
             interactive = False
-            
+
         # Get keyword arguments
         kwargs = self._get_kwargs(geom_style=geom_style, extent_style=extent_style, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
-        
+
         # Plot geometries
         if isinstance(gdf, gpd.GeoDataFrame) and not interactive:
             ax = rpc.geometries.plot_geometries(gdf, ax=ax, **kwargs)
         elif isinstance(gdf, gpd.GeoDataFrame) and interactive:
             ax = rpc.interactive.plot_geometries(gdf, m=m, **kwargs)
         else:
-            raise TypeError('gdf must be a geopandas.GeoDataFrame. Received: {}'.format(type(gdf)))
+            raise TypeError("gdf must be a geopandas.GeoDataFrame. Received: {}".format(type(gdf)))
 
         # Return axis
         return ax
-    
+
     # Plot basemap using contextily
     def basemap(self, crs=None, ax=None, m=None, map_style=None, extent_style=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot basemap using contextily.
@@ -1146,20 +1208,20 @@ class rpclass:
 
         # Get keyword arguments
         if crs is None:
-            crs = self.guidelines['general']['crs']
+            crs = self.guidelines["general"]["crs"]
         kwargs = self._get_kwargs(map_style=map_style, extent_style=extent_style, interactive=interactive, show_kwargs=show_kwargs, **kwargs)
-        
+
         # Plot basemap
         if (isinstance(crs, pyprojCRS) or isinstance(crs, rasterioCRS) or isinstance(crs, str)) and not interactive:
             ax = rpc.basemaps.plot_basemap(crs=crs, ax=ax, **kwargs)
         elif interactive:
             ax = rpc.interactive.plot_basemap(m=m, **kwargs)
         else:
-            raise TypeError('crs must be a pyproj.CRS or rasterio.CRS or str. Received: {}'.format(type(crs)))
-        
+            raise TypeError("crs must be a pyproj.CRS or rasterio.CRS or str. Received: {}".format(type(crs)))
+
         # Return axis
         return ax
-    
+
     # Plot cartopy geometries using geopandas
     def cartopy(self, ax=None, m=None, extent_style=None, interactive=None, show_kwargs=False, **kwargs):
         """Plot cartopy geometries using geopandas.
@@ -1190,16 +1252,16 @@ class rpclass:
 
         # Get keyword arguments
         kwargs = self._get_kwargs(extent_style=extent_style, show_kwargs=show_kwargs, **kwargs)
-        
+
         # Plot cartopy geometries
         if not interactive:
             ax = rpc.geometries.plot_geometries(self.get_cartopy(), ax=ax, **kwargs)
         else:
-            raise TypeError('Interactive cartopy not supported.')
+            raise TypeError("Interactive cartopy not supported.")
 
         # Return axis
         return ax
-    
+
     # =============================================================================
     # Utility methods
     # =============================================================================
@@ -1228,11 +1290,15 @@ class rpclass:
         elif isinstance(data, gpd.GeoDataFrame):
             data = data.to_crs(crs, **kwargs)
         else:
-            raise TypeError('data type not supported. Please provide a xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray, xugrid.UgridDataset or geopandas.GeoDataFrame. Received: {}'.format(type(data)))
-        
+            raise TypeError(
+                "data type not supported. Please provide a xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray, xugrid.UgridDataset or geopandas.GeoDataFrame. Received: {}".format(
+                    type(data)
+                )
+            )
+
         # Return reprojected data
         return data
-    
+
     # Structured data to unstructured data
     def to_unstructured(self, data, **kwargs):
         """Structured data to unstructured data.
@@ -1251,11 +1317,11 @@ class rpclass:
             data = xu.UgridDataArray.from_structured(data, **kwargs)
             data.grid.crs = crs
         else:
-            raise TypeError('data type not supported. Please provide a xarray.DataArray or xarray.Dataset. Received: {}'.format(type(data)))
-        
+            raise TypeError("data type not supported. Please provide a xarray.DataArray or xarray.Dataset. Received: {}".format(type(data)))
+
         # Return unstructured data
         return data
-    
+
     # Unstructured data to structured data
     def to_structured(self, data, data_blueprint=None, bounds=None, resolution=None):
         """Unstructured data to structured data.
@@ -1278,7 +1344,7 @@ class rpclass:
         if isinstance(data, xu.UgridDataArray) or isinstance(data, xu.UgridDataset):
             data = rpc.utils.rasterise_uds(data, data_blueprint, bounds=bounds, resolution=resolution)
         else:
-            raise TypeError('data type not supported. Please provide a xugrid.UgridDataArray or xugrid.UgridDataset. Received: {}'.format(type(data)))
-        
+            raise TypeError("data type not supported. Please provide a xugrid.UgridDataArray or xugrid.UgridDataset. Received: {}".format(type(data)))
+
         # Return structured data
         return data

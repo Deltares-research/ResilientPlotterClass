@@ -1,12 +1,13 @@
 import folium
 import matplotlib.pyplot as plt
-from matplotlib.colors import to_hex
 import numpy as np
 from branca.element import Element, Figure
 from folium.plugins import Draw
+from matplotlib.colors import to_hex
 
-def _explore_image(da, m, cmap='Spectral_r', vmin=None, vmax=None, legend=None, legend_kwds={}, **kwargs):
-    """"Plot data interactively using folium.
+
+def _explore_image(da, m, cmap="Spectral_r", vmin=None, vmax=None, legend=None, legend_kwds={}, **kwargs):
+    """ "Plot data interactively using folium.
 
     :param da:          Data to plot.
     :type da:           xarray.DataArray
@@ -30,7 +31,7 @@ def _explore_image(da, m, cmap='Spectral_r', vmin=None, vmax=None, legend=None, 
     :See also: `folium.raster_layers.ImageOverlay <https://python-visualization.github.io/folium/latest/reference.html#folium.raster_layers.ImageOverlay>`_
     :See also: `folium.LinearColormap <https://python-visualization.github.io/folium/latest/advanced_guide/colormaps.html>`_
     """
-        
+
     # Convert da to number
     if not np.issubdtype(da.dtype, np.number):
         da = da.astype(float)
@@ -49,8 +50,8 @@ def _explore_image(da, m, cmap='Spectral_r', vmin=None, vmax=None, legend=None, 
         legend = True if da.ndim == 2 else False
 
     # Default kwargs
-    kwargs.setdefault('mercator_project', True)
-    
+    kwargs.setdefault("mercator_project", True)
+
     # Normalise values
     da = ((da - vmin) / (vmax - vmin)).clip(0, 1)
 
@@ -61,10 +62,10 @@ def _explore_image(da, m, cmap='Spectral_r', vmin=None, vmax=None, legend=None, 
         rgb = da.values.transpose(1, 2, 0)
         rgba = np.concatenate([rgb, np.ones((*rgb.shape[:2], 1))], axis=2)
     else:
-        raise ValueError('DataArray must be 2D or 3D with shape (3, y, x)')
-    
+        raise ValueError("DataArray must be 2D or 3D with shape (3, y, x)")
+
     # Fix color range for mercator projection
-    if 'mercator_project' in kwargs and kwargs['mercator_project']:
+    if "mercator_project" in kwargs and kwargs["mercator_project"]:
         # Find first two non-nan values
         nan_indices = np.where(np.isnan(da.values))
 
@@ -85,7 +86,7 @@ def _explore_image(da, m, cmap='Spectral_r', vmin=None, vmax=None, legend=None, 
 
     # Create image
     img = folium.raster_layers.ImageOverlay(image=rgba, bounds=bounds, **kwargs)
-    
+
     # Add to map
     m.add_child(img)
 
@@ -102,9 +103,10 @@ def _explore_image(da, m, cmap='Spectral_r', vmin=None, vmax=None, legend=None, 
 
         # Add to map
         m.add_child(cmap)
-    
+
     # Return map
     return m
+
 
 def _set_map_bounds(m, bounds):
     # Convert bounds to list
@@ -115,8 +117,10 @@ def _set_map_bounds(m, bounds):
 
     # Combine bounds
     if np.all(np.array(map_bounds) != None):
-        bounds = [[min(bounds[0][0], map_bounds[0][0]), min(bounds[0][1], map_bounds[0][1])],
-                  [max(bounds[1][0], map_bounds[1][0]), max(bounds[1][1], map_bounds[1][1])]]
+        bounds = [
+            [min(bounds[0][0], map_bounds[0][0]), min(bounds[0][1], map_bounds[0][1])],
+            [max(bounds[1][0], map_bounds[1][0]), max(bounds[1][1], map_bounds[1][1])],
+        ]
 
     # Set bounds
     m.fit_bounds(bounds)
@@ -124,8 +128,10 @@ def _set_map_bounds(m, bounds):
     # Return map
     return m
 
+
 def pcolormesh(da, m=None, skip=1, smooth=1, **kwargs):
     return imshow(da, m=m, skip=skip, smooth=smooth, **kwargs)
+
 
 def imshow(da, m=None, skip=1, smooth=1, **kwargs):
     """Plot data interactively using imshow.
@@ -142,7 +148,7 @@ def imshow(da, m=None, skip=1, smooth=1, **kwargs):
     :type xlim:    list[float], optional
     :param ylim:   y limits.
     :type ylim:    list[float], optional
-    
+
     :param kwargs: Keyword arguments for :func:`resilientplotterclass.interactive._explore_image`.
     :type kwargs:  dict, optional
     :return:       Plot.
@@ -150,20 +156,20 @@ def imshow(da, m=None, skip=1, smooth=1, **kwargs):
     """
 
     # Reproject DataArray
-    if da.rio.crs != 'EPSG:4326':
+    if da.rio.crs != "EPSG:4326":
         print("\033[93mReprojecting DataArray to EPSG:4326.\033[0m")
-        da = da.rio.reproject('EPSG:4326')
-    
+        da = da.rio.reproject("EPSG:4326")
+
     # Get map
     if m is None:
-         m = folium.Map()
+        m = folium.Map()
 
     # Set map bounds
     m = _set_map_bounds(m, da.rio.bounds())
 
     # Reproject DataArray
-    if da.rio.crs != 'EPSG:4326':
-        da = da.rio.reproject('EPSG:4326')
+    if da.rio.crs != "EPSG:4326":
+        da = da.rio.reproject("EPSG:4326")
 
     # Skip DataArray values
     if skip > 1:
@@ -172,27 +178,33 @@ def imshow(da, m=None, skip=1, smooth=1, **kwargs):
     # Smooth DataArray
     if smooth > 1:
         da = da.rolling(x=smooth, center=True).mean().rolling(y=smooth, center=True).mean()
-    
+
     # Plot DataArray
     m = _explore_image(da, m=m, **kwargs)
-    
+
     # Return plot
     return m
 
+
 def scatter(da, m=None, skip=1, smooth=1, **kwargs):
-    raise NotImplementedError('scatter plot not implemented yet')
+    raise NotImplementedError("scatter plot not implemented yet")
+
 
 def contourf(da, m=None, skip=1, smooth=1, **kwargs):
-    raise NotImplementedError('contourf plot not implemented yet')
+    raise NotImplementedError("contourf plot not implemented yet")
+
 
 def contour(da, m=None, skip=1, smooth=1, **kwargs):
-    raise NotImplementedError('contour plot not implemented yet')
+    raise NotImplementedError("contour plot not implemented yet")
+
 
 def quiver(da, m=None, skip=1, smooth=1, **kwargs):
-    raise NotImplementedError('quiver plot not implemented yet')
+    raise NotImplementedError("quiver plot not implemented yet")
+
 
 def streamplot(da, m=None, skip=1, smooth=1, **kwargs):
-    raise NotImplementedError('streamplot plot not implemented yet')
+    raise NotImplementedError("streamplot plot not implemented yet")
+
 
 def plot_geometries(gdf, m=None, **kwargs):
     """Plot geometries interactively using folium.
@@ -210,13 +222,13 @@ def plot_geometries(gdf, m=None, **kwargs):
     """
 
     # Reproject GeoDataFrame
-    if gdf.crs != 'EPSG:4326':
+    if gdf.crs != "EPSG:4326":
         print("\033[93mReprojecting GeoDataFrame to EPSG:4326.\033[0m")
-        gdf = gdf.to_crs('EPSG:4326')
-    
+        gdf = gdf.to_crs("EPSG:4326")
+
     # Get map
     if m is None:
-         m = folium.Map()
+        m = folium.Map()
 
     # Set map bounds
     m = _set_map_bounds(m, gdf.total_bounds)
@@ -226,6 +238,7 @@ def plot_geometries(gdf, m=None, **kwargs):
 
     # Return plot
     return m
+
 
 def plot_basemap(m=None, **kwargs):
     """Plot basemaps interactively using folium.
@@ -242,12 +255,13 @@ def plot_basemap(m=None, **kwargs):
 
     # Get map
     if m is None:
-         m = folium.Map()
+        m = folium.Map()
     # Plot basemap
     folium.TileLayer(**kwargs).add_to(m)
 
     # Return plot
     return m
+
 
 class Draw(Draw):
     """Wrapper for folium.plugins.Draw to add a button to export the map.
@@ -260,9 +274,7 @@ class Draw(Draw):
         super().render(**kwargs)
 
         figure = self.get_root()
-        assert isinstance(
-            figure, Figure
-        ), "You cannot render this Element if it is not in a Figure."
+        assert isinstance(figure, Figure), "You cannot render this Element if it is not in a Figure."
 
         export_style = """
             <style>

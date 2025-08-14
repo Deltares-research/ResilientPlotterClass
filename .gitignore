@@ -1,5 +1,5 @@
-# All files in mains
-mains/*
+# All files in notebooks/tests
+notebooks/tests/**
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -73,6 +73,7 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+!docs/build/
 
 # PyBuilder
 .pybuilder/
