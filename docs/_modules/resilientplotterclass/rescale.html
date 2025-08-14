@@ -1,0 +1,499 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>resilientplotterclass.rescale &mdash; resilientplotterclass 2025.08.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929180a"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage_examples/01_getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage_examples.html">Usage Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_reference.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">resilientplotterclass</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">resilientplotterclass.rescale</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for resilientplotterclass.rescale</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xugrid</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xu</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyproj</span><span class="w"> </span><span class="kn">import</span> <span class="n">CRS</span> <span class="k">as</span> <span class="n">pyprojCRS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rasterio.crs</span><span class="w"> </span><span class="kn">import</span> <span class="n">CRS</span> <span class="k">as</span> <span class="n">rasterioCRS</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_xy_attrs_from_crs</span><span class="p">(</span><span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the x and y attributes for a coordinate reference system.</span>
+
+<span class="sd">    :param crs: Coordinate reference system.</span>
+<span class="sd">    :type crs:  pyproj.CRS, optional</span>
+<span class="sd">    :return:    x and y attributes.</span>
+<span class="sd">    :rtype:     dict, dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Define abbreviations for x and y long names and unit</span>
+    <span class="n">XY_NAME_ABRIVIATIONS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Geodetic latitude&quot;</span><span class="p">:</span> <span class="s2">&quot;Latitude&quot;</span><span class="p">,</span> <span class="s2">&quot;Geodetic longitude&quot;</span><span class="p">:</span> <span class="s2">&quot;Longitude&quot;</span><span class="p">}</span>
+    <span class="n">XY_UNIT_ABRIVIATIONS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;millimeter&quot;</span><span class="p">:</span> <span class="s2">&quot;mm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;decimeter&quot;</span><span class="p">:</span> <span class="s2">&quot;dm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;centimeter&quot;</span><span class="p">:</span> <span class="s2">&quot;cm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;meter&quot;</span><span class="p">:</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;decameter&quot;</span><span class="p">:</span> <span class="s2">&quot;dam&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;hectometer&quot;</span><span class="p">:</span> <span class="s2">&quot;hm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;kilometer&quot;</span><span class="p">:</span> <span class="s2">&quot;km&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;millimetre&quot;</span><span class="p">:</span> <span class="s2">&quot;mm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;decimetre&quot;</span><span class="p">:</span> <span class="s2">&quot;dm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;centimetre&quot;</span><span class="p">:</span> <span class="s2">&quot;cm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;metre&quot;</span><span class="p">:</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;decametre&quot;</span><span class="p">:</span> <span class="s2">&quot;dam&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;hectometre&quot;</span><span class="p">:</span> <span class="s2">&quot;hm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;kilometre&quot;</span><span class="p">:</span> <span class="s2">&quot;km&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;degree&quot;</span><span class="p">:</span> <span class="s2">&quot;deg&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;arcsecond&quot;</span><span class="p">:</span> <span class="s2">&quot;arcsec&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;arcminute&quot;</span><span class="p">:</span> <span class="s2">&quot;arcmin&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;radian&quot;</span><span class="p">:</span> <span class="s2">&quot;rad&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;foot&quot;</span><span class="p">:</span> <span class="s2">&quot;ft&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;inch&quot;</span><span class="p">:</span> <span class="s2">&quot;in&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;yard&quot;</span><span class="p">:</span> <span class="s2">&quot;yd&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;mile&quot;</span><span class="p">:</span> <span class="s2">&quot;mi&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;nautical mile&quot;</span><span class="p">:</span> <span class="s2">&quot;nmi&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Convert the crs to a pyproj.CRS object</span>
+    <span class="k">if</span> <span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">x_attrs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;long_name&quot;</span><span class="p">:</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;unit&quot;</span><span class="p">:</span> <span class="s2">&quot;-&quot;</span><span class="p">}</span>
+        <span class="n">y_attrs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;long_name&quot;</span><span class="p">:</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;unit&quot;</span><span class="p">:</span> <span class="s2">&quot;-&quot;</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">x_attrs</span><span class="p">,</span> <span class="n">y_attrs</span>
+
+    <span class="c1"># Get the x and y axis names</span>
+    <span class="k">if</span> <span class="n">crs</span><span class="o">.</span><span class="n">axis_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s2">&quot;north&quot;</span> <span class="ow">or</span> <span class="n">crs</span><span class="o">.</span><span class="n">axis_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s2">&quot;south&quot;</span><span class="p">:</span>
+        <span class="n">x_axis_name</span> <span class="o">=</span> <span class="n">crs</span><span class="o">.</span><span class="n">axis_info</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">y_axis_name</span> <span class="o">=</span> <span class="n">crs</span><span class="o">.</span><span class="n">axis_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">x_axis_name</span> <span class="o">=</span> <span class="n">crs</span><span class="o">.</span><span class="n">axis_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">y_axis_name</span> <span class="o">=</span> <span class="n">crs</span><span class="o">.</span><span class="n">axis_info</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="c1"># Abbreviate the axis names</span>
+    <span class="n">x_axis_name</span> <span class="o">=</span> <span class="n">XY_NAME_ABRIVIATIONS</span><span class="p">[</span><span class="n">x_axis_name</span><span class="p">]</span> <span class="k">if</span> <span class="n">x_axis_name</span> <span class="ow">in</span> <span class="n">XY_NAME_ABRIVIATIONS</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">else</span> <span class="n">x_axis_name</span>
+    <span class="n">y_axis_name</span> <span class="o">=</span> <span class="n">XY_NAME_ABRIVIATIONS</span><span class="p">[</span><span class="n">y_axis_name</span><span class="p">]</span> <span class="k">if</span> <span class="n">y_axis_name</span> <span class="ow">in</span> <span class="n">XY_NAME_ABRIVIATIONS</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">else</span> <span class="n">y_axis_name</span>
+
+    <span class="c1"># Set the x and y long names</span>
+    <span class="n">x_long_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x_axis_name</span><span class="p">,</span> <span class="n">crs</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">y_long_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">y_axis_name</span><span class="p">,</span> <span class="n">crs</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="c1"># Get the x and y unit</span>
+    <span class="n">xy_unit</span> <span class="o">=</span> <span class="n">crs</span><span class="o">.</span><span class="n">axis_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unit_name</span>
+
+    <span class="c1"># Abbreviate the x and y unit</span>
+    <span class="n">xy_unit</span> <span class="o">=</span> <span class="n">XY_UNIT_ABRIVIATIONS</span><span class="p">[</span><span class="n">xy_unit</span><span class="p">]</span> <span class="k">if</span> <span class="n">xy_unit</span> <span class="ow">in</span> <span class="n">XY_UNIT_ABRIVIATIONS</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">else</span> <span class="n">xy_unit</span>
+
+    <span class="c1"># Set the x and y attributes</span>
+    <span class="n">x_attrs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;long_name&quot;</span><span class="p">:</span> <span class="n">x_long_name</span><span class="p">,</span> <span class="s2">&quot;unit&quot;</span><span class="p">:</span> <span class="n">xy_unit</span><span class="p">}</span>
+    <span class="n">y_attrs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;long_name&quot;</span><span class="p">:</span> <span class="n">y_long_name</span><span class="p">,</span> <span class="s2">&quot;unit&quot;</span><span class="p">:</span> <span class="n">xy_unit</span><span class="p">}</span>
+
+    <span class="c1"># Return the x and y attributes</span>
+    <span class="k">return</span> <span class="n">x_attrs</span><span class="p">,</span> <span class="n">y_attrs</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_scale_factor</span><span class="p">(</span><span class="n">xy_unit_in</span><span class="p">,</span> <span class="n">xy_unit_out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the scale factor and corresponding x and y unit.</span>
+
+<span class="sd">    :param xy_unit_in:  x and y unit of the data.</span>
+<span class="sd">    :type xy_unit_in:   str</span>
+<span class="sd">    :param xy_unit_out: x and y unit of the output data. If ``None``, default x and y units are used.</span>
+<span class="sd">    :type xy_unit_out:  str, optional</span>
+<span class="sd">    :return:            x and y unit of the output data, scale factor.</span>
+<span class="sd">    :rtype:             float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Define the scale factors</span>
+    <span class="n">SCALE_METRES</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;mm&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
+        <span class="s2">&quot;cm&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="s2">&quot;dm&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="s2">&quot;m&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">&quot;dam&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="s2">&quot;hm&quot;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
+        <span class="s2">&quot;km&quot;</span><span class="p">:</span> <span class="mf">0.001</span><span class="p">,</span>
+        <span class="s2">&quot;ft&quot;</span><span class="p">:</span> <span class="mf">3.28084</span><span class="p">,</span>
+        <span class="s2">&quot;in&quot;</span><span class="p">:</span> <span class="mf">39.3701</span><span class="p">,</span>
+        <span class="s2">&quot;yd&quot;</span><span class="p">:</span> <span class="mf">1.09361</span><span class="p">,</span>
+        <span class="s2">&quot;mi&quot;</span><span class="p">:</span> <span class="mf">0.000621371</span><span class="p">,</span>
+        <span class="s2">&quot;nmi&quot;</span><span class="p">:</span> <span class="mf">0.000539957</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">SCALE_DEGREES</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;deg&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;arcsec&quot;</span><span class="p">:</span> <span class="mi">3600</span><span class="p">,</span> <span class="s2">&quot;arcmin&quot;</span><span class="p">:</span> <span class="mi">60</span><span class="p">,</span> <span class="s2">&quot;rad&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">}</span>
+
+    <span class="c1"># Get the x and y unit</span>
+    <span class="k">if</span> <span class="n">xy_unit_out</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">xy_unit_in</span> <span class="ow">in</span> <span class="n">SCALE_METRES</span><span class="p">:</span>
+        <span class="n">xy_unit_out</span> <span class="o">=</span> <span class="s2">&quot;km&quot;</span>
+    <span class="k">elif</span> <span class="n">xy_unit_out</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">xy_unit_in</span> <span class="ow">in</span> <span class="n">SCALE_DEGREES</span><span class="p">:</span>
+        <span class="n">xy_unit_out</span> <span class="o">=</span> <span class="s2">&quot;deg&quot;</span>
+    <span class="k">elif</span> <span class="n">xy_unit_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">xy_unit_out</span> <span class="o">=</span> <span class="n">xy_unit_in</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">xy_unit_out</span> <span class="o">=</span> <span class="n">xy_unit_out</span>
+
+    <span class="c1"># Get the scale factor</span>
+    <span class="k">if</span> <span class="n">xy_unit_in</span> <span class="ow">in</span> <span class="n">SCALE_METRES</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="n">xy_unit_out</span> <span class="ow">in</span> <span class="n">SCALE_METRES</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">scale_factor</span> <span class="o">=</span> <span class="n">SCALE_METRES</span><span class="p">[</span><span class="n">xy_unit_out</span><span class="p">]</span> <span class="o">/</span> <span class="n">SCALE_METRES</span><span class="p">[</span><span class="n">xy_unit_in</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">xy_unit_in</span> <span class="ow">in</span> <span class="n">SCALE_DEGREES</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="n">xy_unit_out</span> <span class="ow">in</span> <span class="n">SCALE_DEGREES</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">scale_factor</span> <span class="o">=</span> <span class="n">SCALE_DEGREES</span><span class="p">[</span><span class="n">xy_unit_out</span><span class="p">]</span> <span class="o">/</span> <span class="n">SCALE_DEGREES</span><span class="p">[</span><span class="n">xy_unit_in</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">scale_factor</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="c1"># Return the scale factor and corresponding x and y unit</span>
+    <span class="k">return</span> <span class="n">scale_factor</span><span class="p">,</span> <span class="n">xy_unit_out</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_rescale_xarray</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rescale the x and y dimensions of a DataArray or Dataset.</span>
+
+<span class="sd">    :param da:           Data to rescale.</span>
+<span class="sd">    :type da:            xarray.DataArray or xarray.Dataset</span>
+<span class="sd">    :param scale_factor: Scale factor to rescale the x and y dimensions to.</span>
+<span class="sd">    :type scale_factor:  float</span>
+<span class="sd">    :return:             Rescaled data</span>
+<span class="sd">    :rtype:              xarray.DataArray or xarray.Dataset</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># If scale factor is 1, return the original data</span>
+    <span class="k">if</span> <span class="n">scale_factor</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">da</span>
+
+    <span class="c1"># Rescale the x and y dimensions</span>
+    <span class="n">x_coord</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">*</span> <span class="n">scale_factor</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">attrs</span><span class="o">=</span><span class="n">da</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span>
+    <span class="n">y_coord</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">*</span> <span class="n">scale_factor</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="n">attrs</span><span class="o">=</span><span class="n">da</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span>
+
+    <span class="c1"># Assign the coordinate arrays to the data</span>
+    <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x_coord</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_coord</span><span class="p">)</span>
+
+    <span class="c1"># Return the rescaled data</span>
+    <span class="k">return</span> <span class="n">da</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_rescale_xugrid</span><span class="p">(</span><span class="n">uda</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rescale the x and y dimensions of a UgridDataArray or UgridDataset.</span>
+
+<span class="sd">    :param uda:          Data to rescale.</span>
+<span class="sd">    :type uda:           xugrid.UgridDataArray or xugrid.UgridDataset</span>
+<span class="sd">    :param scale_factor: Scale factor to rescale the x and y dimensions to.</span>
+<span class="sd">    :type scale_factor:  float</span>
+<span class="sd">    :return:             Rescaled data</span>
+<span class="sd">    :rtype:              xugrid.UgridDataArray</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Function to rename the dimensions of the data</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_rename_dims</span><span class="p">(</span><span class="n">da</span><span class="p">):</span>
+        <span class="c1"># Define the new dimension names</span>
+        <span class="n">NEW_DIMS_1D</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;node&quot;</span><span class="p">:</span> <span class="s2">&quot;network1d_nNodes&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;edge&quot;</span><span class="p">:</span> <span class="s2">&quot;network1d_nEdges&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;face&quot;</span><span class="p">:</span> <span class="s2">&quot;network1d_nFaces&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Node&quot;</span><span class="p">:</span> <span class="s2">&quot;network1d_nNodes&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Edge&quot;</span><span class="p">:</span> <span class="s2">&quot;network1d_nEdges&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Face&quot;</span><span class="p">:</span> <span class="s2">&quot;network1d_nFaces&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">NEW_DIMS_2D</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;node&quot;</span><span class="p">:</span> <span class="s2">&quot;mesh2d_nNodes&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;edge&quot;</span><span class="p">:</span> <span class="s2">&quot;mesh2d_nEdges&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;face&quot;</span><span class="p">:</span> <span class="s2">&quot;mesh2d_nFaces&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Node&quot;</span><span class="p">:</span> <span class="s2">&quot;mesh2d_nNodes&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Edge&quot;</span><span class="p">:</span> <span class="s2">&quot;mesh2d_nEdges&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Face&quot;</span><span class="p">:</span> <span class="s2">&quot;mesh2d_nFaces&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Get the new dimension names</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">Ugrid1d</span><span class="p">):</span>
+            <span class="n">NEW_DIMS</span> <span class="o">=</span> <span class="n">NEW_DIMS_1D</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">Ugrid2d</span><span class="p">):</span>
+            <span class="n">NEW_DIMS</span> <span class="o">=</span> <span class="n">NEW_DIMS_2D</span>
+
+        <span class="c1"># Rename the dimensions of the data</span>
+        <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">indexes</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">new_dim</span> <span class="ow">in</span> <span class="n">NEW_DIMS</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">new_dim</span> <span class="ow">in</span> <span class="n">dim</span><span class="p">:</span>
+                    <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="n">dim</span><span class="p">:</span> <span class="n">NEW_DIMS</span><span class="p">[</span><span class="n">new_dim</span><span class="p">]})</span>
+
+        <span class="c1"># Return the renamed data</span>
+        <span class="k">return</span> <span class="n">da</span>
+
+    <span class="c1"># Rescale the coordinates of the data</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_rescale_coords</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">):</span>
+        <span class="c1"># Define the coordinates to rescale</span>
+        <span class="n">COORD_NAMES</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;x&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;y&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;node_x&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;node_y&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;edge_x&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;edge_y&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;face_x&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;face_y&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;X&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Y&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Node_x&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Node_y&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Edge_x&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Edge_y&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Face_x&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Face_y&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Rescale the coordinates</span>
+        <span class="n">coord_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">coord_name</span> <span class="k">for</span> <span class="n">coord_name</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span> <span class="k">if</span> <span class="n">coord_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">)]</span>
+
+        <span class="c1"># Rescale the coordinates</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">coord_name</span> <span class="ow">in</span> <span class="n">coord_names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">([</span><span class="n">COORD_NAME</span> <span class="ow">in</span> <span class="n">coord_name</span> <span class="k">for</span> <span class="n">COORD_NAME</span> <span class="ow">in</span> <span class="n">COORD_NAMES</span><span class="p">]):</span>
+                <span class="n">coords</span><span class="p">[</span><span class="n">coord_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="n">coord_name</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">*</span> <span class="n">scale_factor</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">da</span><span class="p">[</span><span class="n">coord_name</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">da</span><span class="p">[</span><span class="n">coord_name</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span>
+
+        <span class="c1"># Assign the rescaled coordinates to the data</span>
+        <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
+
+        <span class="c1"># Return the rescaled data</span>
+        <span class="k">return</span> <span class="n">da</span>
+
+    <span class="c1"># Function to rescale the grid</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_rescale_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">):</span>
+        <span class="c1"># Rescale the x and y dimensions of 1D grid</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">Ugrid1d</span><span class="p">):</span>
+            <span class="n">grid</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">Ugrid1d</span><span class="p">(</span>
+                <span class="n">node_x</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">node_x</span> <span class="o">*</span> <span class="n">scale_factor</span><span class="p">,</span>
+                <span class="n">node_y</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">node_y</span> <span class="o">*</span> <span class="n">scale_factor</span><span class="p">,</span>
+                <span class="n">fill_value</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
+                <span class="n">edge_node_connectivity</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Rescale x and y dimensions of 2D grid</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">Ugrid2d</span><span class="p">):</span>
+            <span class="n">grid</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">Ugrid2d</span><span class="p">(</span>
+                <span class="n">node_x</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">node_x</span> <span class="o">*</span> <span class="n">scale_factor</span><span class="p">,</span>
+                <span class="n">node_y</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">node_y</span> <span class="o">*</span> <span class="n">scale_factor</span><span class="p">,</span>
+                <span class="n">fill_value</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
+                <span class="n">face_node_connectivity</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span>
+                <span class="n">edge_node_connectivity</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Return rescaled grid</span>
+        <span class="k">return</span> <span class="n">grid</span>
+
+    <span class="c1"># Rename the dimensions of the data</span>
+    <span class="n">da</span> <span class="o">=</span> <span class="n">_rename_dims</span><span class="p">(</span><span class="n">uda</span><span class="p">)</span>
+
+    <span class="c1"># Rescale the coordinates of the data</span>
+    <span class="n">da</span> <span class="o">=</span> <span class="n">_rescale_coords</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">)</span>
+
+    <span class="c1"># Assign the coordinate arrays to the data</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">uda</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">):</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="n">_rescale_grid</span><span class="p">(</span><span class="n">uda</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">)</span>
+        <span class="n">uda_rescaled</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">(</span><span class="n">obj</span><span class="o">=</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">da</span><span class="p">),</span> <span class="n">grid</span><span class="o">=</span><span class="n">grid</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">uda</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">):</span>
+        <span class="n">grids</span> <span class="o">=</span> <span class="p">[</span><span class="n">_rescale_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">)</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">uda</span><span class="o">.</span><span class="n">grids</span><span class="p">]</span>
+        <span class="n">uda_rescaled</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">(</span><span class="n">obj</span><span class="o">=</span><span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">da</span><span class="p">),</span> <span class="n">grids</span><span class="o">=</span><span class="n">grids</span><span class="p">)</span>
+
+    <span class="c1"># Assign the coordinate reference system to the data</span>
+    <span class="n">uda_rescaled</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">set_crs</span><span class="p">(</span><span class="n">uda</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
+
+    <span class="c1"># Return the rescaled data</span>
+    <span class="k">return</span> <span class="n">uda_rescaled</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_rescale_GeoDataFrame</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rescale the x and y dimensions of a GeoDataFrame.</span>
+
+<span class="sd">    :param gdf:          Geometries to rescale.</span>
+<span class="sd">    :type gdf:           geopandas.GeoDataFrame</span>
+<span class="sd">    :param scale_factor: Scale factor to rescale the x and y dimensions to.</span>
+<span class="sd">    :type scale_factor:  float</span>
+<span class="sd">    :return:             Rescaled geometries</span>
+<span class="sd">    :rtype:              geopandas.GeoDataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># If scale factor is 1, return the original geometries</span>
+    <span class="k">if</span> <span class="n">scale_factor</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">gdf</span>
+
+    <span class="c1"># Rescale the x and y dimensions</span>
+    <span class="n">gdf_rescaled</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">gdf_rescaled</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gdf_rescaled</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">xfact</span><span class="o">=</span><span class="n">scale_factor</span><span class="p">,</span> <span class="n">yfact</span><span class="o">=</span><span class="n">scale_factor</span><span class="p">,</span> <span class="n">zfact</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+    <span class="c1"># Return the rescaled geometries</span>
+    <span class="k">return</span> <span class="n">gdf_rescaled</span>
+
+
+<div class="viewcode-block" id="get_rescale_parameters">
+<a class="viewcode-back" href="../../resilientplotterclass.html#resilientplotterclass.rescale.get_rescale_parameters">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_rescale_parameters</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xy_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the scale factor, xlabel and ylabel for data, geometries or a coordinate reference system and unit.</span>
+
+<span class="sd">    :param data:    Data or geometries to rescale. If ``None``, the crs is used to determine the rescale parameters.</span>
+<span class="sd">    :type data:     xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray, xugrid.UgridDataset, geopandas.GeoDataFrame, optional</span>
+<span class="sd">    :param crs:     Coordinate reference system of the data. If ``None``, the crs is determined automatically based on the data.</span>
+<span class="sd">    :type crs:      pyproj.CRS or rasterio.CRS or str, optional</span>
+<span class="sd">    :param xy_unit: Unit to rescale the x and y dimensions to. If ``None``, the unit is determined automatically based on the data.</span>
+<span class="sd">    :type xy_unit:  str, optional</span>
+<span class="sd">    :return:        Scale factor, xlabel, ylabel.</span>
+<span class="sd">    :rtype:         tuple[float, str, str]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Get the coordiante reference system of the data</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
+        <span class="n">crs</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">crs</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">):</span>
+        <span class="n">crs</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">crs</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
+        <span class="n">crs</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">crs</span>
+    <span class="k">elif</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">crs</span> <span class="o">=</span> <span class="n">crs</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;data type not supported. Please provide a xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray, xugrid.UgridDataset or geopandas.GeoDataFrame.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Convert the crs to a pyproj.CRS</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">crs</span><span class="p">,</span> <span class="n">pyprojCRS</span><span class="p">):</span>
+        <span class="n">crs</span> <span class="o">=</span> <span class="n">crs</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">crs</span><span class="p">,</span> <span class="n">rasterioCRS</span><span class="p">):</span>
+        <span class="n">crs</span> <span class="o">=</span> <span class="n">pyprojCRS</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">crs</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">crs</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">crs</span> <span class="o">=</span> <span class="n">pyprojCRS</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">crs</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">crs</span> <span class="o">=</span> <span class="n">crs</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;crs type not supported. Please provide a pyproj.CRS, rasterio.CRS or str object.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Get x and y attributes and unit</span>
+    <span class="n">x_attrs</span><span class="p">,</span> <span class="n">y_attrs</span> <span class="o">=</span> <span class="n">_get_xy_attrs_from_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">)</span>
+
+    <span class="c1"># Get the scale factor and corresponding x and y unit</span>
+    <span class="n">scale_factor</span><span class="p">,</span> <span class="n">xy_unit_out</span> <span class="o">=</span> <span class="n">_get_scale_factor</span><span class="p">(</span><span class="n">xy_unit_in</span><span class="o">=</span><span class="n">x_attrs</span><span class="p">[</span><span class="s2">&quot;unit&quot;</span><span class="p">],</span> <span class="n">xy_unit_out</span><span class="o">=</span><span class="n">xy_unit</span><span class="p">)</span>
+
+    <span class="c1"># Get labels for the x and y dimensions</span>
+    <span class="n">xlabel</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> [</span><span class="si">{}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x_attrs</span><span class="p">[</span><span class="s2">&quot;long_name&quot;</span><span class="p">],</span> <span class="n">xy_unit_out</span><span class="p">)</span>
+    <span class="n">ylabel</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> [</span><span class="si">{}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">y_attrs</span><span class="p">[</span><span class="s2">&quot;long_name&quot;</span><span class="p">],</span> <span class="n">xy_unit_out</span><span class="p">)</span>
+
+    <span class="c1"># Return the scale factor, xlabel, ylabel</span>
+    <span class="k">return</span> <span class="n">scale_factor</span><span class="p">,</span> <span class="n">xlabel</span><span class="p">,</span> <span class="n">ylabel</span></div>
+
+
+
+<div class="viewcode-block" id="rescale">
+<a class="viewcode-back" href="../../resilientplotterclass.html#resilientplotterclass.rescale.rescale">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">rescale</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">scale_factor</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rescale the x and y dimensions of data or geometries.</span>
+
+<span class="sd">    :param data:         Data or geometries to rescale.</span>
+<span class="sd">    :type data:          xr.DataArray or xugrid.UgridDataArray or gpd.GeoDataFrame</span>
+<span class="sd">    :param scale_factor: Scale factor to rescale the x and y dimensions to.</span>
+<span class="sd">    :type scale_factor:  float, optional</span>
+<span class="sd">    :return:             Rescaled data or geometries</span>
+<span class="sd">    :rtype:              xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray, xugrid.UgridDataset, geopandas.GeoDataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Rescale the datas</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">_rescale_xarray</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">_rescale_xugrid</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">_rescale_GeoDataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;data type not supported. Please provide a xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray, xugrid.UgridDataset or geopandas.GeoDataFrame.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Return the rescaled data</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

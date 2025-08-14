@@ -1,0 +1,747 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>resilientplotterclass.unstructured_data &mdash; resilientplotterclass 2025.08.13 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929180a"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage_examples/01_getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage_examples.html">Usage Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_reference.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">resilientplotterclass</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">resilientplotterclass.unstructured_data</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for resilientplotterclass.unstructured_data</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">resilientplotterclass</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">rpc</span>
+
+
+<div class="viewcode-block" id="pcolormesh">
+<a class="viewcode-back" href="../../resilientplotterclass.html#resilientplotterclass.unstructured_data.pcolormesh">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">pcolormesh</span><span class="p">(</span>
+    <span class="n">uda</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xy_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xlim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ylim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xlabel_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ylabel_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">title_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">aspect_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">grid_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">append_axes_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot data using pcolormesh.</span>
+
+<span class="sd">    :param uda:                Data to plot.</span>
+<span class="sd">    :type uda:                 xugrid.UgridDataArray</span>
+<span class="sd">    :param ax:                 Axis.</span>
+<span class="sd">    :type ax:                  matplotlib.axes.Axes, optional</span>
+<span class="sd">    :param xy_unit:            Unit to rescale the x and y dimensions to. If ``None``, the unit is determined automatically based on the input data.</span>
+<span class="sd">    :type xy_unit:             str, optional</span>
+<span class="sd">    :param xlim:               x limits.</span>
+<span class="sd">    :type xlim:                list[float], optional</span>
+<span class="sd">    :param ylim:               y limits.</span>
+<span class="sd">    :type ylim:                list[float], optional</span>
+<span class="sd">    :param xlabel_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_xlabel`.</span>
+<span class="sd">    :type xlabel_kwargs:       dict, optional</span>
+<span class="sd">    :param ylabel_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_ylabel`.</span>
+<span class="sd">    :type ylabel_kwargs:       dict, optional</span>
+<span class="sd">    :param title_kwargs:       Keyword arguments for :func:`matplotlib.axis.set_title`.</span>
+<span class="sd">    :type title_kwargs:        dict, optional</span>
+<span class="sd">    :param aspect_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_aspect`.</span>
+<span class="sd">    :type aspect_kwargs:       dict, optional</span>
+<span class="sd">    :param grid_kwargs:        Keyword arguments for :func:`matplotlib.axis.grid`.</span>
+<span class="sd">    :type grid_kwargs:         dict, optional</span>
+<span class="sd">    :param append_axes_kwargs: Keyword arguments for :func:`mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes`.</span>
+<span class="sd">    :type append_axes_kwargs:  dict, optional</span>
+<span class="sd">    :param kwargs:             Keyword arguments for :func:`xugrid.plot.pcolormesh`.</span>
+<span class="sd">    :type kwargs:              dict, optional</span>
+<span class="sd">    :return:                   Plot.</span>
+<span class="sd">    :rtype:                    matplotlib.collections.QuadMesh</span>
+
+<span class="sd">    :See also: `matplotlib.axis.set_xlabel &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_xlabel.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.set_ylabel &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_ylabel.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.set_title &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_title.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.set_aspect &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_aspect.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.grid &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.grid.html&gt;`_,</span>
+<span class="sd">               `mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes &lt;https://matplotlib.org/stable/api/_as_gen/mpl_toolkits.axes_grid1.axes_divider.AxesDivider.html#mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes&gt;`_,</span>
+<span class="sd">               `xugrid.plot.pcolormesh &lt;https://deltares.github.io/xugrid/api/xugrid.plot.pcolormesh.html#xugrid.plot.pcolormesh&gt;`_.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Initialise axis</span>
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+
+    <span class="c1"># Get the rescale parameters</span>
+    <span class="n">scale_factor</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">rescale</span><span class="o">.</span><span class="n">get_rescale_parameters</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">uda</span><span class="p">,</span> <span class="n">xy_unit</span><span class="o">=</span><span class="n">xy_unit</span><span class="p">)</span>
+
+    <span class="c1"># Rescale UgridudataArray</span>
+    <span class="n">uda</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">rescale</span><span class="o">.</span><span class="n">rescale</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">uda</span><span class="p">,</span> <span class="n">scale_factor</span><span class="o">=</span><span class="n">scale_factor</span><span class="p">)</span>
+
+    <span class="c1"># Append colorbar axis</span>
+    <span class="k">if</span> <span class="n">append_axes_kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;add_colorbar&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;add_colorbar&quot;</span><span class="p">]):</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="s2">&quot;cbar_kwargs&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">]</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">][</span><span class="s2">&quot;cax&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">append_cbar_axis</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">append_axes_kwargs</span><span class="o">=</span><span class="n">append_axes_kwargs</span><span class="p">)</span>
+
+    <span class="c1"># Plot UgridDataArray</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">uda</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="c1"># Format axis</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">uda</span><span class="p">,</span>
+        <span class="n">xy_unit</span><span class="o">=</span><span class="n">xy_unit</span><span class="p">,</span>
+        <span class="n">xlim</span><span class="o">=</span><span class="n">xlim</span><span class="p">,</span>
+        <span class="n">ylim</span><span class="o">=</span><span class="n">ylim</span><span class="p">,</span>
+        <span class="n">xlabel_kwargs</span><span class="o">=</span><span class="n">xlabel_kwargs</span><span class="p">,</span>
+        <span class="n">ylabel_kwargs</span><span class="o">=</span><span class="n">ylabel_kwargs</span><span class="p">,</span>
+        <span class="n">title_kwargs</span><span class="o">=</span><span class="n">title_kwargs</span><span class="p">,</span>
+        <span class="n">aspect_kwargs</span><span class="o">=</span><span class="n">aspect_kwargs</span><span class="p">,</span>
+        <span class="n">grid_kwargs</span><span class="o">=</span><span class="n">grid_kwargs</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Return plot</span>
+    <span class="k">return</span> <span class="n">p</span></div>
+
+
+
+<div class="viewcode-block" id="imshow">
+<a class="viewcode-back" href="../../resilientplotterclass.html#resilientplotterclass.unstructured_data.imshow">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">imshow</span><span class="p">(</span>
+    <span class="n">uda</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xy_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xlim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ylim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xlabel_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ylabel_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">title_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">aspect_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">grid_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">append_axes_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot data using imshow.</span>
+
+<span class="sd">    :param uda:                Data to plot.</span>
+<span class="sd">    :type uda:                 xugrid.UgridDataArray</span>
+<span class="sd">    :param ax:                 Axis.</span>
+<span class="sd">    :type ax:                  matplotlib.axes.Axes, optional</span>
+<span class="sd">    :param xy_unit:            Unit to rescale the x and y dimensions to. If ``None``, the unit is determined automatically based on the input data.</span>
+<span class="sd">    :type xy_unit:             str, optional</span>
+<span class="sd">    :param xlim:               x limits.</span>
+<span class="sd">    :type xlim:                list[float], optional</span>
+<span class="sd">    :param ylim:               y limits.</span>
+<span class="sd">    :type ylim:                list[float], optional</span>
+<span class="sd">    :param xlabel_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_xlabel`.</span>
+<span class="sd">    :type xlabel_kwargs:       dict, optional</span>
+<span class="sd">    :param ylabel_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_ylabel`.</span>
+<span class="sd">    :type ylabel_kwargs:       dict, optional</span>
+<span class="sd">    :param title_kwargs:       Keyword arguments for :func:`matplotlib.axis.set_title`.</span>
+<span class="sd">    :type title_kwargs:        dict, optional</span>
+<span class="sd">    :param aspect_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_aspect`.</span>
+<span class="sd">    :type aspect_kwargs:       dict, optional</span>
+<span class="sd">    :param grid_kwargs:        Keyword arguments for :func:`matplotlib.axis.grid`.</span>
+<span class="sd">    :type grid_kwargs:         dict, optional</span>
+<span class="sd">    :param append_axes_kwargs: Keyword arguments for :func:`mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes`.</span>
+<span class="sd">    :type append_axes_kwargs:  dict, optional</span>
+<span class="sd">    :param kwargs:             Keyword arguments for :func:`xugrid.plot.imshow`.</span>
+<span class="sd">    :type kwargs:              dict, optional</span>
+<span class="sd">    :return:                   Plot.</span>
+<span class="sd">    :rtype:                    matplotlib.collections.QuadMesh</span>
+
+<span class="sd">    :See also: `matplotlib.axis.set_xlabel &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_xlabel.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.set_ylabel &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_ylabel.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.set_title &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_title.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.set_aspect &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_aspect.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.grid &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.grid.html&gt;`_,</span>
+<span class="sd">               `mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes &lt;https://matplotlib.org/stable/api/_as_gen/mpl_toolkits.axes_grid1.axes_divider.AxesDivider.html#mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes&gt;`_,</span>
+<span class="sd">               `xugrid.plot.imshow &lt;https://deltares.github.io/xugrid/api/xugrid.plot.imshow.html#xugrid.plot.imshow&gt;`_.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Initialise axis</span>
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+    <span class="c1"># Get the rescale parameters</span>
+    <span class="n">scale_factor</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">rescale</span><span class="o">.</span><span class="n">get_rescale_parameters</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">uda</span><span class="p">,</span> <span class="n">xy_unit</span><span class="o">=</span><span class="n">xy_unit</span><span class="p">)</span>
+
+    <span class="c1"># Rescale UgridudataArray</span>
+    <span class="n">uda</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">rescale</span><span class="o">.</span><span class="n">rescale</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">uda</span><span class="p">,</span> <span class="n">scale_factor</span><span class="o">=</span><span class="n">scale_factor</span><span class="p">)</span>
+
+    <span class="c1"># Append colorbar axis</span>
+    <span class="k">if</span> <span class="n">append_axes_kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;add_colorbar&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;add_colorbar&quot;</span><span class="p">]):</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="s2">&quot;cbar_kwargs&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">]</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">][</span><span class="s2">&quot;cax&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">append_cbar_axis</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">append_axes_kwargs</span><span class="o">=</span><span class="n">append_axes_kwargs</span><span class="p">)</span>
+
+    <span class="c1"># Plot UgridDataArray</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">uda</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="c1"># Format axis</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">uda</span><span class="p">,</span>
+        <span class="n">xy_unit</span><span class="o">=</span><span class="n">xy_unit</span><span class="p">,</span>
+        <span class="n">xlim</span><span class="o">=</span><span class="n">xlim</span><span class="p">,</span>
+        <span class="n">ylim</span><span class="o">=</span><span class="n">ylim</span><span class="p">,</span>
+        <span class="n">xlabel_kwargs</span><span class="o">=</span><span class="n">xlabel_kwargs</span><span class="p">,</span>
+        <span class="n">ylabel_kwargs</span><span class="o">=</span><span class="n">ylabel_kwargs</span><span class="p">,</span>
+        <span class="n">title_kwargs</span><span class="o">=</span><span class="n">title_kwargs</span><span class="p">,</span>
+        <span class="n">aspect_kwargs</span><span class="o">=</span><span class="n">aspect_kwargs</span><span class="p">,</span>
+        <span class="n">grid_kwargs</span><span class="o">=</span><span class="n">grid_kwargs</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Return plot</span>
+    <span class="k">return</span> <span class="n">p</span></div>
+
+
+
+<div class="viewcode-block" id="scatter">
+<a class="viewcode-back" href="../../resilientplotterclass.html#resilientplotterclass.unstructured_data.scatter">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">scatter</span><span class="p">(</span>
+    <span class="n">uda</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xy_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xlim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ylim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xlabel_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ylabel_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">title_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">aspect_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">grid_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">append_axes_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot data using scatter.</span>
+
+<span class="sd">    :param uda:                Data to plot.</span>
+<span class="sd">    :type uda:                 xugrid.UgridDataArray</span>
+<span class="sd">    :param ax:                 Axis.</span>
+<span class="sd">    :type ax:                  matplotlib.axes.Axes, optional</span>
+<span class="sd">    :param xy_unit:            Unit to rescale the x and y dimensions to. If ``None``, the unit is determined automatically based on the input data.</span>
+<span class="sd">    :type xy_unit:             str, optional</span>
+<span class="sd">    :param xlim:               x limits.</span>
+<span class="sd">    :type xlim:                list[float], optional</span>
+<span class="sd">    :param ylim:               y limits.</span>
+<span class="sd">    :type ylim:                list[float], optional</span>
+<span class="sd">    :param xlabel_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_xlabel`.</span>
+<span class="sd">    :type xlabel_kwargs:       dict, optional</span>
+<span class="sd">    :param ylabel_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_ylabel`.</span>
+<span class="sd">    :type ylabel_kwargs:       dict, optional</span>
+<span class="sd">    :param title_kwargs:       Keyword arguments for :func:`matplotlib.axis.set_title`.</span>
+<span class="sd">    :type title_kwargs:        dict, optional</span>
+<span class="sd">    :param aspect_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_aspect`.</span>
+<span class="sd">    :type aspect_kwargs:       dict, optional</span>
+<span class="sd">    :param grid_kwargs:        Keyword arguments for :func:`matplotlib.axis.grid`.</span>
+<span class="sd">    :type grid_kwargs:         dict, optional</span>
+<span class="sd">    :param append_axes_kwargs: Keyword arguments for :func:`mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes`.</span>
+<span class="sd">    :type append_axes_kwargs:  dict, optional</span>
+<span class="sd">    :param kwargs:             Keyword arguments for :func:`xugrid.plot.scatter`.</span>
+<span class="sd">    :type kwargs:              dict, optional</span>
+<span class="sd">    :return:                   Plot.</span>
+<span class="sd">    :rtype:                    matplotlib.collections.QuadMesh</span>
+
+<span class="sd">    :See also: `matplotlib.axis.set_xlabel &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_xlabel.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.set_ylabel &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_ylabel.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.set_title &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_title.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.set_aspect &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_aspect.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.grid &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.grid.html&gt;`_,</span>
+<span class="sd">               `mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes &lt;https://matplotlib.org/stable/api/_as_gen/mpl_toolkits.axes_grid1.axes_divider.AxesDivider.html#mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes&gt;`_,</span>
+<span class="sd">               `xugrid.plot.scatter &lt;https://deltares.github.io/xugrid/api/xugrid.plot.scatter.html#xugrid.plot.scatter&gt;`_.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Initialise axis</span>
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+
+    <span class="c1"># Get the rescale parameters</span>
+    <span class="n">scale_factor</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">rescale</span><span class="o">.</span><span class="n">get_rescale_parameters</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">uda</span><span class="p">,</span> <span class="n">xy_unit</span><span class="o">=</span><span class="n">xy_unit</span><span class="p">)</span>
+
+    <span class="c1"># Rescale UgridudataArray</span>
+    <span class="n">uda</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">rescale</span><span class="o">.</span><span class="n">rescale</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">uda</span><span class="p">,</span> <span class="n">scale_factor</span><span class="o">=</span><span class="n">scale_factor</span><span class="p">)</span>
+
+    <span class="c1"># Append colorbar axis</span>
+    <span class="k">if</span> <span class="n">append_axes_kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">((</span><span class="s2">&quot;add_colorbar&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;add_colorbar&quot;</span><span class="p">])</span> <span class="ow">or</span> <span class="p">(</span><span class="s2">&quot;hue&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;hue&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)):</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="s2">&quot;cbar_kwargs&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">]</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">][</span><span class="s2">&quot;cax&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">append_cbar_axis</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">append_axes_kwargs</span><span class="o">=</span><span class="n">append_axes_kwargs</span><span class="p">)</span>
+
+    <span class="c1"># Plot UgridDataArray</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">uda</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="c1"># Format axis</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">uda</span><span class="p">,</span>
+        <span class="n">xy_unit</span><span class="o">=</span><span class="n">xy_unit</span><span class="p">,</span>
+        <span class="n">xlim</span><span class="o">=</span><span class="n">xlim</span><span class="p">,</span>
+        <span class="n">ylim</span><span class="o">=</span><span class="n">ylim</span><span class="p">,</span>
+        <span class="n">xlabel_kwargs</span><span class="o">=</span><span class="n">xlabel_kwargs</span><span class="p">,</span>
+        <span class="n">ylabel_kwargs</span><span class="o">=</span><span class="n">ylabel_kwargs</span><span class="p">,</span>
+        <span class="n">title_kwargs</span><span class="o">=</span><span class="n">title_kwargs</span><span class="p">,</span>
+        <span class="n">aspect_kwargs</span><span class="o">=</span><span class="n">aspect_kwargs</span><span class="p">,</span>
+        <span class="n">grid_kwargs</span><span class="o">=</span><span class="n">grid_kwargs</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Return plot</span>
+    <span class="k">return</span> <span class="n">p</span></div>
+
+
+
+<div class="viewcode-block" id="contourf">
+<a class="viewcode-back" href="../../resilientplotterclass.html#resilientplotterclass.unstructured_data.contourf">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">contourf</span><span class="p">(</span>
+    <span class="n">uda</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xy_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xlim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ylim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xlabel_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ylabel_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">title_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">aspect_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">grid_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">append_axes_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot data using contourf.</span>
+
+<span class="sd">    :param uda:                Data to plot.</span>
+<span class="sd">    :type uda:                 xugrid.UgridDataArray</span>
+<span class="sd">    :param ax:                 Axis.</span>
+<span class="sd">    :type ax:                  matplotlib.axes.Axes, optional</span>
+<span class="sd">    :param xy_unit:            Unit to rescale the x and y dimensions to. If ``None``, the unit is determined automatically based on the input data.</span>
+<span class="sd">    :type xy_unit:             str, optional</span>
+<span class="sd">    :param xlim:               x limits.</span>
+<span class="sd">    :type xlim:                list[float], optional</span>
+<span class="sd">    :param ylim:               y limits.</span>
+<span class="sd">    :type ylim:                list[float], optional</span>
+<span class="sd">    :param xlabel_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_xlabel`.</span>
+<span class="sd">    :type xlabel_kwargs:       dict, optional</span>
+<span class="sd">    :param ylabel_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_ylabel`.</span>
+<span class="sd">    :type ylabel_kwargs:       dict, optional</span>
+<span class="sd">    :param title_kwargs:       Keyword arguments for :func:`matplotlib.axis.set_title`.</span>
+<span class="sd">    :type title_kwargs:        dict, optional</span>
+<span class="sd">    :param aspect_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_aspect`.</span>
+<span class="sd">    :type aspect_kwargs:       dict, optional</span>
+<span class="sd">    :param grid_kwargs:        Keyword arguments for :func:`matplotlib.axis.grid`.</span>
+<span class="sd">    :type grid_kwargs:         dict, optional</span>
+<span class="sd">    :param append_axes_kwargs: Keyword arguments for :func:`mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes`.</span>
+<span class="sd">    :type append_axes_kwargs:  dict, optional</span>
+<span class="sd">    :param kwargs:             Keyword arguments for :func:`xugrid.plot.contourf`.</span>
+<span class="sd">    :type kwargs:              dict, optional</span>
+<span class="sd">    :return:                   Plot.</span>
+<span class="sd">    :rtype:                    matplotlib.collections.QuadMesh</span>
+
+<span class="sd">    :See also: `matplotlib.axis.set_xlabel &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_xlabel.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.set_ylabel &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_ylabel.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.set_title &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_title.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.set_aspect &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_aspect.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.grid &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.grid.html&gt;`_,</span>
+<span class="sd">               `mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes &lt;https://matplotlib.org/stable/api/_as_gen/mpl_toolkits.axes_grid1.axes_divider.AxesDivider.html#mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes&gt;`_,</span>
+<span class="sd">               `xugrid.plot.contourf &lt;https://deltares.github.io/xugrid/api/xugrid.plot.contourf.html#xugrid.plot.contourf&gt;`_.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Initialise axis</span>
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+
+    <span class="c1"># Get the rescale parameters</span>
+    <span class="n">scale_factor</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">rescale</span><span class="o">.</span><span class="n">get_rescale_parameters</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">uda</span><span class="p">,</span> <span class="n">xy_unit</span><span class="o">=</span><span class="n">xy_unit</span><span class="p">)</span>
+
+    <span class="c1"># Rescale UgridudataArray</span>
+    <span class="n">uda</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">rescale</span><span class="o">.</span><span class="n">rescale</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">uda</span><span class="p">,</span> <span class="n">scale_factor</span><span class="o">=</span><span class="n">scale_factor</span><span class="p">)</span>
+
+    <span class="c1"># Append colorbar axis</span>
+    <span class="k">if</span> <span class="n">append_axes_kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;add_colorbar&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;add_colorbar&quot;</span><span class="p">]):</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="s2">&quot;cbar_kwargs&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">]</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">][</span><span class="s2">&quot;cax&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">append_cbar_axis</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">append_axes_kwargs</span><span class="o">=</span><span class="n">append_axes_kwargs</span><span class="p">)</span>
+
+    <span class="c1"># Plot UgridDataArray</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">uda</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="c1"># Format axis</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">uda</span><span class="p">,</span>
+        <span class="n">xy_unit</span><span class="o">=</span><span class="n">xy_unit</span><span class="p">,</span>
+        <span class="n">xlim</span><span class="o">=</span><span class="n">xlim</span><span class="p">,</span>
+        <span class="n">ylim</span><span class="o">=</span><span class="n">ylim</span><span class="p">,</span>
+        <span class="n">xlabel_kwargs</span><span class="o">=</span><span class="n">xlabel_kwargs</span><span class="p">,</span>
+        <span class="n">ylabel_kwargs</span><span class="o">=</span><span class="n">ylabel_kwargs</span><span class="p">,</span>
+        <span class="n">title_kwargs</span><span class="o">=</span><span class="n">title_kwargs</span><span class="p">,</span>
+        <span class="n">aspect_kwargs</span><span class="o">=</span><span class="n">aspect_kwargs</span><span class="p">,</span>
+        <span class="n">grid_kwargs</span><span class="o">=</span><span class="n">grid_kwargs</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Return plot</span>
+    <span class="k">return</span> <span class="n">p</span></div>
+
+
+
+<div class="viewcode-block" id="contour">
+<a class="viewcode-back" href="../../resilientplotterclass.html#resilientplotterclass.unstructured_data.contour">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">contour</span><span class="p">(</span>
+    <span class="n">uda</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xy_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xlim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ylim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xlabel_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ylabel_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">title_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">aspect_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">grid_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">append_axes_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot data using contour.</span>
+
+<span class="sd">    :param uda:                Data to plot.</span>
+<span class="sd">    :type uda:                 xugrid.UgridDataArray</span>
+<span class="sd">    :param ax:                 Axis.</span>
+<span class="sd">    :type ax:                  matplotlib.axes.Axes, optional</span>
+<span class="sd">    :param xy_unit:            Unit to rescale the x and y dimensions to. If ``None``, the unit is determined automatically based on the input data.</span>
+<span class="sd">    :type xy_unit:             str, optional</span>
+<span class="sd">    :param xlim:               x limits.</span>
+<span class="sd">    :type xlim:                list[float], optional</span>
+<span class="sd">    :param ylim:               y limits.</span>
+<span class="sd">    :type ylim:                list[float], optional</span>
+<span class="sd">    :param xlabel_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_xlabel`.</span>
+<span class="sd">    :type xlabel_kwargs:       dict, optional</span>
+<span class="sd">    :param ylabel_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_ylabel`.</span>
+<span class="sd">    :type ylabel_kwargs:       dict, optional</span>
+<span class="sd">    :param title_kwargs:       Keyword arguments for :func:`matplotlib.axis.set_title`.</span>
+<span class="sd">    :type title_kwargs:        dict, optional</span>
+<span class="sd">    :param aspect_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_aspect`.</span>
+<span class="sd">    :type aspect_kwargs:       dict, optional</span>
+<span class="sd">    :param grid_kwargs:        Keyword arguments for :func:`matplotlib.axis.grid`.</span>
+<span class="sd">    :type grid_kwargs:         dict, optional</span>
+<span class="sd">    :param append_axes_kwargs: Keyword arguments for :func:`mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes`.</span>
+<span class="sd">    :type append_axes_kwargs:  dict, optional</span>
+<span class="sd">    :param kwargs:             Keyword arguments for :func:`xugrid.plot.contour`.</span>
+<span class="sd">    :type kwargs:              dict, optional</span>
+<span class="sd">    :return:                   Plot.</span>
+<span class="sd">    :rtype:                    matplotlib.collections.QuadMesh</span>
+
+<span class="sd">    :See also: `matplotlib.axis.set_xlabel &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_xlabel.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.set_ylabel &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_ylabel.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.set_title &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_title.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.set_aspect &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_aspect.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.grid &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.grid.html&gt;`_,</span>
+<span class="sd">               `mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes &lt;https://matplotlib.org/stable/api/_as_gen/mpl_toolkits.axes_grid1.axes_divider.AxesDivider.html#mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes&gt;`_,</span>
+<span class="sd">               `xugrid.plot.contour &lt;https://deltares.github.io/xugrid/api/xugrid.plot.contour.html#xugrid.plot.contour&gt;`_.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Initialise axis</span>
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+
+    <span class="c1"># Get the rescale parameters</span>
+    <span class="n">scale_factor</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">rescale</span><span class="o">.</span><span class="n">get_rescale_parameters</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">uda</span><span class="p">,</span> <span class="n">xy_unit</span><span class="o">=</span><span class="n">xy_unit</span><span class="p">)</span>
+
+    <span class="c1"># Rescale UgridudataArray</span>
+    <span class="n">uda</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">rescale</span><span class="o">.</span><span class="n">rescale</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">uda</span><span class="p">,</span> <span class="n">scale_factor</span><span class="o">=</span><span class="n">scale_factor</span><span class="p">)</span>
+
+    <span class="c1"># Append colorbar axis</span>
+    <span class="k">if</span> <span class="n">append_axes_kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;add_colorbar&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;add_colorbar&quot;</span><span class="p">]):</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="s2">&quot;cbar_kwargs&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">]</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">][</span><span class="s2">&quot;cax&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">append_cbar_axis</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">append_axes_kwargs</span><span class="o">=</span><span class="n">append_axes_kwargs</span><span class="p">)</span>
+
+    <span class="c1"># Plot UgridDataArray</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">uda</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="c1"># Format axis</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">uda</span><span class="p">,</span>
+        <span class="n">xy_unit</span><span class="o">=</span><span class="n">xy_unit</span><span class="p">,</span>
+        <span class="n">xlim</span><span class="o">=</span><span class="n">xlim</span><span class="p">,</span>
+        <span class="n">ylim</span><span class="o">=</span><span class="n">ylim</span><span class="p">,</span>
+        <span class="n">xlabel_kwargs</span><span class="o">=</span><span class="n">xlabel_kwargs</span><span class="p">,</span>
+        <span class="n">ylabel_kwargs</span><span class="o">=</span><span class="n">ylabel_kwargs</span><span class="p">,</span>
+        <span class="n">title_kwargs</span><span class="o">=</span><span class="n">title_kwargs</span><span class="p">,</span>
+        <span class="n">aspect_kwargs</span><span class="o">=</span><span class="n">aspect_kwargs</span><span class="p">,</span>
+        <span class="n">grid_kwargs</span><span class="o">=</span><span class="n">grid_kwargs</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Return plot</span>
+    <span class="k">return</span> <span class="n">p</span></div>
+
+
+
+<div class="viewcode-block" id="quiver">
+<a class="viewcode-back" href="../../resilientplotterclass.html#resilientplotterclass.unstructured_data.quiver">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">quiver</span><span class="p">(</span>
+    <span class="n">uds</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xy_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xlim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ylim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xlabel_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ylabel_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">title_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">aspect_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">grid_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">append_axes_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot data using quiver.</span>
+
+<span class="sd">    :param uda:                Data to plot.</span>
+<span class="sd">    :type uda:                 xugrid.UgridDataArray</span>
+<span class="sd">    :param ax:                 Axis.</span>
+<span class="sd">    :type ax:                  matplotlib.axes.Axes, optional</span>
+<span class="sd">    :param xy_unit:            Unit to rescale the x and y dimensions to. If ``None``, the unit is determined automatically based on the input data.</span>
+<span class="sd">    :type xy_unit:             str, optional</span>
+<span class="sd">    :param xlim:               x limits.</span>
+<span class="sd">    :type xlim:                list[float], optional</span>
+<span class="sd">    :param ylim:               y limits.</span>
+<span class="sd">    :type ylim:                list[float], optional</span>
+<span class="sd">    :param xlabel_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_xlabel`.</span>
+<span class="sd">    :type xlabel_kwargs:       dict, optional</span>
+<span class="sd">    :param ylabel_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_ylabel`.</span>
+<span class="sd">    :type ylabel_kwargs:       dict, optional</span>
+<span class="sd">    :param title_kwargs:       Keyword arguments for :func:`matplotlib.axis.set_title`.</span>
+<span class="sd">    :type title_kwargs:        dict, optional</span>
+<span class="sd">    :param aspect_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_aspect`.</span>
+<span class="sd">    :type aspect_kwargs:       dict, optional</span>
+<span class="sd">    :param grid_kwargs:        Keyword arguments for :func:`matplotlib.axis.grid`.</span>
+<span class="sd">    :type grid_kwargs:         dict, optional</span>
+<span class="sd">    :param append_axes_kwargs: Keyword arguments for :func:`mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes`.</span>
+<span class="sd">    :type append_axes_kwargs:  dict, optional</span>
+<span class="sd">    :param kwargs:             Keyword arguments for :func:`xugrid.plot.quiver`.</span>
+<span class="sd">    :type kwargs:              dict, optional</span>
+<span class="sd">    :return:                   Plot.</span>
+<span class="sd">    :rtype:                    matplotlib.collections.QuadMesh</span>
+
+<span class="sd">    :See also: `matplotlib.axis.set_xlabel &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_xlabel.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.set_ylabel &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_ylabel.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.set_title &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_title.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.set_aspect &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_aspect.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.grid &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.grid.html&gt;`_,</span>
+<span class="sd">               `mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes &lt;https://matplotlib.org/stable/api/_as_gen/mpl_toolkits.axes_grid1.axes_divider.AxesDivider.html#mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes&gt;`_,</span>
+<span class="sd">               `xarray.plot.quiver &lt;http://xarray.pydata.org/en/stable/generated/xarray.plot.quiver.html&gt;`_.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Initialise axis</span>
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+
+    <span class="c1"># Get the rescale parameters</span>
+    <span class="n">scale_factor</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">rescale</span><span class="o">.</span><span class="n">get_rescale_parameters</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">uds</span><span class="p">,</span> <span class="n">xy_unit</span><span class="o">=</span><span class="n">xy_unit</span><span class="p">)</span>
+
+    <span class="c1"># Rescale UgridDataSet</span>
+    <span class="n">uds</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">rescale</span><span class="o">.</span><span class="n">rescale</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">uds</span><span class="p">,</span> <span class="n">scale_factor</span><span class="o">=</span><span class="n">scale_factor</span><span class="p">)</span>
+
+    <span class="c1"># Append colorbar axis</span>
+    <span class="k">if</span> <span class="n">append_axes_kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">((</span><span class="s2">&quot;add_colorbar&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;add_colorbar&quot;</span><span class="p">])</span> <span class="ow">or</span> <span class="p">(</span><span class="s2">&quot;hue&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;hue&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)):</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="s2">&quot;cbar_kwargs&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">]</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">][</span><span class="s2">&quot;cax&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">append_cbar_axis</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">append_axes_kwargs</span><span class="o">=</span><span class="n">append_axes_kwargs</span><span class="p">)</span>
+
+    <span class="c1"># Plot UgridDataSet</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">uds</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">quiver</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="c1"># Format axis</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">uds</span><span class="p">,</span>
+        <span class="n">xy_unit</span><span class="o">=</span><span class="n">xy_unit</span><span class="p">,</span>
+        <span class="n">xlim</span><span class="o">=</span><span class="n">xlim</span><span class="p">,</span>
+        <span class="n">ylim</span><span class="o">=</span><span class="n">ylim</span><span class="p">,</span>
+        <span class="n">xlabel_kwargs</span><span class="o">=</span><span class="n">xlabel_kwargs</span><span class="p">,</span>
+        <span class="n">ylabel_kwargs</span><span class="o">=</span><span class="n">ylabel_kwargs</span><span class="p">,</span>
+        <span class="n">title_kwargs</span><span class="o">=</span><span class="n">title_kwargs</span><span class="p">,</span>
+        <span class="n">aspect_kwargs</span><span class="o">=</span><span class="n">aspect_kwargs</span><span class="p">,</span>
+        <span class="n">grid_kwargs</span><span class="o">=</span><span class="n">grid_kwargs</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Return plot</span>
+    <span class="k">return</span> <span class="n">p</span></div>
+
+
+
+<div class="viewcode-block" id="grid">
+<a class="viewcode-back" href="../../resilientplotterclass.html#resilientplotterclass.unstructured_data.grid">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">grid</span><span class="p">(</span>
+    <span class="n">uda</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xy_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xlim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ylim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xlabel_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ylabel_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">title_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">aspect_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">grid_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">append_axes_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot data using grid.</span>
+
+<span class="sd">    :param uda:                Data to plot.</span>
+<span class="sd">    :type uda:                 xugrid.UgridDataArray</span>
+<span class="sd">    :param ax:                 Axis.</span>
+<span class="sd">    :type ax:                  matplotlib.axes.Axes, optional</span>
+<span class="sd">    :param xy_unit:            Unit to rescale the x and y dimensions to. If ``None``, the unit is determined automatically based on the input data.</span>
+<span class="sd">    :type xy_unit:             str, optional</span>
+<span class="sd">    :param xlim:               x limits.</span>
+<span class="sd">    :type xlim:                list[float], optional</span>
+<span class="sd">    :param ylim:               y limits.</span>
+<span class="sd">    :type ylim:                list[float], optional</span>
+<span class="sd">    :param xlabel_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_xlabel`.</span>
+<span class="sd">    :type xlabel_kwargs:       dict, optional</span>
+<span class="sd">    :param ylabel_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_ylabel`.</span>
+<span class="sd">    :type ylabel_kwargs:       dict, optional</span>
+<span class="sd">    :param title_kwargs:       Keyword arguments for :func:`matplotlib.axis.set_title`.</span>
+<span class="sd">    :type title_kwargs:        dict, optional</span>
+<span class="sd">    :param aspect_kwargs:      Keyword arguments for :func:`matplotlib.axis.set_aspect`.</span>
+<span class="sd">    :type aspect_kwargs:       dict, optional</span>
+<span class="sd">    :param grid_kwargs:        Keyword arguments for :func:`matplotlib.axis.grid`.</span>
+<span class="sd">    :type grid_kwargs:         dict, optional</span>
+<span class="sd">    :param append_axes_kwargs: Keyword arguments for :func:`mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes`.</span>
+<span class="sd">    :type append_axes_kwargs:  dict, optional</span>
+<span class="sd">    :param kwargs:             Keyword arguments for :func:`xugrid.Ugrid2d.plot`.</span>
+<span class="sd">    :type kwargs:              dict, optional</span>
+<span class="sd">    :return:                   Plot.</span>
+<span class="sd">    :rtype:                    matplotlib.collections.QuadMesh</span>
+
+<span class="sd">    :See also: `matplotlib.axis.set_xlabel &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_xlabel.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.set_ylabel &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_ylabel.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.set_title &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_title.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.set_aspect &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_aspect.html&gt;`_,</span>
+<span class="sd">               `matplotlib.axis.grid &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.grid.html&gt;`_,</span>
+<span class="sd">               `mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes &lt;https://matplotlib.org/stable/api/_as_gen/mpl_toolkits.axes_grid1.axes_divider.AxesDivider.html#mpl_toolkits.axes_grid1.axes_divider.AxesDivider.append_axes&gt;`_,</span>
+<span class="sd">               `xugrid.Ugrid2d.plot &lt;https://deltares.github.io/xugrid/api/xugrid.Ugrid2d.html#xugrid.Ugrid2d.plot&gt;`_.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Initialise axis</span>
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+
+    <span class="c1"># Get the rescale parameters</span>
+    <span class="n">scale_factor</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">rescale</span><span class="o">.</span><span class="n">get_rescale_parameters</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">uda</span><span class="p">,</span> <span class="n">xy_unit</span><span class="o">=</span><span class="n">xy_unit</span><span class="p">)</span>
+
+    <span class="c1"># Rescale UgridudataArray</span>
+    <span class="n">uda</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">rescale</span><span class="o">.</span><span class="n">rescale</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">uda</span><span class="p">,</span> <span class="n">scale_factor</span><span class="o">=</span><span class="n">scale_factor</span><span class="p">)</span>
+
+    <span class="c1"># Append colorbar axis</span>
+    <span class="k">if</span> <span class="n">append_axes_kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s2">&quot;add_colorbar&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;add_colorbar&quot;</span><span class="p">]:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="s2">&quot;cbar_kwargs&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">]</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cbar_kwargs&quot;</span><span class="p">][</span><span class="s2">&quot;cax&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">append_cbar_axis</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">append_axes_kwargs</span><span class="o">=</span><span class="n">append_axes_kwargs</span><span class="p">)</span>
+
+    <span class="c1"># Plot UgridDataArray</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">uda</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="c1"># Format axis</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">uda</span><span class="p">,</span>
+        <span class="n">xy_unit</span><span class="o">=</span><span class="n">xy_unit</span><span class="p">,</span>
+        <span class="n">xlim</span><span class="o">=</span><span class="n">xlim</span><span class="p">,</span>
+        <span class="n">ylim</span><span class="o">=</span><span class="n">ylim</span><span class="p">,</span>
+        <span class="n">xlabel_kwargs</span><span class="o">=</span><span class="n">xlabel_kwargs</span><span class="p">,</span>
+        <span class="n">ylabel_kwargs</span><span class="o">=</span><span class="n">ylabel_kwargs</span><span class="p">,</span>
+        <span class="n">title_kwargs</span><span class="o">=</span><span class="n">title_kwargs</span><span class="p">,</span>
+        <span class="n">aspect_kwargs</span><span class="o">=</span><span class="n">aspect_kwargs</span><span class="p">,</span>
+        <span class="n">grid_kwargs</span><span class="o">=</span><span class="n">grid_kwargs</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Return plot</span>
+    <span class="k">return</span> <span class="n">ax</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
