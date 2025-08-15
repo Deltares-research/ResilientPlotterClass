@@ -341,8 +341,8 @@ class Draw_Map(ipyleaflet.Map):
         gdf = None
         if file_path_gdf is not None:
             gdf = gpd.read_file(file_path_gdf).to_crs("EPSG:4326")
-        elif gdf is not None and not gdf.empty:
-            gdf = gpd.GeoDataFrame(geometry=gdf, crs="EPSG:4326")
+        elif gdf is not None:
+            gdf = gpd.to_crs("EPSG:4326")
 
         # Get center of the map
         if center is None and gdf is not None and not gdf.empty:
