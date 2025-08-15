@@ -1,7 +1,11 @@
+import branca
 import folium
+import geopandas as gpd
+import ipyleaflet
+import ipywidgets
 import matplotlib.pyplot as plt
 import numpy as np
-from branca.element import Element, Figure
+import xyzservices
 from folium.plugins import Draw
 from matplotlib.colors import to_hex
 
@@ -129,8 +133,49 @@ def _set_map_bounds(m, bounds):
     return m
 
 
+class _Draw(Draw):
+    """Wrapper for folium.plugins.Draw to add a button to export the map.
+
+    :param Draw: Folium Draw object.
+    :type Draw: folium.plugins.Draw
+    """
+
+    def render(self, **kwargs):
+        super().render(**kwargs)
+
+        figure = self.get_root()
+        assert isinstance(figure, branca.element.Figure), "You cannot render this Element if it is not in a Figure."
+
+        export_style = """
+            <style>
+                #export {
+                    position: absolute;
+                    bottom: 12px;
+                    left: 12px;
+                    z-index: 1000;
+                    background: white;
+                    outline: 2px solid rgba(0, 0, 0, 0.2);
+                    padding: 7px;
+                    border-radius: 2px;
+                    cursor: pointer;
+                    font-size: 12px;
+                    text-decoration: none;
+                }
+
+                #export:hover {
+                    background: #f0f0f0;
+                }
+            </style>
+        """
+        export_button = """<a href='#' id='export'>💾</a>"""
+        if self.export:
+            # Add button to figure
+            figure.header.add_child(branca.element.Element(export_style), name="export")
+            figure.html.add_child(branca.element.Element(export_button), name="export_button")
+
+
 def pcolormesh(da, m=None, skip=1, smooth=1, **kwargs):
-    return imshow(da, m=m, skip=skip, smooth=smooth, **kwargs)
+    raise NotImplementedError("pcolormesh plot not implemented yet")
 
 
 def imshow(da, m=None, skip=1, smooth=1, **kwargs):
@@ -263,42 +308,105 @@ def plot_basemap(m=None, **kwargs):
     return m
 
 
-class Draw(Draw):
-    """Wrapper for folium.plugins.Draw to add a button to export the map.
-
-    :param Draw: Folium Draw object.
-    :type Draw: folium.plugins.Draw
+class Draw_Map(ipyleaflet.Map):
+    """
+    A class to create a map to draw geometries.
     """
 
-    def render(self, **kwargs):
-        super().render(**kwargs)
+    STYLE = {"weight": 2}
 
-        figure = self.get_root()
-        assert isinstance(figure, Figure), "You cannot render this Element if it is not in a Figure."
+    def __init__(
+        self,
+        center: tuple[float] = None,
+        zoom: int = 8,
+        basemap: xyzservices.TileProvider = ipyleaflet.basemaps.OpenStreetMap.Mapnik,
+        file_path_gdf: str = None,
+        gdf: gpd.GeoDataFrame = None,
+        **kwargs,
+    ):
+        """Constructor for the draw map class.
 
-        export_style = """
-            <style>
-                #export {
-                    position: absolute;
-                    bottom: 12px;
-                    left: 12px;
-                    z-index: 1000;
-                    background: white;
-                    outline: 2px solid rgba(0, 0, 0, 0.2);
-                    padding: 7px;
-                    border-radius: 2px;
-                    cursor: pointer;
-                    font-size: 12px;
-                    text-decoration: none;
-                }
-
-                #export:hover {
-                    background: #f0f0f0;
-                }
-            </style>
+        :param center:        Center of the map.
+        :type center:         tuple[float], optional
+        :param zoom:          Zoom level of the map.
+        :type zoom:           int, optional
+        :param basemap:       Basemap layer for the map.
+        :type basemap:        xyzservices.TileProvider, optional
+        :param file_path_gdf: File path to the GeoDataFrame file.
+        :type file_path_gdf:  str, optional
+        :param gdf:           GeoDataFrame to display on the map.
+        :type gdf:            gpd.GeoDataFrame, optional
         """
-        export_button = """<a href='#' id='export'>💾</a>"""
-        if self.export:
-            # Add button to figure
-            figure.header.add_child(Element(export_style), name="export")
-            figure.html.add_child(Element(export_button), name="export_button")
+        # Get geometries from file or list
+        gdf = None
+        if file_path_gdf is not None:
+            gdf = gpd.read_file(file_path_gdf).to_crs("EPSG:4326")
+        elif gdf is not None and not gdf.empty:
+            gdf = gpd.GeoDataFrame(geometry=gdf, crs="EPSG:4326")
+
+        # Get center of the map
+        if center is None and gdf is not None and not gdf.empty:
+            centroid = gdf.geometry.union_all().representative_point()
+            center = (centroid.y, centroid.x)
+
+        # Set default kwargs
+        kwargs.setdefault("scroll_wheel_zoom", True)  # Enable scroll wheel zoom
+        kwargs.setdefault("attribution_control", False)  # Disable attribution control
+        kwargs.setdefault("layout", ipywidgets.Layout(height="600px", width="100%"))  # Set layout height and width
+
+        # Initialize map superclass
+        super().__init__(center=center, zoom=zoom, basemap=basemap, **kwargs)
+
+        # Initialise draw control
+        self.draw_control = ipyleaflet.DrawControl(
+            polygon={"shapeOptions": self.STYLE},
+            rectangle={"shapeOptions": self.STYLE},
+            circlemarker={"shapeOptions": self.STYLE},
+            polyline={"shapeOptions": self.STYLE},
+        )
+
+        # Add draw control to the map
+        self.add_control(self.draw_control)
+
+        # Set geometries to the map
+        if gdf is not None and not gdf.empty:
+            self.set_geometries(gdf)
+            self.fit_bounds(gdf.total_bounds)
+
+    def set_geometries(self, gdf: gpd.GeoDataFrame) -> None:
+        """Set geometries to the map.
+
+        :param aoi: The GeoDataFrame containing the geometries.
+        :type aoi: gpd.GeoDataFrame
+
+        Returns:
+            None
+        """
+        # Update draw flag
+        self.drawn = True
+
+        # Add style to GeoDataFrame
+        gdf["style"] = [self.STYLE] * len(gdf)
+
+        # Add geometries to the draw control
+        self.draw_control.data = self.draw_control.data + list(gdf.iterfeatures())
+
+    def get_geometries(self, crs: str = "EPSG:4326") -> gpd.GeoDataFrame:
+        """
+        Get geometries from the map.
+
+        Args:
+            crs (str): The coordinate reference system to reproject the geometries to.
+        Returns:
+            gpd.GeoDataFrame: A GeoDataFrame containing the geometries from the map.
+        """
+        # Get geometries from the map
+        if not self.draw_control.data:
+            gdf = gpd.GeoDataFrame(columns=["geometry"], crs="EPSG:4326")
+        else:
+            gdf = gpd.GeoDataFrame.from_features(self.draw_control.data, crs="EPSG:4326").drop(columns="style")
+
+        # Reproject geometries
+        gdf = gdf.to_crs(crs)
+
+        return gdf

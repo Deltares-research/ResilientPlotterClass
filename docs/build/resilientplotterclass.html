@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>resilientplotterclass &mdash; resilientplotterclass 2025.08.13 documentation</title>
+  <title>resilientplotterclass &mdash; resilientplotterclass 2025.08.15 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=5929180a"></script>
+      <script src="_static/documentation_options.js?v=36d80cde"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -88,7 +88,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-resilientplotterclass.interactive">interactive</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#resilientplotterclass.interactive.Draw"><code class="docutils literal notranslate"><span class="pre">Draw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#resilientplotterclass.interactive.Draw_Map"><code class="docutils literal notranslate"><span class="pre">Draw_Map</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#resilientplotterclass.interactive.contour"><code class="docutils literal notranslate"><span class="pre">contour()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#resilientplotterclass.interactive.contourf"><code class="docutils literal notranslate"><span class="pre">contourf()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#resilientplotterclass.interactive.imshow"><code class="docutils literal notranslate"><span class="pre">imshow()</span></code></a></li>
@@ -306,23 +306,19 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="resilientplotterclass.rpclass.rpclass.draw_map">
-<span class="sig-name descname"><span class="pre">draw_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resilientplotterclass/rpclass.html#rpclass.draw_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.draw_map" title="Link to this definition"></a></dt>
-<dd><p>Draw map.</p>
+<span class="sig-name descname"><span class="pre">draw_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resilientplotterclass/rpclass.html#rpclass.draw_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.draw_map" title="Link to this definition"></a></dt>
+<dd><p>Create interactive map for drawing geometries.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>m</strong> (<em>folium.Map</em><em>, </em><em>optional</em>) – Folium map to draw on.</p></li>
-<li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Keyword arguments for <code class="xref py py-func docutils literal notranslate"><span class="pre">folium.Map()</span></code>.</p></li>
-</ul>
+<dd class="field-odd"><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Keyword arguments for <a class="reference internal" href="#resilientplotterclass.interactive.Draw_Map" title="resilientplotterclass.interactive.Draw_Map"><code class="xref py py-func docutils literal notranslate"><span class="pre">resilientplotterclass.interactive.Draw_Map()</span></code></a>.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Map.</p>
+<dd class="field-even"><p>Draw map.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>folium.Map</p>
+<dd class="field-odd"><p>ipyleaflet.Map</p>
 </dd>
 </dl>
-<p>See also: <a class="reference external" href="https://python-visualization.github.io/folium/modules.html#folium.folium.Map">folium.Map()</a></p>
 </dd></dl>
 
 <dl class="py method">
@@ -434,7 +430,7 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="resilientplotterclass.rpclass.rpclass.map">
 <span class="sig-name descname"><span class="pre">map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resilientplotterclass/rpclass.html#rpclass.map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.map" title="Link to this definition"></a></dt>
-<dd><p>Create map.</p>
+<dd><p>Create interactive map.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Keyword arguments for <code class="xref py py-func docutils literal notranslate"><span class="pre">folium.Map()</span></code>.</p>
@@ -630,13 +626,13 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="resilientplotterclass.rpclass.rpclass.show">
-<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resilientplotterclass/rpclass.html#rpclass.show"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.show" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">draw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resilientplotterclass/rpclass.html#rpclass.show"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#resilientplotterclass.rpclass.rpclass.show" title="Link to this definition"></a></dt>
 <dd><p>Show figure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fig</strong> (<em>matplotlib.figure.Figure</em>) – Figure to show.</p></li>
-<li><p><strong>m</strong> (<em>folium.Map</em>) – Map to show.</p></li>
+<li><p><strong>m</strong> (<em>folium.Map</em><em> or </em><em>ipyleaflet.Map</em>) – Map to show.</p></li>
 <li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Keyword arguments for <code class="xref py py-func docutils literal notranslate"><span class="pre">matplotlib.pyplot.show()</span></code>.</p></li>
 </ul>
 </dd>
@@ -1485,19 +1481,44 @@
 <section id="module-resilientplotterclass.interactive">
 <span id="interactive"></span><h2>interactive<a class="headerlink" href="#module-resilientplotterclass.interactive" title="Link to this heading"></a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="resilientplotterclass.interactive.Draw">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">resilientplotterclass.interactive.</span></span><span class="sig-name descname"><span class="pre">Draw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">export</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'data.geojson'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'topleft'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_geometry_on_click</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">draw_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edit_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resilientplotterclass/interactive.html#Draw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#resilientplotterclass.interactive.Draw" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Draw</span></code></p>
-<p>Wrapper for folium.plugins.Draw to add a button to export the map.</p>
+<dt class="sig sig-object py" id="resilientplotterclass.interactive.Draw_Map">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">resilientplotterclass.interactive.</span></span><span class="sig-name descname"><span class="pre">Draw_Map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resilientplotterclass/interactive.html#Draw_Map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#resilientplotterclass.interactive.Draw_Map" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Map</span></code></p>
+<p>A class to create a map to draw geometries.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resilientplotterclass.interactive.Draw_Map.STYLE">
+<span class="sig-name descname"><span class="pre">STYLE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'weight':</span> <span class="pre">2}</span></em><a class="headerlink" href="#resilientplotterclass.interactive.Draw_Map.STYLE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resilientplotterclass.interactive.Draw_Map.get_geometries">
+<span class="sig-name descname"><span class="pre">get_geometries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'EPSG:4326'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://geopandas.org/en/stable/docs/reference/api/geopandas.GeoDataFrame.html#geopandas.GeoDataFrame" title="(in GeoPandas v1.1.1)"><span class="pre">GeoDataFrame</span></a></span></span><a class="reference internal" href="_modules/resilientplotterclass/interactive.html#Draw_Map.get_geometries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#resilientplotterclass.interactive.Draw_Map.get_geometries" title="Link to this definition"></a></dt>
+<dd><p>Get geometries from the map.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>Draw</strong> (<em>folium.plugins.Draw</em>) – Folium Draw object.</p>
+<dd class="field-odd"><p><strong>crs</strong> (<em>str</em>) – The coordinate reference system to reproject the geometries to.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A GeoDataFrame containing the geometries from the map.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>gpd.GeoDataFrame</p>
 </dd>
 </dl>
+</dd></dl>
+
 <dl class="py method">
-<dt class="sig sig-object py" id="resilientplotterclass.interactive.Draw.render">
-<span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resilientplotterclass/interactive.html#Draw.render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#resilientplotterclass.interactive.Draw.render" title="Link to this definition"></a></dt>
-<dd><p>Renders the HTML representation of the element.</p>
+<dt class="sig sig-object py" id="resilientplotterclass.interactive.Draw_Map.set_geometries">
+<span class="sig-name descname"><span class="pre">set_geometries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gdf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://geopandas.org/en/stable/docs/reference/api/geopandas.GeoDataFrame.html#geopandas.GeoDataFrame" title="(in GeoPandas v1.1.1)"><span class="pre">GeoDataFrame</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/resilientplotterclass/interactive.html#Draw_Map.set_geometries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#resilientplotterclass.interactive.Draw_Map.set_geometries" title="Link to this definition"></a></dt>
+<dd><p>Set geometries to the map.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>aoi</strong> (<em>gpd.GeoDataFrame</em>) – The GeoDataFrame containing the geometries.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

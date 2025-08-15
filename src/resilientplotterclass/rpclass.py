@@ -7,6 +7,7 @@ import os
 
 import folium
 import geopandas as gpd
+import ipyleaflet
 import matplotlib.pyplot as plt
 import pandas as pd
 import xarray as xr
@@ -558,7 +559,7 @@ class rpclass:
         return fig, axs
 
     def map(self, **kwargs):
-        """Create map.
+        """Create interactive map.
 
         :param kwargs: Keyword arguments for :func:`folium.Map`.
         :type kwargs:  dict, optional
@@ -574,33 +575,29 @@ class rpclass:
         # Create map
         return m
 
-    def draw_map(self, m=None, **kwargs):
-        """Draw map.
+    def draw_map(self, **kwargs):
+        """Create interactive map for drawing geometries.
 
-        :param m:      Folium map to draw on.
-        :type m:       folium.Map, optional
-        :param kwargs: Keyword arguments for :func:`folium.Map`.
+        :param kwargs: Keyword arguments for :func:`resilientplotterclass.interactive.Draw_Map`.
         :type kwargs:  dict, optional
-        :return:       Map.
-        :rtype:        folium.Map
-
-        See also: `folium.Map() <https://python-visualization.github.io/folium/modules.html#folium.folium.Map>`_
+        :return:       Draw map.
+        :rtype:        ipyleaflet.Map
         """
 
-        # Create map
-        m = folium.Map(**kwargs)
+        # Create draw map
+        m = rpc.interactive.Draw_Map(**kwargs)
 
-        # Create map
+        # Return map
         return m
 
     # Show figure
-    def show(self, fig=None, m=None, **kwargs):
+    def show(self, fig=None, m=None, draw=False, **kwargs):
         """Show figure.
 
         :param fig:    Figure to show.
         :type fig:     matplotlib.figure.Figure
         :param m:      Map to show.
-        :type m:       folium.Map
+        :type m:       folium.Map or ipyleaflet.Map
         :param kwargs: Keyword arguments for :func:`matplotlib.pyplot.show`.
         :type kwargs:  dict, optional
         :return:       None.
@@ -612,19 +609,20 @@ class rpclass:
         fig = m if fig is None else fig
         if isinstance(fig, plt.Figure):
             interactive = False
-        elif isinstance(fig, folium.Map):
+        elif isinstance(fig, folium.Map) or isinstance(fig, ipyleaflet.Map):
             interactive = True
         else:
-            raise TypeError("fig must be a matplotlib.figure.Figure or folium.Map. Received: {}".format(type(fig)))
+            raise TypeError("fig must be a matplotlib.figure.Figure, folium.Map or ipyleaflet.Map Received: {}".format(type(fig)))
 
         # Show figure
         if not interactive:
             fig.tight_layout()
             plt.show(**kwargs)
         else:
-            if "draw" in kwargs.keys() and kwargs["draw"]:
-                rpc.interactive.Draw(export=True, filename="draw.geojson").add_to(m)
-            folium.LayerControl().add_to(m)
+            if isinstance(fig, folium.Map):
+                folium.LayerControl().add_to(m)
+            else:
+                m.add(ipyleaflet.LayersControl(position="topright"))
             display(m)
 
     # Save figure

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>resilientplotterclass.interactive &mdash; resilientplotterclass 2025.08.13 documentation</title>
+  <title>resilientplotterclass.interactive &mdash; resilientplotterclass 2025.08.15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -13,7 +13,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=5929180a"></script>
+      <script src="../../_static/documentation_options.js?v=36d80cde"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -77,10 +77,14 @@
            <div itemprop="articleBody">
              
   <h1>Source code for resilientplotterclass.interactive</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">folium</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">branca</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">folium</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ipyleaflet</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ipywidgets</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">branca.element</span><span class="w"> </span><span class="kn">import</span> <span class="n">Element</span><span class="p">,</span> <span class="n">Figure</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xyzservices</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">folium.plugins</span><span class="w"> </span><span class="kn">import</span> <span class="n">Draw</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.colors</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_hex</span>
 
@@ -208,10 +212,51 @@
     <span class="k">return</span> <span class="n">m</span>
 
 
+<span class="k">class</span><span class="w"> </span><span class="nc">_Draw</span><span class="p">(</span><span class="n">Draw</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrapper for folium.plugins.Draw to add a button to export the map.</span>
+
+<span class="sd">    :param Draw: Folium Draw object.</span>
+<span class="sd">    :type Draw: folium.plugins.Draw</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">figure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_root</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">branca</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">Figure</span><span class="p">),</span> <span class="s2">&quot;You cannot render this Element if it is not in a Figure.&quot;</span>
+
+        <span class="n">export_style</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            &lt;style&gt;</span>
+<span class="s2">                #export {</span>
+<span class="s2">                    position: absolute;</span>
+<span class="s2">                    bottom: 12px;</span>
+<span class="s2">                    left: 12px;</span>
+<span class="s2">                    z-index: 1000;</span>
+<span class="s2">                    background: white;</span>
+<span class="s2">                    outline: 2px solid rgba(0, 0, 0, 0.2);</span>
+<span class="s2">                    padding: 7px;</span>
+<span class="s2">                    border-radius: 2px;</span>
+<span class="s2">                    cursor: pointer;</span>
+<span class="s2">                    font-size: 12px;</span>
+<span class="s2">                    text-decoration: none;</span>
+<span class="s2">                }</span>
+
+<span class="s2">                #export:hover {</span>
+<span class="s2">                    background: #f0f0f0;</span>
+<span class="s2">                }</span>
+<span class="s2">            &lt;/style&gt;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="n">export_button</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;&lt;a href=&#39;#&#39; id=&#39;export&#39;&gt;💾&lt;/a&gt;&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">export</span><span class="p">:</span>
+            <span class="c1"># Add button to figure</span>
+            <span class="n">figure</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">branca</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="n">export_style</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;export&quot;</span><span class="p">)</span>
+            <span class="n">figure</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">branca</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="n">export_button</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;export_button&quot;</span><span class="p">)</span>
+
+
 <div class="viewcode-block" id="pcolormesh">
 <a class="viewcode-back" href="../../resilientplotterclass.html#resilientplotterclass.interactive.pcolormesh">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">pcolormesh</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">smooth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">imshow</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="n">m</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="n">skip</span><span class="p">,</span> <span class="n">smooth</span><span class="o">=</span><span class="n">smooth</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;pcolormesh plot not implemented yet&quot;</span><span class="p">)</span></div>
 
 
 
@@ -369,49 +414,115 @@
 
 
 
-<div class="viewcode-block" id="Draw">
-<a class="viewcode-back" href="../../resilientplotterclass.html#resilientplotterclass.interactive.Draw">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Draw</span><span class="p">(</span><span class="n">Draw</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrapper for folium.plugins.Draw to add a button to export the map.</span>
-
-<span class="sd">    :param Draw: Folium Draw object.</span>
-<span class="sd">    :type Draw: folium.plugins.Draw</span>
+<div class="viewcode-block" id="Draw_Map">
+<a class="viewcode-back" href="../../resilientplotterclass.html#resilientplotterclass.interactive.Draw_Map">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Draw_Map</span><span class="p">(</span><span class="n">ipyleaflet</span><span class="o">.</span><span class="n">Map</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to create a map to draw geometries.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Draw.render">
-<a class="viewcode-back" href="../../resilientplotterclass.html#resilientplotterclass.interactive.Draw.render">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">STYLE</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;weight&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
 
-        <span class="n">figure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_root</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">Figure</span><span class="p">),</span> <span class="s2">&quot;You cannot render this Element if it is not in a Figure.&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">center</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">zoom</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
+        <span class="n">basemap</span><span class="p">:</span> <span class="n">xyzservices</span><span class="o">.</span><span class="n">TileProvider</span> <span class="o">=</span> <span class="n">ipyleaflet</span><span class="o">.</span><span class="n">basemaps</span><span class="o">.</span><span class="n">OpenStreetMap</span><span class="o">.</span><span class="n">Mapnik</span><span class="p">,</span>
+        <span class="n">file_path_gdf</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">gdf</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor for the draw map class.</span>
 
-        <span class="n">export_style</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">            &lt;style&gt;</span>
-<span class="s2">                #export {</span>
-<span class="s2">                    position: absolute;</span>
-<span class="s2">                    bottom: 12px;</span>
-<span class="s2">                    left: 12px;</span>
-<span class="s2">                    z-index: 1000;</span>
-<span class="s2">                    background: white;</span>
-<span class="s2">                    outline: 2px solid rgba(0, 0, 0, 0.2);</span>
-<span class="s2">                    padding: 7px;</span>
-<span class="s2">                    border-radius: 2px;</span>
-<span class="s2">                    cursor: pointer;</span>
-<span class="s2">                    font-size: 12px;</span>
-<span class="s2">                    text-decoration: none;</span>
-<span class="s2">                }</span>
+<span class="sd">        :param center:        Center of the map.</span>
+<span class="sd">        :type center:         tuple[float], optional</span>
+<span class="sd">        :param zoom:          Zoom level of the map.</span>
+<span class="sd">        :type zoom:           int, optional</span>
+<span class="sd">        :param basemap:       Basemap layer for the map.</span>
+<span class="sd">        :type basemap:        xyzservices.TileProvider, optional</span>
+<span class="sd">        :param file_path_gdf: File path to the GeoDataFrame file.</span>
+<span class="sd">        :type file_path_gdf:  str, optional</span>
+<span class="sd">        :param gdf:           GeoDataFrame to display on the map.</span>
+<span class="sd">        :type gdf:            gpd.GeoDataFrame, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get geometries from file or list</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">file_path_gdf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">file_path_gdf</span><span class="p">)</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">gdf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">gdf</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">geometry</span><span class="o">=</span><span class="n">gdf</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">)</span>
 
-<span class="s2">                #export:hover {</span>
-<span class="s2">                    background: #f0f0f0;</span>
-<span class="s2">                }</span>
-<span class="s2">            &lt;/style&gt;</span>
-<span class="s2">        &quot;&quot;&quot;</span>
-        <span class="n">export_button</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;&lt;a href=&#39;#&#39; id=&#39;export&#39;&gt;💾&lt;/a&gt;&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">export</span><span class="p">:</span>
-            <span class="c1"># Add button to figure</span>
-            <span class="n">figure</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">Element</span><span class="p">(</span><span class="n">export_style</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;export&quot;</span><span class="p">)</span>
-            <span class="n">figure</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">Element</span><span class="p">(</span><span class="n">export_button</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;export_button&quot;</span><span class="p">)</span></div>
+        <span class="c1"># Get center of the map</span>
+        <span class="k">if</span> <span class="n">center</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">gdf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">gdf</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="n">centroid</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">union_all</span><span class="p">()</span><span class="o">.</span><span class="n">representative_point</span><span class="p">()</span>
+            <span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="n">centroid</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">centroid</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># Set default kwargs</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;scroll_wheel_zoom&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>  <span class="c1"># Enable scroll wheel zoom</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;attribution_control&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>  <span class="c1"># Disable attribution control</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;layout&quot;</span><span class="p">,</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="s2">&quot;600px&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="s2">&quot;100%&quot;</span><span class="p">))</span>  <span class="c1"># Set layout height and width</span>
+
+        <span class="c1"># Initialize map superclass</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">center</span><span class="o">=</span><span class="n">center</span><span class="p">,</span> <span class="n">zoom</span><span class="o">=</span><span class="n">zoom</span><span class="p">,</span> <span class="n">basemap</span><span class="o">=</span><span class="n">basemap</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># Initialise draw control</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw_control</span> <span class="o">=</span> <span class="n">ipyleaflet</span><span class="o">.</span><span class="n">DrawControl</span><span class="p">(</span>
+            <span class="n">polygon</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;shapeOptions&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">STYLE</span><span class="p">},</span>
+            <span class="n">rectangle</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;shapeOptions&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">STYLE</span><span class="p">},</span>
+            <span class="n">circlemarker</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;shapeOptions&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">STYLE</span><span class="p">},</span>
+            <span class="n">polyline</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;shapeOptions&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">STYLE</span><span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Add draw control to the map</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_control</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">draw_control</span><span class="p">)</span>
+
+        <span class="c1"># Set geometries to the map</span>
+        <span class="k">if</span> <span class="n">gdf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">gdf</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_geometries</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fit_bounds</span><span class="p">(</span><span class="n">gdf</span><span class="o">.</span><span class="n">total_bounds</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Draw_Map.set_geometries">
+<a class="viewcode-back" href="../../resilientplotterclass.html#resilientplotterclass.interactive.Draw_Map.set_geometries">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_geometries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gdf</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set geometries to the map.</span>
+
+<span class="sd">        :param aoi: The GeoDataFrame containing the geometries.</span>
+<span class="sd">        :type aoi: gpd.GeoDataFrame</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Update draw flag</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drawn</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Add style to GeoDataFrame</span>
+        <span class="n">gdf</span><span class="p">[</span><span class="s2">&quot;style&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">STYLE</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
+
+        <span class="c1"># Add geometries to the draw control</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw_control</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw_control</span><span class="o">.</span><span class="n">data</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">gdf</span><span class="o">.</span><span class="n">iterfeatures</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="Draw_Map.get_geometries">
+<a class="viewcode-back" href="../../resilientplotterclass.html#resilientplotterclass.interactive.Draw_Map.get_geometries">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_geometries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crs</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;EPSG:4326&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get geometries from the map.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            crs (str): The coordinate reference system to reproject the geometries to.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            gpd.GeoDataFrame: A GeoDataFrame containing the geometries from the map.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get geometries from the map</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw_control</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+            <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">],</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="o">.</span><span class="n">from_features</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">draw_control</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s2">&quot;style&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Reproject geometries</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">gdf</span></div>
 </div>
 
 </pre></div>
