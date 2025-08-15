@@ -338,11 +338,10 @@ class Draw_Map(ipyleaflet.Map):
         :type gdf:            gpd.GeoDataFrame, optional
         """
         # Get geometries from file or list
-        gdf = None
         if file_path_gdf is not None:
             gdf = gpd.read_file(file_path_gdf).to_crs("EPSG:4326")
         elif gdf is not None:
-            gdf = gpd.to_crs("EPSG:4326")
+            gdf = gdf.to_crs("EPSG:4326")
 
         # Get center of the map
         if center is None and gdf is not None and not gdf.empty:
@@ -351,8 +350,7 @@ class Draw_Map(ipyleaflet.Map):
 
         # Set default kwargs
         kwargs.setdefault("scroll_wheel_zoom", True)  # Enable scroll wheel zoom
-        kwargs.setdefault("attribution_control", False)  # Disable attribution control
-        kwargs.setdefault("layout", ipywidgets.Layout(height="600px", width="100%"))  # Set layout height and width
+        kwargs.setdefault("layout", ipywidgets.Layout(height="800px", width="100%"))  # Set layout height and width
 
         # Initialize map superclass
         super().__init__(center=center, zoom=zoom, basemap=basemap, **kwargs)
