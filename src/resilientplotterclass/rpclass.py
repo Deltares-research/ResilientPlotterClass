@@ -46,6 +46,8 @@ class rpclass:
 
         # Register colormaps
         rpc.colormaps.register_colormaps()
+        import cmocean.cm as cmo  # noqa: F401
+        import colorcet as cc  # noqa: F401
 
     # =============================================================================
     # Guideline support methods
