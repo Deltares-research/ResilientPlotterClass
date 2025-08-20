@@ -361,7 +361,6 @@ def plot_geometries(
 
     # Append colorbar axis
     if append_axes_kwargs is not None and "cax" not in kwargs and "legend" in kwargs and kwargs["legend"]:
-        print("Appending colorbar axis to the plot.")
         kwargs["cax"] = rpc.axes.append_cbar_axis(ax, append_axes_kwargs)
 
     # Plot GeoDataFrame
