@@ -1,6 +1,6 @@
 [project]
 name = "resilientplotterclass"
-version = "2025.11.28"
+version = "2025.11.29"
 authors = [{ name = "Math van Soest" }, { name = "Ruben White" }]
 description = "A Python package to create resilient plots for geospatial data"
 readme = "README.md"
