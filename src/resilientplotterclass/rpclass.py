@@ -1350,7 +1350,7 @@ class rpclass:
         return data
 
     # Get x and y unit
-    def get_xy_unit(data=None, crs=None):
+    def get_xy_unit(self, data=None, crs=None):
         """Get the x and y unit for data, geometries or a coordinate reference system.
 
         :param data: Data or geometries to get the x and y unit for. If ``None``, the crs is used to determine the x and y unit.
