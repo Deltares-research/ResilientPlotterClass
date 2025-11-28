@@ -358,6 +358,50 @@ def get_rescale_parameters(data=None, crs=None, xy_unit=None):
     return scale_factor, xlabel, ylabel
 
 
+def get_xy_unit(data=None, crs=None):
+    """Get the x and y unit for data, geometries or a coordinate reference system.
+
+    :param data: Data or geometries to get the x and y unit for. If ``None``, the crs is used to determine the x and y unit.
+    :type data:  xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray, xugrid.UgridDataset, geopandas.GeoDataFrame, optional
+    :param crs:  Coordinate reference system of the data. If ``None``, the crs is determined automatically based on the data.
+    :type crs:   pyproj.CRS or rasterio.CRS or str, optional
+    :return:     x and y unit.
+    :rtype:      str
+    """
+
+    # Get the coordiante reference system of the data
+    if isinstance(data, xr.DataArray) or isinstance(data, xr.Dataset):
+        crs = data.rio.crs
+    elif isinstance(data, xu.UgridDataArray) or isinstance(data, xu.UgridDataset):
+        crs = data.grid.crs
+    elif isinstance(data, gpd.GeoDataFrame):
+        crs = data.crs
+    elif data is None:
+        crs = crs
+    else:
+        raise TypeError(
+            "data type not supported. Please provide a xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray, xugrid.UgridDataset or geopandas.GeoDataFrame."
+        )
+
+    # Convert the crs to a pyproj.CRS
+    if isinstance(crs, pyprojCRS):
+        crs = crs
+    elif isinstance(crs, rasterioCRS):
+        crs = pyprojCRS.from_string(crs.to_string())
+    elif isinstance(crs, str):
+        crs = pyprojCRS.from_string(crs)
+    elif crs is None:
+        crs = crs
+    else:
+        raise TypeError("crs type not supported. Please provide a pyproj.CRS, rasterio.CRS or str object.")
+
+    # Get x and y attributes and unit
+    x_attrs, _ = _get_xy_attrs_from_crs(crs)
+
+    # Return the x and y unit
+    return x_attrs["unit"]
+
+
 def rescale(data, scale_factor=1):
     """Rescale the x and y dimensions of data or geometries.
 

@@ -1348,3 +1348,21 @@ class rpclass:
 
         # Return structured data
         return data
+
+    # Get x and y unit
+    def get_xy_unit(data=None, crs=None):
+        """Get the x and y unit for data, geometries or a coordinate reference system.
+
+        :param data: Data or geometries to get the x and y unit for. If ``None``, the crs is used to determine the x and y unit.
+        :type data:  xarray.DataArray, xarray.Dataset, xugrid.UgridDataArray, xugrid.UgridDataset, geopandas.GeoDataFrame, optional
+        :param crs:  Coordinate reference system of the data. If ``None``, the crs is determined automatically based on the data.
+        :type crs:   pyproj.CRS or rasterio.CRS or str, optional
+        :return:     x and y unit.
+        :rtype:      str
+        """
+
+        # Get the x and y unit
+        xy_unit = rpc.rescale.get_xy_unit(data=data, crs=crs)
+
+        # Return the x and y unit
+        return xy_unit
