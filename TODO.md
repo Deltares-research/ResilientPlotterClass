@@ -2,12 +2,16 @@
 ### General
 * GUIDE NOTEBOOKS
 * Add draw_map class for drawing geometries
+* replace interactive plotting of rasters with `odc.geo.add_to()` function
+
+# Add 
+* North arrows and bars - https://moss-xyz.github.io/matplotlib-map-utils/scale_bars/?h=projection#bar
 
 ### Ruben
-* Hillshade
 * Make it easier to add entries to guidelines, currently lot of repetition for different plot types. Can this be abstracted?
 * Add keyword inheritance to guidelines
 * Consider dataset name and unit in kwargs hierarchy: User kwargs > dataset kwargs > project kwargs > default kwargs
+* rename keyword arguments from 'data_style', 'map_style', etc to just 'style' for simplicity
 
 ### Zeta
 * Interactive plotting: Zoom, limits, tooltips, etc.
@@ -28,4 +32,4 @@
 * Reference: import matplotlib.pyplot as plt
 * Equivalent: import resplotlib.guideplot as gplt.
 * gplt.read_guidelines()
-* gplt.imshow
+* gplt.imshow()

@@ -83,6 +83,9 @@ def plot_basemap(
 # Code below was adapted from the contextily package to allow for scaling using the scale parameter
 """Tools to plot basemaps"""
 
+import uuid
+
+import contextily as cx
 import numpy as np
 from contextily import providers
 from contextily.plotting import _is_overlay, _reproj_bb
@@ -91,6 +94,7 @@ from contextily.tile import _warper, bounds2img, warp_tiles
 from rasterio.enums import Resampling
 from xyzservices import TileProvider
 
+cx.tile.USER_AGENT = f"resilientplotterclass-{uuid.uuid4().hex}"  # NOTE: Use a unique user agent to avoid being blocked by tile providers
 INTERPOLATION = "bilinear"
 ZOOM = "auto"
 ATTRIBUTION_SIZE = 8
@@ -289,5 +293,3 @@ def _add_basemap(
         attribution = source.get("attribution")
     if attribution and add_attribution:
         add_attribution_(ax, attribution, font_size=attribution_size)
-
-    return
