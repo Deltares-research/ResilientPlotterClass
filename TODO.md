@@ -2,6 +2,10 @@
 ### General
 * GUIDE NOTEBOOKS
 * Add draw_map class for drawing geometries
+* replace interactive plotting of rasters with `odc.geo.add_to()` function
+
+# Add 
+* North arrows and bars - https://moss-xyz.github.io/matplotlib-map-utils/scale_bars/?h=projection#bar
 
 ### Ruben
 * Make it easier to add entries to guidelines, currently lot of repetition for different plot types. Can this be abstracted?
